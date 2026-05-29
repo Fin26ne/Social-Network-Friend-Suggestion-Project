@@ -38,7 +38,7 @@ public class DataStore {
     // Save Graph and User BST data to JSON
     public synchronized void save(Graph graph, BinarySearchTree<String, User> userBst) throws IOException {
         JSONObject root = new JSONObject();
-        
+
         // Serialize Users
         JSONArray usersJson = new JSONArray();
         for (User user : userBst.inOrderValues()) {
@@ -49,7 +49,7 @@ public class DataStore {
         // Serialize Friendships
         JSONArray friendshipsJson = new JSONArray();
         BinarySearchTree<String, Boolean> visitedEdges = new BinarySearchTree<>();
-        
+
         for (String uId : graph.getVertices()) {
             for (String vId : graph.getNeighbors(uId)) {
                 // To avoid storing edge (u, v) and (v, u) twice
@@ -64,6 +64,7 @@ public class DataStore {
                 }
             }
         }
+
         root.put("friendships", friendshipsJson);
 
         // Write to file
@@ -105,16 +106,16 @@ public class DataStore {
     // Generate seed sample data
     public void initializeSeedData(Graph graph, BinarySearchTree<String, User> userBst) throws IOException {
         User[] seedUsers = {
-            new User("u1", "Alice Johnson", "alice", "Loves hiking and coding in Java", "2026-01-01"),
-            new User("u2", "Bob Smith", "bob", "Coffee enthusiast & data structures fan", "2026-01-05"),
-            new User("u3", "Charlie Davis", "charlie", "Algorithms student at FPT", "2026-01-10"),
-            new User("u4", "David Wilson", "david", "Web designer & CSS wizard", "2026-01-12"),
-            new User("u5", "Eve Martinez", "eve", "Cybersecurity analyst & gamer", "2026-01-15"),
-            new User("u6", "Frank Miller", "frank", "Software engineer & tech geek", "2026-01-20"),
-            new User("u7", "Grace Taylor", "grace", "AI researcher & dog lover", "2026-01-22"),
-            new User("u8", "Heidi Anderson", "heidi", "Photographer & travel blogger", "2026-01-25"),
-            new User("u9", "Ivan Thomas", "ivan", "Math professor & chess enthusiast", "2026-01-28"),
-            new User("u10", "Judy White", "judy", "UX writer & book explorer", "2026-02-01")
+                new User("u1", "Alice Johnson", "alice", "Loves hiking and coding in Java", "2026-01-01"),
+                new User("u2", "Bob Smith", "bob", "Coffee enthusiast & data structures fan", "2026-01-05"),
+                new User("u3", "Charlie Davis", "charlie", "Algorithms student at FPT", "2026-01-10"),
+                new User("u4", "David Wilson", "david", "Web designer & CSS wizard", "2026-01-12"),
+                new User("u5", "Eve Martinez", "eve", "Cybersecurity analyst & gamer", "2026-01-15"),
+                new User("u6", "Frank Miller", "frank", "Software engineer & tech geek", "2026-01-20"),
+                new User("u7", "Grace Taylor", "grace", "AI researcher & dog lover", "2026-01-22"),
+                new User("u8", "Heidi Anderson", "heidi", "Photographer & travel blogger", "2026-01-25"),
+                new User("u9", "Ivan Thomas", "ivan", "Math professor & chess enthusiast", "2026-01-28"),
+                new User("u10", "Judy White", "judy", "UX writer & book explorer", "2026-02-01")
         };
 
         for (User user : seedUsers) {
@@ -124,15 +125,15 @@ public class DataStore {
 
         // Add friendships
         String[][] friendships = {
-            {"u1", "u2"}, {"u1", "u3"}, {"u1", "u4"},
-            {"u2", "u3"}, {"u2", "u6"}, {"u2", "u8"},
-            {"u3", "u4"}, {"u3", "u5"}, {"u3", "u9"},
-            {"u4", "u7"}, {"u4", "u10"},
-            {"u5", "u6"}, {"u5", "u7"},
-            {"u6", "u7"}, {"u6", "u8"},
-            {"u7", "u9"}, {"u7", "u10"},
-            {"u8", "u10"},
-            {"u9", "u10"}
+                { "u1", "u2" }, { "u1", "u3" }, { "u1", "u4" },
+                { "u2", "u3" }, { "u2", "u6" }, { "u2", "u8" },
+                { "u3", "u4" }, { "u3", "u5" }, { "u3", "u9" },
+                { "u4", "u7" }, { "u4", "u10" },
+                { "u5", "u6" }, { "u5", "u7" },
+                { "u6", "u7" }, { "u6", "u8" },
+                { "u7", "u9" }, { "u7", "u10" },
+                { "u8", "u10" },
+                { "u9", "u10" }
         };
 
         for (String[] edge : friendships) {
