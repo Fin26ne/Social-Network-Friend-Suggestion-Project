@@ -32,7 +32,7 @@ public class GraphService {
         } catch (IOException e) {
             System.err.println("Failed to load data, starting with fresh dataset. Error: " + e.getMessage());
             try {
-                dataStore.initializeSeedData(graph, userBst);
+                dataStore.seedIfEmpty(graph, userBst);
                 rebuildIndexes();
             } catch (IOException ex) {
                 System.err.println("Critical error initializing seed data: " + ex.getMessage());

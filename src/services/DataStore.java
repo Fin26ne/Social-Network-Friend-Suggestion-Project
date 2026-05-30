@@ -39,6 +39,13 @@ public class DataStore {
         return usersFile.exists() && usersFile.length() > 0 && friendshipsFile.exists() && friendshipsFile.length() > 0;
     }
 
+    // Seed data if files do not exist
+    public synchronized void seedIfEmpty(Graph graph, BinarySearchTree<String, User> userBst) throws IOException {
+        if (!exists()) {
+            initializeSeedData(graph, userBst);
+        }
+    }
+
     // Save Graph and User BST data to separate JSON files
     public synchronized void save(Graph graph, BinarySearchTree<String, User> userBst) throws IOException {
         ensureDirectoryExists();
@@ -84,7 +91,7 @@ public class DataStore {
     // Load Graph and User BST data from separate JSON files
     public synchronized void load(Graph graph, BinarySearchTree<String, User> userBst) throws IOException {
         if (!exists()) {
-            initializeSeedData(graph, userBst);
+            seedIfEmpty(graph, userBst);
             return;
         }
 
