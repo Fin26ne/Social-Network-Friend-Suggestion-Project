@@ -1,15 +1,15 @@
 import api.AppServer;
-import api.ConsoleMenu;
+import console.ConsoleMenu;
 import service.GraphService;
 
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        String dataFilePath = "data/social_network.json";
+        String dataDirectoryPath = "backend-java/data";
         
         System.out.println("Initializing Social Network Graph...");
-        GraphService graphService = new GraphService(dataFilePath);
+        GraphService graphService = new GraphService(dataDirectoryPath);
 
         boolean consoleOnly = false;
         for (String arg : args) {
@@ -21,7 +21,7 @@ public class Main {
 
         AppServer apiServer = null;
         if (!consoleOnly) {
-            int port = 8080;
+            int port = 3001;
             apiServer = new AppServer(port, graphService);
             try {
                 apiServer.start();

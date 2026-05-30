@@ -1,4 +1,4 @@
-package api;
+package console;
 
 import datastructures.SinglyLinkedList;
 import graph.Graph;
