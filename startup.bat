@@ -15,4 +15,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo Compilation successful! Starting Java application...
+echo Opening web application and research dashboard in default browser...
+start http://localhost:3001
+start http://localhost:3001/research.html
 java -cp "out;lib/json.jar" Main
