@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Tổng Quan - Social Network Friend Suggestion</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- D3.js CDN for Network Graph -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+
+    <div class="layout-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <span class="logo-icon">👑</span>
+                <span class="logo-text">AURASuggest</span>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a href="home.html">
+                            <span class="nav-icon">📊</span>
+                            <span>Tổng Quan</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="explore.html">
+                            <span class="nav-icon">🔍</span>
+                            <span>Khám Phá</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="network.html">
+                            <span class="nav-icon">🕸️</span>
+                            <span>Mạng Lưới</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="research.html">
+                            <span class="nav-icon">🔬</span>
+                            <span>Nghiên Cứu</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px;">
+                <button class="btn" style="width: 100%;" id="btn-switch-user">
+                    <span>🔄</span> Đổi Tài Khoản
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- Topbar -->
+            <div class="topbar">
+                <div>
+                    <h2 class="page-title" id="welcome-message">Xin chào, Thành viên</h2>
+                    <p style="color: var(--muted); font-size: 14px;">Bảng điều khiển gợi ý bạn bè và thống kê mạng lưới</p>
+                </div>
+                
+                <div class="user-profile-badge" id="user-badge">
+                    <div class="user-avatar" id="badge-avatar">?</div>
+                    <span class="user-name" id="badge-name">Đang tải...</span>
+                </div>
+            </div>
+
+            <!-- Stats strip -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-details">
+                        <span class="stat-label">Tổng số thành viên</span>
+                        <span class="stat-value" id="stat-total-users">-</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🤝</div>
+                    <div class="stat-details">
+                        <span class="stat-label">Bạn bè của bạn</span>
+                        <span class="stat-value" id="stat-friends-count">-</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✨</div>
+                    <div class="stat-details">
+                        <span class="stat-label">Jaccard cao nhất</span>
+                        <span class="stat-value" id="stat-highest-jaccard">-</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Dashboard Content Grid -->
+            <div class="dashboard-grid">
+                
+                <!-- Left Column: Friends List -->
+                <section class="gold-card" style="padding: 20px;">
+                    <h3 class="section-label">Bạn Bè Của Bạn</h3>
+                    <div class="item-list" id="friends-list-container" style="max-height: 450px; overflow-y: auto; padding-right: 5px;">
+                        <!-- Dynamically filled -->
+                        <div style="color: var(--muted); text-align: center; padding: 20px; font-size: 13px;">
+                            Đang tải...
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Center Column: Recommendations -->
+                <section class="gold-card" style="padding: 20px;">
+                    <h3 class="section-label">Gợi Ý Kết Bạn (Top 5)</h3>
+                    <div class="item-list" id="suggestions-container" style="max-height: 450px; overflow-y: auto; padding-right: 5px;">
+                        <!-- Dynamically filled -->
+                        <div style="color: var(--muted); text-align: center; padding: 20px; font-size: 13px;">
+                            Đang tải gợi ý...
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Right Column: Activity Feed -->
+                <section class="gold-card" style="padding: 20px;">
+                    <h3 class="section-label">Nhật Ký Hoạt Động</h3>
+                    <div class="activity-feed" id="activity-feed-container" style="max-height: 450px; overflow-y: auto; padding-right: 5px;">
+                        <!-- Dynamically filled -->
+                        <div class="activity-item" style="border-color: rgba(255, 255, 255, 0.1);">
+                            <p class="activity-text" style="color: var(--muted);">Chưa có hoạt động nào trong phiên này.</p>
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+
+            <!-- Bottom Section: D3 canvas personal depth-2 subgraph -->
+            <section class="gold-card" style="margin-top: auto;">
+                <h3 class="section-label">Bản Đồ Mạng Lưới Cá Nhân (Khuyên Dùng Bậc 2)</h3>
+                <p style="color: var(--muted); font-size: 13px; margin-bottom: 15px;">
+                    Biểu đồ trực quan hóa các mối quan hệ trực tiếp (xanh dương) và các liên kết tiềm năng từ bạn bè của bạn (xanh lá). Cuộn để phóng to, kéo để xoay.
+                </p>
+                <div class="graph-container">
+                    <canvas id="subgraph-canvas" class="graph-canvas"></canvas>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // LocalStorage and Auth Guard
+            const userId = localStorage.getItem("userId");
+            if (!userId) {
+                location.href = "index.html";
+                return;
+            }
+
+            // Active Page Detection
+            const page = location.pathname.split('/').pop() || "home.html";
+            document.querySelector('a[href="'+page+'"]')?.classList.add('active');
+
+            // Switch User Button
+            document.getElementById("btn-switch-user").addEventListener("click", () => {
+                localStorage.removeItem("userId");
+                localStorage.removeItem("userName");
+                location.href = "index.html";
+            });
+
+            // Activity Log helpers
+            function addActivity(text) {
+                const container = document.getElementById("activity-feed-container");
+                
+                // Clear initial placeholder
+                if (container.querySelector(".activity-text")?.textContent.includes("Chưa có hoạt động nào")) {
+                    container.innerHTML = "";
+                }
+
+                const item = document.createElement("div");
+                item.className = "activity-item";
+                
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                
+                item.innerHTML = `
+                    <p class="activity-text">${text}</p>
+                    <span class="activity-time">${timeStr}</span>
+                `;
+                container.insertBefore(item, container.firstChild);
+
+                // Save to localStorage activity log
+                const currentLogs = JSON.parse(localStorage.getItem(`activity_${userId}`) || "[]");
+                currentLogs.unshift({ text, time: timeStr });
+                localStorage.setItem(`activity_${userId}`, JSON.stringify(currentLogs.slice(0, 15)));
+            }
+
+            function loadSavedActivity() {
+                const container = document.getElementById("activity-feed-container");
+                const currentLogs = JSON.parse(localStorage.getItem(`activity_${userId}`) || "[]");
+                if (currentLogs.length > 0) {
+                    container.innerHTML = "";
+                    currentLogs.forEach(log => {
+                        const item = document.createElement("div");
+                        item.className = "activity-item";
+                        item.innerHTML = `
+                            <p class="activity-text">${log.text}</p>
+                            <span class="activity-time">${log.time}</span>
+                        `;
+                        container.appendChild(item);
+                    });
+                }
+            }
+
+            // User initials generator
+            function getAvatarInitials(name) {
+                if (!name) return "?";
+                const parts = name.trim().split(" ");
+                if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            }
+
+            // Dashboard refreshing mechanism
+            async function refreshDashboard() {
+                // Get elements
+                const welcomeMsg = document.getElementById("welcome-message");
+                const badgeName = document.getElementById("badge-name");
+                const badgeAvatar = document.getElementById("badge-avatar");
+                const totalUsersVal = document.getElementById("stat-total-users");
+                const friendsCountVal = document.getElementById("stat-friends-count");
+                const highestJaccardVal = document.getElementById("stat-highest-jaccard");
+                
+                const friendsContainer = document.getElementById("friends-list-container");
+                const suggestionsContainer = document.getElementById("suggestions-container");
+
+                // 1. Fetch user data
+                const userRes = await api.getUserById(userId);
+                if (!userRes.success) {
+                    welcomeMsg.textContent = "Không tìm thấy người dùng!";
+                    return;
+                }
+
+                const self = userRes.data;
+                welcomeMsg.textContent = `Xin chào, ${self.name}!`;
+                badgeName.textContent = self.name;
+                badgeAvatar.textContent = getAvatarInitials(self.name);
+
+                // 2. Fetch all users count
+                const allUsersRes = await api.getUsers();
+                if (allUsersRes.success) {
+                    totalUsersVal.textContent = allUsersRes.data.length;
+                }
+
+                // 3. Fetch friends list
+                const friendsRes = await api.getFriends(userId);
+                let friendIds = [];
+                if (friendsRes.success) {
+                    const friends = friendsRes.data || [];
+                    friendsCountVal.textContent = friends.length;
+                    friendIds = friends.map(f => f.id);
+
+                    if (friends.length === 0) {
+                        friendsContainer.innerHTML = `
+                            <div style="color: var(--muted); text-align: center; padding: 30px; font-size: 13px;">
+                                Bạn chưa kết bạn với ai. Hãy thêm bạn từ mục gợi ý hoặc tab Khám Phá!
+                            </div>
+                        `;
+                    } else {
+                        friendsContainer.innerHTML = "";
+                        friends.forEach(friend => {
+                            const initials = getAvatarInitials(friend.name);
+                            const item = document.createElement("div");
+                            item.className = "list-item";
+                            item.innerHTML = `
+                                <div class="list-item-info">
+                                    <div class="list-item-avatar">${initials}</div>
+                                    <div class="list-item-details">
+                                        <span class="list-item-name">${friend.name}</span>
+                                        <span class="list-item-username">@${friend.username}</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" data-id="${friend.id}">Hủy</button>
+                            `;
+
+                            // Unfriend button listener
+                            item.querySelector(".btn-danger").addEventListener("click", async (e) => {
+                                const trgId = e.target.getAttribute("data-id");
+                                const confirmUnfriend = confirm(`Hủy kết bạn với ${friend.name}?`);
+                                if (confirmUnfriend) {
+                                    const actionRes = await api.removeFriend(userId, trgId);
+                                    if (actionRes.success) {
+                                        addActivity(`Đã hủy kết bạn với ${friend.name}.`);
+                                        refreshDashboard();
+                                    } else {
+                                        alert("Lỗi: " + (actionRes.error || "Không thể hủy kết bạn."));
+                                    }
+                                }
+                            });
+
+                            friendsContainer.appendChild(item);
+                        });
+                    }
+                }
+
+                // 4. Fetch Suggestions (Jaccard)
+                const sugRes = await api.getSuggestions(userId, 5, "min");
+                if (sugRes.success) {
+                    const suggestions = sugRes.data || [];
+                    
+                    if (suggestions.length > 0) {
+                        const highestJaccard = suggestions[0].jaccardSimilarity;
+                        highestJaccardVal.textContent = highestJaccard.toFixed(2);
+                    } else {
+                        highestJaccardVal.textContent = "0.00";
+                    }
+
+                    if (suggestions.length === 0) {
+                        suggestionsContainer.innerHTML = `
+                            <div style="color: var(--muted); text-align: center; padding: 30px; font-size: 13px;">
+                                Không có gợi ý phù hợp nào lúc này.
+                            </div>
+                        `;
+                    } else {
+                        suggestionsContainer.innerHTML = "";
+                        suggestions.forEach(sug => {
+                            const user = sug.user;
+                            const initials = getAvatarInitials(user.name);
+                            const scorePct = Math.round(sug.jaccardSimilarity * 100);
+                            
+                            const item = document.createElement("div");
+                            item.className = "list-item";
+                            item.style.flexDirection = "column";
+                            item.style.alignItems = "stretch";
+                            item.style.gap = "12px";
+                            item.innerHTML = `
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div class="list-item-info">
+                                        <div class="list-item-avatar" style="background-color: rgba(201,169,110,0.12); color: var(--gold2);">${initials}</div>
+                                        <div class="list-item-details">
+                                            <span class="list-item-name">${user.name}</span>
+                                            <span class="list-item-username">@${user.username} (Chung: ${sug.mutualFriends})</span>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" data-id="${user.id}">Kết bạn</button>
+                                </div>
+                                <div class="score-bar-wrapper">
+                                    <div class="score-bar-labels">
+                                        <span>Độ Tương Đồng Jaccard</span>
+                                        <span style="font-family: var(--font-mono); font-weight: bold; color: var(--gold2);">${sug.jaccardSimilarity.toFixed(2)}</span>
+                                    </div>
+                                    <div class="score-bar-bg">
+                                        <div class="score-bar-fill" style="width: ${scorePct}%"></div>
+                                    </div>
+                                </div>
+                            `;
+
+                            // Add friend button listener
+                            item.querySelector(".btn-primary").addEventListener("click", async (e) => {
+                                const trgId = e.target.getAttribute("data-id");
+                                const actionRes = await api.addFriend(userId, trgId);
+                                if (actionRes.success) {
+                                    addActivity(`Đã kết bạn với ${user.name}!`);
+                                    refreshDashboard();
+                                } else {
+                                    alert("Lỗi: " + (actionRes.error || "Không thể kết bạn."));
+                                }
+                            });
+
+                            suggestionsContainer.appendChild(item);
+                        });
+                    }
+                }
+
+                // 5. Draw the personal depth-2 subgraph in D3 canvas
+                drawPersonalGraph(friendIds, sugRes.success ? (sugRes.data || []).map(s => s.user.id) : []);
+            }
+
+            // D3 Canvas force-directed drawing
+            function drawPersonalGraph(friendIds, suggestionIds) {
+                const canvas = document.getElementById("subgraph-canvas");
+                const container = canvas.parentElement;
+                
+                // Adjust sizes
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext("2d");
+                
+                // Set up visual nodes & links data by parsing all network data
+                api.getNetworkData().then(res => {
+                    if (!res.success) return;
+
+                    const allNodes = res.data.nodes;
+                    const allLinks = res.data.links;
+
+                    // 1. Build subgraph nodes set
+                    const subgraphNodeIds = new Set();
+                    subgraphNodeIds.add(userId); // Self
+                    friendIds.forEach(id => subgraphNodeIds.add(id)); // Level 1
+                    
+                    // Direct friends of friends (Level 2)
+                    const directFriendSet = new Set(friendIds);
+                    allLinks.forEach(link => {
+                        const s = typeof link.source === 'object' ? link.source.id : link.source;
+                        const t = typeof link.target === 'object' ? link.target.id : link.target;
+                        
+                        if (directFriendSet.has(s) && !directFriendSet.has(t) && t !== userId) {
+                            subgraphNodeIds.add(t);
+                        } else if (directFriendSet.has(t) && !directFriendSet.has(s) && s !== userId) {
+                            subgraphNodeIds.add(s);
+                        }
+                    });
+
+                    // Filter nodes & links belonging to the personal depth-2 subgraph
+                    const nodes = allNodes.filter(n => subgraphNodeIds.has(n.id)).map(n => ({...n}));
+                    const nodeMap = {};
+                    nodes.forEach(n => nodeMap[n.id] = n);
+
+                    const links = allLinks.filter(link => {
+                        const s = typeof link.source === 'object' ? link.source.id : link.source;
+                        const t = typeof link.target === 'object' ? link.target.id : link.target;
+                        return subgraphNodeIds.has(s) && subgraphNodeIds.has(t);
+                    }).map(link => ({
+                        source: typeof link.source === 'object' ? link.source.id : link.source,
+                        target: typeof link.target === 'object' ? link.target.id : link.target
+                    }));
+
+                    // Set up simulation
+                    const simulation = d3.forceSimulation(nodes)
+                        .force("link", d3.forceLink(links).id(d => d.id).distance(80))
+                        .force("charge", d3.forceManyBody().strength(-150))
+                        .force("center", d3.forceCenter(width / 2, height / 2))
+                        .force("collision", d3.forceCollide().radius(25));
+
+                    // Add zoom/pan controls
+                    const transform = { x: 0, y: 0, k: 1 };
+                    d3.select(canvas).call(d3.zoom()
+                        .scaleExtent([0.2, 5])
+                        .on("zoom", (event) => {
+                            transform.x = event.transform.x;
+                            transform.y = event.transform.y;
+                            transform.k = event.transform.k;
+                            render();
+                        })
+                    );
+
+                    // Node styling colors
+                    function getNodeColor(nodeId) {
+                        if (nodeId === userId) return "#C9A96E"; // Self (Gold)
+                        if (friendIds.includes(nodeId)) return "#3498db"; // Direct Friends (Blue)
+                        if (suggestionIds.includes(nodeId)) return "#2ecc71"; // Suggestions (Green)
+                        return "#95a5a6"; // Others (Gray)
+                    }
+
+                    function render() {
+                        ctx.clearRect(0, 0, width, height);
+                        ctx.save();
+                        ctx.translate(transform.x, transform.y);
+                        ctx.scale(transform.k, transform.k);
+
+                        // Draw Links
+                        ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+                        ctx.lineWidth = 1.5;
+                        links.forEach(link => {
+                            ctx.beginPath();
+                            ctx.moveTo(link.source.x, link.source.y);
+                            ctx.lineTo(link.target.x, link.target.y);
+                            ctx.stroke();
+                        });
+
+                        // Draw Nodes
+                        nodes.forEach(node => {
+                            ctx.beginPath();
+                            ctx.arc(node.x, node.y, 8, 0, 2 * Math.PI);
+                            ctx.fillStyle = getNodeColor(node.id);
+                            ctx.shadowColor = getNodeColor(node.id);
+                            ctx.shadowBlur = node.id === userId ? 12 : 2;
+                            ctx.fill();
+
+                            ctx.shadowBlur = 0; // Reset shadow
+                            
+                            // Draw Labels
+                            ctx.font = "bold 11px Outfit";
+                            ctx.fillStyle = node.id === userId ? "var(--gold2)" : "rgba(232, 228, 220, 0.8)";
+                            ctx.fillText(node.name, node.x + 12, node.y + 4);
+                        });
+
+                        ctx.restore();
+                    }
+
+                    simulation.on("tick", render);
+                });
+            }
+
+            // Initialize Page
+            loadSavedActivity();
+            refreshDashboard();
+        });
+    </script>
+</body>
+</html>
