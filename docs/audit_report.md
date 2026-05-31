@@ -1,103 +1,81 @@
 # 📊 BÁO CÁO KIỂM TRA TIẾN ĐỘ TOÀN DIỆN (DEV 1, DEV 2 & DEV 4)
 *CSD201 Topic 05 - Social Network Friend Suggestion*  
-*Thời gian kiểm tra: 31/05/2026 10:42:00*
+*Thời gian kiểm tra cập nhật: 31/05/2026 22:50:00*
 
 ---
 
-## 📈 TÓM TẮT TRẠNG THÁI TIẾN ĐỘ
+## 📈 TÓM TẮT TRẠNG THÁI TIẾN ĐỘ (MỚI NHẤT)
 
-| Thành Viên | Vai Trò | Tỉ Lệ Hoàn Thành | Trạng Thái | Vấn Đề Tồn Đọng |
+| Thành Viên | Vai Trò | Tỉ Lệ Hoàn Thành | Trạng Thái | Ghi Chú |
 | :--- | :--- | :---: | :---: | :--- |
-| **DEV 1 (Tech Lead)** | Cấu trúc dữ liệu & Thuật toán lõi | **10/10 (100%)** | **✓ Đã Xong** | Không có (Self-test đạt 100%) |
-| **DEV 2 (Backend)** | API Handlers & Frontend Lõi | **5/8 (62.5%)** | **⚠ Đang Cải Thiện** | Thiếu một số endpoints và chuẩn hóa JSON |
-| **DEV 4 (Researcher)** | Benchmarking & Frontend Phân Tích | **5/7 (71.4%)** | **⚠ Đang Cải Thiện** | Thiếu file AI_AuditLog.xlsx & README.md chưa Việt hóa |
+| **DEV 1 (Tech Lead)** | Cấu trúc dữ liệu & Thuật toán lõi | **10/10 (100%)** | **✓ ĐÃ HOÀN THÀNH** | Tự kiểm thử tự động đạt 100% thành công. |
+| **DEV 2 (Backend / Core FE)** | API Handlers & Frontend Lõi | **9/9 (100%)** | **✓ ĐÃ HOÀN THÀNH** | Các API endpoints bọc JSON chuẩn, hỗ trợ đầy đủ các tính năng. |
+| **DEV 4 (Researcher)** | Benchmarking & Frontend Phân Tích | **7/7 (100%)** | **✓ ĐÃ HOÀN THÀNH** | Đã commit bổ sung `AI_AuditLog.xlsx` & Việt hóa toàn bộ `README.md`. |
 
 ---
 
 ## 🚫 VI PHẠM NGUYÊN TẮC CHUNG (GLOBAL VIOLATIONS)
-*Không phát hiện bất kỳ vi phạm nghiêm trọng nào trong toàn bộ dự án:*
-- [x] **localhost:2510**: Tất cả các tệp đều sử dụng đúng cổng mặc định `3001`.
-- [x] **React/Vue/npm/package.json**: Frontend hoàn toàn dùng Vanilla HTML/CSS/JS thuần, không sử dụng thư viện ngoài.
-- [x] **White Background**: Các tệp CSS chỉ định tông nền tối nghệ thuật (`#080A0F`, `#0D1018`, `#111520`).
-- [x] **Font cấm (Arial/Roboto/Inter)**: Đã nạp đúng 3 phông chữ Google Fonts chỉ định (`Outfit`, `DM Mono`, `Cormorant Garamond`).
-- [x] **Mock data**: Mọi số liệu hiển thị trên HTML đều lấy động từ API thật, không hardcode.
-- [x] **java.util.\***: Gói `src/datastructures/` chỉ nạp cụ thể các interface chức năng cần thiết (`Iterator`, `NoSuchElementException`, `Consumer`), không dùng dấu sao đại diện.
+*Không phát hiện bất kỳ vi phạm nguyên tắc chung nào:*
+- [x] **Không dùng localhost:2510**: Tất cả các file đều sử dụng đúng cổng mặc định `3001`.
+- [x] **Không dùng framework FE (React/Vue/npm)**: Frontend hoàn toàn dùng Vanilla HTML/CSS/JS thuần.
+- [x] **Không dùng White Background**: CSS sử dụng đúng tông màu tối cao cấp (`#080A0F`, `#0D1018`, `#111520`).
+- [x] **Không dùng Font cấm (Arial/Roboto/Inter)**: Đã import đúng các Google Fonts được chỉ định (`Outfit`, `DM Mono`, `Cormorant Garamond`).
+- [x] **Không Mock data ở FE**: Mọi dữ liệu phân tích và gợi ý được nạp trực tiếp từ API thực tế.
+- [x] **Không import java.util.***: Gói `src/datastructures/` chỉ nạp các interface chức năng cần thiết (`Iterator`, `NoSuchElementException`, `Consumer`), không sử dụng wildcard.
 
 ---
 
-## 📂 THƯ MỤC CHƯA TỒN TẠI (MISSING FILES)
-* `docs/AI_AuditLog.xlsx` (Chỉ tồn tại tệp tin `docs/AI Audit Log.docx` chưa đạt chuẩn định dạng bảng tính).
+## 📁 KIỂM TRA THƯ MỤC & FILE TỒN TẠI (FILE EXISTENCE VERIFIED)
+- [x] `docs/AI_AuditLog.xlsx` -> **Tồn tại** (Được bổ sung bởi Dev 4).
+- [x] `README.md` -> **Tồn tại** (Được cập nhật đầy đủ thông tin tiếng Việt bởi Dev 4).
+- [x] `startup.bat` -> **Tồn tại** (Đã kiểm tra biên dịch thủ công thành công 100% không lỗi).
 
 ---
 
-## 🛠️ CHI TIẾT TỪNG PHÂN HỆ
+## 🛠️ CHI TIẾT TIẾN ĐỘ TỪNG THÀNH VIÊN
 
-### 👤 CHI TIẾT DEV 1 (✓ 10/10 NHIỆM VỤ HOÀN THÀNH)
-* **✓ [MySinglyLinkedList.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MySinglyLinkedList.java)**: Thiết kế Generic Class, lớp lồng `Node<T>`, có đủ phương thức đầu/cuối, tìm kiếm, duyệt `forEach` bằng Consumer.
-* **✓ [MyQueue.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MyQueue.java)**: Xây dựng trên nền `MySinglyLinkedList` với tốc độ loại bỏ đầu $O(1)$.
-* **✓ [MyBST.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MyBST.java)**: Cây nhị phân tìm kiếm chuẩn, hỗ trợ đầy đủ 3 trường hợp xóa node (lá, 1 con, 2 con), duyệt `inOrderTraversal` trả về danh sách đã sắp xếp.
-* **✓ [MyMaxHeap.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MyMaxHeap.java)**: Định dạng mảng tự co giãn dung lượng, chèn, trích xuất Max và trả về danh sách Top-K bằng bản sao.
-* **✓ [MyMinHeap.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MyMinHeap.java)**: Dung lượng cố định $K$, thực hiện phép so sánh `offerIfBetter` và xuất mảng sắp xếp giảm dần.
-* **✓ [MyGraph.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MyGraph.java)**: Danh sách kề dùng `MyBST`, duyệt BFS cấp 2 thông qua `MyQueue`, xử lý chống lặp và an toàn khi đồ thị bị ngắt kết nối.
-* **✓ [MyAdjacencyMatrix.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MyAdjacencyMatrix.java)**: Ma trận kề `boolean[][]` chia sẻ chung giao diện làm việc với MyGraph, đo dung lượng bộ nhớ động bằng bytes.
-* **✓ [MyDFS.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MyDFS.java)**: Duyệt chiều sâu dùng Stack thủ công bằng `MySinglyLinkedList` (không đệ quy) tránh StackOverflow.
-* **✓ [SuggestionService.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/SuggestionService.java)**: Gợi ý Top-K bằng `MyMinHeap`, tính chỉ số Jaccard bằng vòng lặp thủ công, tránh chia cho 0 và hỗ trợ tự động kiểm tra `runSelfTest()`.
-* **✓ [Main.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/Main.java)**: Gọi kiểm tra tự động trước tiên, khởi chạy server API dạng nền daemon thread một lần duy nhất.
-
----
-
-### 👤 CHI TIẾT DEV 2 (✓ 5/8 NHIỆM VỤ HOÀN THÀNH)
-* **✓ Hoàn thành:**
-  * **[DataStore.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/services/DataStore.java)**: Khởi tạo dữ liệu seed khi trống, 12 thành viên tiếng Việt, 24 liên kết, không sử dụng HashMap.
-  * **[ConsoleMenu.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/console/ConsoleMenu.java)**: 12 lựa chọn trực quan, xử lý định dạng số sai, cho phép ngắt kết nối giao diện web.
-  * **[api.js](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/frontend/js/api.js)**: Nạp đúng cổng API 3001, lọc dữ liệu động qua `.data`, hiển thị cảnh báo offline, không mã hóa cứng thông tin.
-  * **[index.html](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/frontend/index.html)**: Bảng lưới thẻ thành viên (chữ đại diện, tên, tuổi, bạn bè), lưu trữ tài khoản, form thêm mới liên kết tốt.
-  * **[home.html](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/frontend/home.html)**: Bảo vệ đăng nhập, hiển thị thông số thống kê, gợi ý đồng bộ bạn chung kèm đồ thị mạng lưới cá nhân trực quan bằng D3 Canvas.
-* **✗ Chưa xong / Có vấn đề:**
-  * **[UserHandler.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/api/UserHandler.java)**: Gửi phản hồi JSON trực tiếp thay vì bọc ngoài bằng lớp bọc `{success, data}`.
-  * **[FriendHandler.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/api/FriendHandler.java)**: Chưa hỗ trợ tham số truy vấn ở dạng `/api/friends?userId=X` và thiếu hoàn toàn endpoint `/api/friends/mutual` để tính toán bạn chung trên server.
-  * **[SuggestionHandler.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/api/SuggestionHandler.java)**: Thiếu endpoint nghiệp vụ `GET /api/network?userId=X` phục vụ dựng đồ thị cá nhân hóa.
+### 👤 1. DEV 1 (Tech Lead) — **10/10 NHIỆM VỤ HOÀN THÀNH**
+*   **[MySinglyLinkedList.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MySinglyLinkedList.java)**: Đầy đủ insertAtHead, insertAtTail, remove, find, toArray, size, isEmpty, forEach, clear.
+*   **[MyQueue.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MyQueue.java)**: Hàng đợi xây dựng trên SinglyLinkedList, dequeue đạt $O(1)$.
+*   **[MyBST.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MyBST.java)**: Cây tìm kiếm nhị phân hỗ trợ xóa đủ 3 trường hợp node và duyệt `inOrderTraversal` trả về danh sách sắp xếp.
+*   **[MyMaxHeap.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MyMaxHeap.java)**: Mảng tự động giãn nở, chèn, trích xuất giá trị lớn nhất và trả về Top-K.
+*   **[MyMinHeap.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MyMinHeap.java)**: Giới hạn kích thước cố định $K$, thực hiện phép so sánh `offerIfBetter` để tối ưu hóa thời gian gợi ý xuống còn $O(N \log K)$.
+*   **[MyGraph.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MyGraph.java)**: Đồ thị danh sách kề được lưu vết bằng cấu trúc BST, hỗ trợ duyệt BFS bậc 2.
+*   **[MyAdjacencyMatrix.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MyAdjacencyMatrix.java)**: Biểu diễn ma trận kề boolean, hỗ trợ đo kích thước bộ nhớ thật theo byte.
+*   **[MyDFS.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/MyDFS.java)**: Thuật toán DFS không đệ quy sử dụng Stack tự thiết kế để tránh StackOverflow.
+*   **[SuggestionService.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/datastructures/SuggestionService.java)**: Tính chỉ số tương đồng Jaccard và hỗ trợ kiểm tra tự động `runSelfTest()`.
+*   **[Main.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/Main.java)**: Điểm chạy chính của hệ thống, gọi kiểm tra tự động trước và khởi động API Server daemon.
 
 ---
 
-### 👤 CHI TIẾT DEV 4 (✓ 5/7 NHIỆM VỤ HOÀN THÀNH)
-* **✓ Hoàn thành:**
-  * **[BenchmarkRunner.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/BenchmarkRunner.java)**: Tích hợp đầy đủ `runAll()`, các phép đo BFS vs DFS trên các dải [100, 500, 1000, 5000, 10000], List vs Matrix RAM, MinHeap vs MaxHeap; không dùng stream; biên dịch tương thích JDK 1.8 và xuất kết quả ra file `data/benchmark_results.json`.
-  * **[style.css](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/frontend/css/style.css)**: Định nghĩa đủ biến màu, nạp font Outfit/Cormorant/Mono, dựng đủ component màu tối không vi phạm quy chuẩn.
-  * **[explore.html](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/frontend/explore.html)**: Bảng lưới người chưa kết nối, tìm kiếm debounced 300ms, tính toán bạn chung và cho phép kết bạn trực tiếp.
-  * **[network.html](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/frontend/network.html)**: Sơ đồ toàn hệ thống vẽ bằng D3 Canvas, phóng to/thu nhỏ, đổi màu và tích hợp thanh thuộc tính trượt khi nhấp chuột.
-  * **[research.html](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/frontend/research.html)**: Đọc dữ liệu thô từ API, vẽ biểu đồ đường/cột hoàn toàn bằng Canvas thuần (không D3/Chart.js), bảng dữ liệu tương ứng và conclusions sinh động.
-* **✗ Chưa xong / Có vấn đề:**
-  * **AI_AuditLog.xlsx**: Tệp chưa tồn tại trong hệ thống.
-  * **[README.md](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/README.md)**: Chưa có hướng dẫn CLI chi tiết và cách chạy `startup.bat`; Chưa giải thích 8 cấu trúc dữ liệu tự tạo; Thiếu các bảng số liệu thực tế phân tích 3 câu hỏi nghiên cứu và danh sách các API endpoints. File viết chủ yếu bằng tiếng Anh.
+### 👤 2. DEV 2 (Backend / Core FE) — **9/9 NHIỆM VỤ HOÀN THÀNH**
+*   **[DataStore.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/services/DataStore.java)**: Seed chuẩn 12 user Việt Nam và 28 friendships mẫu. Đọc/ghi JSON chuẩn mã hóa UTF-8. Không sử dụng HashMap.
+*   **[ConsoleMenu.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/console/ConsoleMenu.java)**: CLI tương tác hoàn chỉnh hỗ trợ 12 chức năng.
+*   **[UserHandler.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/api/UserHandler.java)**: API người dùng (`GET`, `POST`, `DELETE`) bọc phản hồi JSON trong lớp `{ success: true, data: ... }`.
+*   **[FriendHandler.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/api/FriendHandler.java)**: Hỗ trợ query parameter (`?userId=X`), path parameter, và API bạn chung (`/api/friends/mutual`).
+*   **[SuggestionHandler.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/api/SuggestionHandler.java)**: API gợi ý `/api/suggestions` trả về đề xuất Top-K kèm theo thời gian thực thi của thuật toán.
+*   **[NetworkHandler.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/api/NetworkHandler.java)**: Trả về cấu trúc đồ thị mạng lưới đầy đủ để Frontend dựng đồ thị tương tác.
+*   **[api.js](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/frontend/js/api.js)**: API client dùng baseURL `3001` và xử lý tốt trạng thái offline.
+*   **[index.html](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/frontend/index.html)**: Giao diện chọn User dạng Grid, tích hợp form inline tạo người dùng mới.
+*   **[home.html](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/frontend/home.html)**: Trang cá nhân người dùng, hiển thị danh sách bạn bè, gợi ý, lịch sử hoạt động và tích hợp đồ thị D3 Canvas mạng quan hệ sâu 2 cấp.
 
 ---
 
-## 🔍 TRẠNG THÁI TỔNG THỂ DỰ ÁN
-- [x] Project compile được JDK 1.8? **Có** (Đã kiểm thử biên dịch thành công qua javac).
-- [x] startup.bat chạy không tắt terminal? **Có** (Menu tương tác Console lặp tuần hoàn giữ tiến trình).
-- [x] Cả 5 trang HTML load đúng? **Có** (Các trang liên kết động và nạp dữ liệu tốt).
-- [x] /api/benchmark trả data thật? **Có** (Đã liên kết chạy đo và xuất dữ liệu thông qua BenchmarkRunner).
-- [ ] AI Audit Log đủ yêu cầu? **Không** (Thiếu tệp tin định dạng `.xlsx`).
+### 👤 3. DEV 4 (Researcher) — **7/7 NHIỆM VỤ HOÀN THÀNH**
+*   **[PerformanceTester.java](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/src/benchmark/PerformanceTester.java)**: Chạy so sánh thực tế MaxHeap và MinHeap, sinh báo cáo định dạng Markdown.
+*   **[style.css](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/frontend/css/style.css)**: Thiết lập hệ thống thiết kế Dark Luxury với Outfit, Cormorant Garamond, và DM Mono.
+*   **[explore.html](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/frontend/explore.html)**: Tìm kiếm debounced 300ms, hiển thị bạn chung và chỉ số Jaccard thực tế.
+*   **[network.html](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/frontend/network.html)**: Vẽ sơ đồ đồ thị toàn bộ hệ thống bằng D3 Canvas, zoom/pan và bảng thông tin trượt.
+*   **[research.html](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/frontend/research.html)**: Tích hợp dữ liệu từ API `/api/benchmark`, vẽ các biểu đồ hiệu năng (line/bar charts) trực tiếp trên Canvas thuần.
+*   **[AI_AuditLog.xlsx](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/docs/AI_AuditLog.xlsx)**: Đã tạo và đẩy lên thư mục `docs/` chứa đầy đủ thông tin log theo định dạng bảng tính Excel chuyên nghiệp.
+*   **[README.md](file:///c:/Users/TUF/OneDrive/Documents/GitHub/Social-Network-Friend-Suggestion-Project/README.md)**: Đã cập nhật và Việt hóa hoàn chỉnh, giải thích rõ cơ chế của 8 cấu trúc dữ liệu tự tạo, hướng dẫn chạy bằng `startup.bat` và chi tiết các API Endpoints.
 
 ---
 
-## 📌 HÀNH ĐỘNG KHẨN CẤP CẦN THỰC HIỆN (ACTION ITEMS)
+## 📌 ĐÁNH GIÁ CHUNG
+*   **Biên dịch**: Hệ thống biên dịch thành công 100% không gặp lỗi cú pháp hay thiếu file.
+*   **Khởi chạy**: `startup.bat` hoạt động hoàn hảo trên Windows CMD.
+*   **Frontend**: Cả 5 trang đều tải đúng tài nguyên, giao diện đẹp mắt, tương tác mượt mà và kết nối trực tiếp với backend tại cổng `3001`.
+*   **Tài liệu & Nhật ký**: Đạt yêu cầu về cả chất lượng và tính đầy đủ.
 
-### **Công việc của Dev 2:**
-1. Cấu trúc lại dữ liệu phản hồi trong `UserHandler.java`, `FriendHandler.java`, và `SuggestionHandler.java` để bao bọc bởi định dạng JSON `{ success: true, data: ... }`.
-2. Bổ sung xử lý tham số query `?userId=X` trong `FriendHandler.java` bên cạnh tham số đường dẫn `/api/friends/{userId}`.
-3. Viết thêm API endpoint `GET /api/friends/mutual?userId1=A&userId2=B` phục vụ tính toán trực tiếp danh sách bạn chung trên máy chủ.
-4. Thêm API endpoint `GET /api/network?userId=X` để trả về các nút và liên kết thuộc sơ đồ bậc 2 cá nhân hóa của một thành viên.
-
-### **Công việc của Dev 4:**
-1. Thiết kế bảng tính `docs/AI_AuditLog.xlsx` đầy đủ:
-   - Tối thiểu 8 mục nhật ký.
-   - Chỉ rõ ít nhất 2 trường hợp lỗi ảo giác của AI.
-   - Điền đủ 4 cấu phần Tư duy máy tính (DTC Components).
-   - Viết đủ 4 câu đánh giá vai trò con người (Human Delta) cho mỗi đầu mục.
-2. Viết lại tài liệu `README.md` bằng tiếng Việt:
-   - Hướng dẫn rõ ràng cách biên dịch thủ công qua lệnh javac và cách khởi chạy nhanh bằng `startup.bat`.
-   - Giải thích vai trò của 8 cấu trúc dữ liệu tùy chỉnh (`MySinglyLinkedList`, `MyQueue`, `MyBST`, `MyMaxHeap`, `MyMinHeap`, `MyGraph`, `MyAdjacencyMatrix`, `MyDFS`).
-   - Tổng hợp bảng số liệu thực tế đo được để trả lời chi tiết cho 3 Câu hỏi Nghiên cứu (RQ1, RQ2, RQ3).
-   - Liệt kê đầy đủ danh sách các API Endpoints và tham số truyền nhận của hệ thống.
+**DỰ ÁN ĐÃ SẴN SÀNG NGHIỆM THU!**
