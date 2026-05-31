@@ -25,6 +25,30 @@ Tài liệu này hướng dẫn AI agent cách tự động kiểm tra, đánh g
 * [ ] `backend-java/data/friendships.json` tồn tại và chứa ít nhất 20 mối quan hệ bạn bè (friendships).
 * [ ] **RÀNG BUỘC PHỦ ĐỊNH**: Không được sử dụng `java.util.HashMap` trong lớp `DataStore` (phải dùng cấu trúc dữ liệu tự định nghĩa).
 * [ ] **RÀNG BUỘC PHỦ ĐỊNH**: Không sử dụng Spring Boot hoặc bất kỳ framework nào khác (chỉ dùng Java thuần JDK 1.8 và thư viện `org.json`).
+* [ ] **Quy tắc 1: Tương tác qua GraphService**: Tech Lead đã đóng gói toàn bộ logic đồ thị trong [GraphService.java](file:///c:/Users/ASUS%20TUF/Downloads/CSD-Dev2/src/service/GraphService.java). Khi Dev 2 viết thêm API bạn chung hay cấu trúc mạng lưới, hãy gọi thông qua các phương thức của `GraphService`, tránh tạo mới hoặc sửa đổi cấu trúc trong gói `datastructures` hay `graph`.
+* [ ] **Quy tắc 2: Tách biệt lớp bọc JSON (Response Wrapper)**: Để định dạng tất cả API về dạng `{ success: true, data: ... }`, Dev 2 hãy dùng hàm tiện ích có sẵn của Tech Lead trong `AppServer.java`:
+  ```java
+  // Sử dụng helper có sẵn để chuẩn hóa phản hồi:
+  JSONObject response = new JSONObject();
+  response.put("success", true);
+  response.put("data", dataPayload); // Mảng hoặc đối tượng thô
+  AppServer.sendJsonResponse(exchange, 200, response);
+  ```
+* [ ] **Quy tắc 3: Tránh xung đột định tuyến (Routing Conflict) trong AppServer.java**: Khi đăng ký endpoint `GET /api/network?userId=X`, hãy đăng ký một Context mới trong phương thức `start()` của `AppServer.java` trỏ về một Handler riêng biệt, ví dụ:
+  ```java
+  server.createContext("/api/network", new NetworkHandler());
+  ```
+  Tránh lồng chéo logic `/api/network` vào bên trong `SuggestionHandler` vì cổng ngữ cảnh (Context Port) `/api/suggestions` đã được định tuyến riêng biệt.
+* [ ] **Quy tắc 4: Xử lý tương thích đồng thời Query Parameter & Path Parameter**: Trong `FriendHandler.java`, khi bổ sung hỗ trợ `?userId=X` cho khớp checklist, Dev 2 hãy kiểm tra xem chuỗi truy vấn (query string) có trống hay không để điều hướng xử lý:
+  ```java
+  String query = exchange.getRequestURI().getQuery();
+  if (query != null && query.contains("userId=")) {
+      // Xử lý dạng query ?userId=X
+  } else {
+      // Fallback về xử lý dạng path parameter /api/friends/{userId} như cũ
+  }
+  ```
+
 
 ### 2. DEV 3 CHECKLIST (Frontend CSS/JS + HTML Pages)
 * [ ] `frontend/css/style.css` tồn tại và định nghĩa các CSS variables: `--bg`, `--gold`, `--surface`.

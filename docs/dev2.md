@@ -1,37 +1,67 @@
-### 1. Implement DataStore module
-*   **File chịu trách nhiệm**: `DataStore.java`
-*   **Chi tiết**: Lớp `DataStore` đảm nhận vai trò quản lý lưu trữ, tự động tạo đường dẫn thư mục dữ liệu và đồng bộ trạng thái đồ thị mạng xã hội.
+# Tài Liệu Nhiệm Vụ và Các File Mã Nguồn của Dev 2
 
-### 2. Read/write JSON data files
-*   **File chịu trách nhiệm**: `DataStore.java`
-*   **Chi tiết**:
-    *   Hàm `save(Graph graph, BinarySearchTree<String, User> userBst)`: Chuyển đổi dữ liệu Đồ thị & BST Người dùng thành định dạng JSON và ghi độc lập ra 2 tệp `users.json` và `friendships.json` tại thư mục `backend-java/data/` sử dụng chuẩn mã hóa UTF-8.
-    *   Hàm `load(Graph graph, BinarySearchTree<String, User> userBst)`: Đọc dữ liệu từ hai tệp JSON trên, giải mã UTF-8 và dựng lại toàn bộ cấu trúc Đồ thị (Graph) cùng Cây tìm kiếm nhị phân (BST) lưu trữ người dùng.
+Tài liệu này tổng hợp toàn bộ các file mã nguồn thuộc trách nhiệm phát triển của **Dev 2** trong dự án **Social Network Friend Suggestion System** và nêu rõ tác dụng của từng file.
 
-### 3. Create seed sample dataset
-*   **File chịu trách nhiệm**: `DataStore.java`
-*   **Chi tiết**: Hàm `seedIfEmpty(Graph graph, BinarySearchTree<String, User> userBst)` kiểm tra nếu tệp dữ liệu chưa tồn tại hoặc trống sẽ tự động gọi `initializeSeedData(...)` để khởi tạo dữ liệu mẫu gồm đúng 12 tài khoản người dùng Việt Nam (`u1` đến `u12`) và thiết lập tối thiểu 20 mối quan hệ bạn bè (thực tế khởi tạo sẵn 24 liên kết bạn bè).
+---
 
-### 4. Develop Console Menu interface
-*   **File chịu trách nhiệm**: `ConsoleMenu.java`
-*   **Chi tiết**: Lớp `ConsoleMenu` lập trình giao diện tương tác dòng lệnh (CLI menu), hiển thị danh sách các tùy chọn thao tác (CRUD người dùng, kết bạn/hủy kết bạn, duyệt đồ thị BFS/DFS, hiển thị ma trận kề, gợi ý bạn bè Top-K...).
+### 1. Nhóm Cấu Trúc Dữ Liệu & Giải Thuật Cốt Lõi (Core DS & Algorithms)
 
-### 5. Build API Handlers
-Các bộ xử lý API được tách riêng biệt thành các lớp public nằm độc lập:
+*   `SinglyLinkedList.java`
+    *   **Tác dụng**: Triển khai cấu trúc danh sách liên kết đơn generic. Hỗ trợ giao diện `Iterable` để phục vụ việc duyệt danh sách các đỉnh kề của đồ thị và danh sách người dùng thông qua vòng lặp.
+*   `Queue.java`
+    *   **Tác dụng**: Triển khai cấu trúc hàng đợi generic kiểu FIFO (First-In-First-Out) bằng liên kết nút (Node-pointer) phục vụ thuật toán duyệt đồ thị theo chiều rộng (BFS).
+*   `BinarySearchTree.java`
+    *   **Tác dụng**: Triển khai cấu trúc cây tìm kiếm nhị phân generic hoạt động như một bản đồ ánh xạ Khóa - Giá trị (Ordered Map). Được sử dụng để lưu trữ người dùng và lập chỉ mục phụ để tra cứu ID nhanh qua tên đăng nhập (Secondary Index) với độ phức tạp $O(\log N)$.
+*   `MaxHeap.java`
+    *   **Tác dụng**: Triển khai cấu trúc đống cực đại (Max-Heap) tự động co giãn kích thước mảng. Dùng để lưu trữ và sắp xếp toàn bộ danh sách gợi ý bạn bè.
+*   `MinHeap.java`
+    *   **Tác dụng**: Triển khai cấu trúc đống cực tiểu (Min-Heap) giới hạn kích thước phần tử ở mức $K$. Tối ưu thuật toán gợi ý Top-K với độ phức tạp bộ nhớ tối giản $O(K)$ và thời gian $O(N \log K)$.
+*   `Graph.java`
+    *   **Tác dụng**: Thiết lập mô hình đồ thị mạng xã hội vô hướng dựa trên danh sách kề (Adjacency List). Tích hợp các giải thuật duyệt BFS, DFS, tìm đường đi ngắn nhất (Degrees of Separation) và chuyển đổi động sang ma trận kề (Adjacency Matrix).
+*   `User.java`
+    *   **Tác dụng**: Lớp thực thể định nghĩa các thuộc tính của người dùng (ID, tên hiển thị, tên đăng nhập, tiểu sử bio, ngày tham gia) cùng các phương thức để tuần tự hóa và giải tuần tự hóa dữ liệu JSON.
+*   `PerformanceTester.java`
+    *   **Tác dụng**: Lập trình mô đun chạy stress test độc lập để đo đạc và so sánh hiệu năng thực tế của hai cấu trúc đống (Min-Heap vs Max-Heap) và thuật toán duyệt (BFS vs DFS) ở các quy mô dữ liệu lớn, sau đó ghi báo cáo ra định dạng Markdown.
 
-*   **User Handler**: Lớp `UserHandler` xử lý định tuyến:
-    *   `GET /api/users`: Trả về danh sách thông tin toàn bộ người dùng.
-    *   `GET /api/users/{id}`: Trả về thông tin chi tiết của một người dùng theo ID.
-    *   `POST /api/users`: Tạo tài khoản người dùng mới (dữ liệu truyền qua request body JSON).
-    *   `DELETE /api/users/{id}`: Xóa tài khoản người dùng và hủy toàn bộ các liên kết bạn bè liên quan.
-*   **Friend Handler**: Lớp `FriendHandler` xử lý định tuyến:
-    *   `GET /api/friends/{userId}`: Trả về danh sách bạn bè của người dùng theo ID chỉ định.
-    *   `POST /api/friends`: Thiết lập mối quan hệ bạn bè mới giữa 2 người dùng (dữ liệu `userId1` và `userId2` gửi qua request body JSON).
-    *   `DELETE /api/friends`: Hủy quan hệ bạn bè giữa 2 người dùng (dữ liệu gửi qua request body JSON).
-*   **Suggestion Handler**: Lớp `SuggestionHandler` xử lý định tuyến:
-    *   `GET /api/suggestions`: Trả về danh sách gợi ý kết bạn Top-K dựa trên số bạn chung hoặc hệ số tương đồng Jaccard. Yêu cầu truyền các query parameters: `userId` (ID người dùng cần gợi ý), `k` (số lượng gợi ý tối đa), và `heapType` (`min` hoặc `max` để chọn chiến lược đống tối ưu).
+---
 
-### 6. System Execution and Testing
-*   **File chịu trách nhiệm**:
-    *   `Main.java`: Điểm khởi chạy chính (hàm `main`), tiếp nhận đối số dòng lệnh (ví dụ `--console` để chỉ chạy CLI menu không bật web server), khởi động máy chủ Web API tại cổng `3001` (nếu không chạy chế độ console-only) phục vụ giao diện tĩnh từ thư mục `frontend/`, và kích hoạt giao diện `ConsoleMenu`.
-    *   `ConsoleMenu.java`: Chạy vòng lặp Scanner nhận dữ liệu từ terminal và phản hồi kết quả trực quan phục vụ cho công tác kiểm thử thủ công.
+### 2. Nhóm Lưu Trữ Dữ Liệu & Giao Diện Menu CLI (Storage & CLI Menu)
+
+*   `DataStore.java`
+    *   **Tác dụng**: Quản lý việc đọc, ghi và đồng bộ hóa cơ sở dữ liệu đồ thị mạng xã hội. Phân tách dữ liệu thành 2 tệp JSON độc lập và cung cấp phương thức `seedIfEmpty()` để tự động sinh dữ liệu mẫu ban đầu nếu tệp dữ liệu trống.
+*   `users.json`
+    *   **Tác dụng**: Tệp lưu trữ dữ liệu chứa thông tin hồ sơ của đúng 12 người dùng Việt Nam mẫu ban đầu.
+*   `friendships.json`
+    *   **Tác dụng**: Tệp lưu trữ các liên kết bạn bè (friendship edges) gồm 24 mối quan hệ bạn bè ban đầu để xây dựng cấu trúc đồ thị mạng lưới.
+*   `ConsoleMenu.java`
+    *   **Tác dụng**: Lập trình giao diện tương tác dòng lệnh dòng quét (CLI menu), cung cấp đầy đủ 12 lựa chọn chức năng hệ thống (CRUD người dùng, kết bạn/hủy kết bạn, duyệt BFS/DFS, xem đường đi ngắn nhất, xem ma trận kề, chạy thử nghiệm Top-K...).
+
+---
+
+### 3. Nhóm Bộ Xử Lý REST API (REST API Handlers)
+
+*   `UserHandler.java`
+    *   **Tác dụng**: Lớp xử lý định tuyến (API Handler) cho endpoint `/api/users` và `/api/users/{id}` tương ứng với các phương thức:
+        *   `GET /api/users`: Trả về danh sách toàn bộ người dùng.
+        *   `GET /api/users/{id}`: Trả về thông tin một người dùng cụ thể theo ID.
+        *   `POST /api/users`: Tạo hồ sơ người dùng mới (thông qua dữ liệu JSON ở request body).
+        *   `DELETE /api/users/{id}`: Xóa người dùng và tất cả liên kết bạn bè của người đó.
+*   `FriendHandler.java`
+    *   **Tác dụng**: Lớp xử lý định tuyến (API Handler) cho endpoint quan hệ bạn bè:
+        *   `GET /api/friends/{userId}`: Trả về danh sách bạn bè của người dùng.
+        *   `POST /api/friends`: Thiết lập mối quan hệ bạn bè mới giữa 2 người dùng (nhận dữ liệu ID qua request body).
+        *   `DELETE /api/friends`: Hủy quan hệ bạn bè giữa 2 người dùng (nhận dữ liệu ID qua request body).
+*   `SuggestionHandler.java`
+    *   **Tác dụng**: Lớp xử lý định tuyến (API Handler) cho endpoint `/api/suggestions` để trả về danh sách gợi ý bạn bè phù hợp dựa trên số bạn chung và hệ số tương đồng Jaccard sử dụng cơ chế Min-Heap hoặc Max-Heap theo các tham số truy vấn (`userId`, `k`, `heapType`).
+
+---
+
+### 4. Nhóm Giao Diện & Kết Nối API Frontend (Frontend UI & API Connection)
+
+*   `index.html`
+    *   **Tác dụng**: Thiết lập trang chủ và giao diện chọn tài khoản đăng nhập (Select User) dạng bảng lưới thẻ thành viên (chữ đại diện, tên, tuổi, bạn bè) kèm biểu mẫu thêm mới liên kết giữa các tài khoản.
+*   `home.html`
+    *   **Tác dụng**: Thiết lập bảng điều khiển chính (dashboard) sau khi đăng nhập giả lập thành công, hiển thị các thông số thống kê mạng lưới, danh sách gợi ý kết bạn đồng bộ và vẽ đồ thị mạng lưới cá nhân hóa bậc 2 của thành viên hiện tại bằng thư viện D3 Canvas trực quan.
+*   `api.js`
+    *   **Tác dụng**: Xây dựng lớp bọc gọi API (API Helper) động kết nối trực tiếp đến backend qua cổng `3001`, tự động phân tách dữ liệu thông qua cấu trúc phản hồi dạng `.data` và hiển thị cảnh báo cảnh báo khi backend ngoại tuyến.
+

@@ -1,83 +1,3 @@
-<<<<<<< HEAD
-const API_URL = 'http://localhost:3001/api';
-
-function showOfflineBanner() {
-    let banner = document.getElementById('offline-banner');
-    if (!banner) {
-        banner = document.createElement('div');
-        banner.id = 'offline-banner';
-        banner.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #ff4d4f;
-            color: white;
-            text-align: center;
-            padding: 12px;
-            font-weight: bold;
-            z-index: 10000;
-            font-family: 'Outfit', sans-serif;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        `;
-        banner.innerHTML = '⚠️ Không thể kết nối với máy chủ. Vui lòng kiểm tra xem backend Java đã được khởi động chưa!';
-        document.body.appendChild(banner);
-    } else {
-        banner.style.display = 'block';
-    }
-}
-
-function hideOfflineBanner() {
-    let banner = document.getElementById('offline-banner');
-    if (banner) {
-        banner.style.display = 'none';
-    }
-}
-
-async function request(endpoint, options = {}) {
-    try {
-        const response = await fetch(`${API_URL}${endpoint}`, options);
-        const json = await response.json().catch(() => ({}));
-        if (!response.ok || json.success === false) {
-            throw new Error(json.error || `HTTP error! status: ${response.status}`);
-        }
-        hideOfflineBanner();
-        return { data: json.data };
-    } catch (error) {
-        console.error(`API Error on ${endpoint}:`, error);
-        showOfflineBanner();
-        throw error;
-    }
-}
-
-window.api = {
-    getUsers: () => request('/users'),
-    getUserById: (id) => request(`/users/${id}`),
-    createUser: (user) => request('/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(user)
-    }),
-    deleteUser: (id) => request(`/users/${id}`, {
-        method: 'DELETE'
-    }),
-    getFriends: (userId) => request(`/friends/${userId}`),
-    addFriend: (userId1, userId2) => request('/friends', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId1, userId2 })
-    }),
-    removeFriend: (userId1, userId2) => request('/friends', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId1, userId2 })
-    }),
-    getMutualFriends: (userId1, userId2) => request(`/friends/mutual?userId1=${userId1}&userId2=${userId2}`),
-    getSuggestions: (userId, k = 5, heapType = 'min') => request(`/suggestions?userId=${userId}&k=${k}&heapType=${heapType}`),
-    getNetworkData: () => request('/network'),
-    getBenchmarkData: () => request('/benchmark')
-};
-=======
 const baseURL = "http://localhost:3001/api";
 
 // Create offline banner if not present in the DOM
@@ -126,16 +46,33 @@ async function request(url, options = {}) {
         
         // standardise response formats to return { success: true, data: [...] }
         let data = rawData;
-        if (rawData.users !== undefined) {
-            data = rawData.users;
-        } else if (rawData.friends !== undefined) {
-            data = rawData.friends;
-        } else if (rawData.suggestions !== undefined) {
-            data = rawData.suggestions;
-        } else if (rawData.user !== undefined) {
-            data = rawData.user;
-        } else if (rawData.benchmarkResults !== undefined) {
-            data = rawData.benchmarkResults;
+        if (rawData.data !== undefined) {
+            const inner = rawData.data;
+            if (inner.users !== undefined) {
+                data = inner.users;
+            } else if (inner.friends !== undefined) {
+                data = inner.friends;
+            } else if (inner.suggestions !== undefined) {
+                data = inner.suggestions;
+            } else if (inner.user !== undefined) {
+                data = inner.user;
+            } else if (inner.benchmarkResults !== undefined) {
+                data = inner.benchmarkResults;
+            } else {
+                data = inner;
+            }
+        } else {
+            if (rawData.users !== undefined) {
+                data = rawData.users;
+            } else if (rawData.friends !== undefined) {
+                data = rawData.friends;
+            } else if (rawData.suggestions !== undefined) {
+                data = rawData.suggestions;
+            } else if (rawData.user !== undefined) {
+                data = rawData.user;
+            } else if (rawData.benchmarkResults !== undefined) {
+                data = rawData.benchmarkResults;
+            }
         }
 
         return {
@@ -237,4 +174,3 @@ const api = {
 
 // Make api globally available
 window.api = api;
->>>>>>> e6180d4e3476907484e5820ebfcdfca1b0d9f096
