@@ -1,6 +1,7 @@
 import api.AppServer;
 import console.ConsoleMenu;
 import service.GraphService;
+import datastructures.SuggestionService;
 
 import java.io.IOException;
 
@@ -11,6 +12,9 @@ public class Main {
         System.out.println("Initializing Social Network Graph...");
         GraphService graphService = new GraphService(dataDirectoryPath);
 
+        // Run SuggestionService self-test before starting the server
+        SuggestionService.runSelfTest();
+
         boolean consoleOnly = false;
         for (String arg : args) {
             if ("--console".equalsIgnoreCase(arg) || "--console-only".equalsIgnoreCase(arg)) {
@@ -19,20 +23,29 @@ public class Main {
             }
         }
 
-        AppServer apiServer = null;
+        final AppServer apiServer;
         if (!consoleOnly) {
-            int port = 3001;
+            final int port = 3001;
             apiServer = new AppServer(port, graphService);
-            try {
-                apiServer.start();
-                System.out.println("Web Dashboard is running at: http://localhost:" + port + "/");
-            } catch (IOException e) {
-                System.err.println("Could not start API Server on port " + port + ": " + e.getMessage());
-                System.err.println("System will fall back to console-only mode.");
-            }
+            
+            // Start ApiServer in a background thread (daemon = true) exactly once
+            Thread serverThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        apiServer.start();
+                    } catch (IOException e) {
+                        System.err.println("Could not start API Server on port " + port + ": " + e.getMessage());
+                    }
+                }
+            });
+            serverThread.setDaemon(true);
+            serverThread.start();
+        } else {
+            apiServer = null;
         }
 
-        // Start Console Menu
+        // Start Console Menu in main thread
         ConsoleMenu consoleMenu = new ConsoleMenu(graphService);
         consoleMenu.start();
 

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khám Phá Bạn Mới - Social Network Friend Suggestion</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="layout-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <span class="logo-icon">👑</span>
+                <span class="logo-text">AURASuggest</span>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a href="home.html">
+                            <span class="nav-icon">📊</span>
+                            <span>Tổng Quan</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="explore.html">
+                            <span class="nav-icon">🔍</span>
+                            <span>Khám Phá</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="network.html">
+                            <span class="nav-icon">🕸️</span>
+                            <span>Mạng Lưới</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="research.html">
+                            <span class="nav-icon">🔬</span>
+                            <span>Nghiên Cứu</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px;">
+                <button class="btn" style="width: 100%;" id="btn-switch-user">
+                    <span>🔄</span> Đổi Tài Khoản
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- Topbar -->
+            <div class="topbar">
+                <div>
+                    <h2 class="page-title">Khám Phá Mối Quan Hệ Mới</h2>
+                    <p style="color: var(--muted); font-size: 14px;">Mở rộng mạng lưới kết nối cá nhân của bạn</p>
+                </div>
+                
+                <div class="user-profile-badge" id="user-badge">
+                    <div class="user-avatar" id="badge-avatar">?</div>
+                    <span class="user-name" id="badge-name">Đang tải...</span>
+                </div>
+            </div>
+
+            <!-- Search and Filter strip -->
+            <div class="gold-card" style="padding: 20px; margin-bottom: 30px;">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <div style="font-size: 20px; color: var(--gold);">🔍</div>
+                    <div style="flex-grow: 1;">
+                        <input type="text" id="search-input" class="form-input" placeholder="Tìm kiếm bạn mới theo tên hoặc tên tài khoản..." style="background-color: var(--bg); border-color: rgba(255,255,255,0.08);">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Title and User Grid -->
+            <h3 class="section-label" id="grid-header">Người dùng có thể quen</h3>
+            
+            <div class="user-grid" id="explore-grid-container">
+                <!-- Dynamically filled -->
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);">
+                    Đang tìm kiếm thành viên mới...
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userId = localStorage.getItem("userId");
+            if (!userId) {
+                location.href = "index.html";
+                return;
+            }
+
+            // Active Page Detection
+            const page = location.pathname.split('/').pop() || "explore.html";
+            document.querySelector('a[href="'+page+'"]')?.classList.add('active');
+
+            // Switch User
+            document.getElementById("btn-switch-user").addEventListener("click", () => {
+                localStorage.removeItem("userId");
+                localStorage.removeItem("userName");
+                location.href = "index.html";
+            });
+
+            // Cache data for real-time local filtering
+            let availableUsers = [];
+            let directFriendIds = [];
+            let searchTimeout = null;
+
+            // Generate deterministic initials and age
+            function getAvatarInitials(name) {
+                if (!name) return "?";
+                const parts = name.trim().split(" ");
+                if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            }
+
+            function getDeterministicAge(id) {
+                let hash = 0;
+                for (let i = 0; i < id.length; i++) {
+                    hash = id.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                return Math.abs(hash % 15) + 19;
+            }
+
+            async function initExploreData() {
+                // Set up Profile Badge
+                const userRes = await api.getUserById(userId);
+                if (userRes.success) {
+                    const self = userRes.data;
+                    document.getElementById("badge-name").textContent = self.name;
+                    document.getElementById("badge-avatar").textContent = getAvatarInitials(self.name);
+                }
+
+                // Fetch friends to exclude them from the list
+                const friendsRes = await api.getFriends(userId);
+                if (friendsRes.success) {
+                    directFriendIds = (friendsRes.data || []).map(f => f.id);
+                }
+
+                // Fetch all users
+                const allUsersRes = await api.getUsers();
+                if (allUsersRes.success) {
+                    const allUsers = allUsersRes.data || [];
+                    
+                    // Exclude self and current friends
+                    availableUsers = allUsers.filter(u => u.id !== userId && !directFriendIds.includes(u.id));
+                    
+                    // Pre-fetch mutual friends counts for all available users
+                    for (let user of availableUsers) {
+                        const mutualRes = await api.getMutualFriends(userId, user.id);
+                        user.mutualCount = mutualRes.success ? mutualRes.data.length : 0;
+                        
+                        // Parse age from bio if saved
+                        let age = getDeterministicAge(user.id);
+                        if (user.bio.includes("Tuổi:")) {
+                            const match = user.bio.match(/Tuổi:\s*(\d+)/);
+                            if (match) age = parseInt(match[1]);
+                        }
+                        user.age = age;
+                        user.cleanBio = user.bio.replace(/Tuổi:\s*\d+;?\s*/, "") || "Không có tiểu sử.";
+                    }
+
+                    renderGrid(availableUsers);
+                }
+            }
+
+            function renderGrid(usersList) {
+                const container = document.getElementById("explore-grid-container");
+                const header = document.getElementById("grid-header");
+                
+                header.textContent = `TẤT CẢ GỢI Ý KẾT NỐI (${usersList.length})`;
+
+                if (usersList.length === 0) {
+                    container.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);">
+                            Không tìm thấy người dùng nào phù hợp với từ khóa tìm kiếm.
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = "";
+                usersList.forEach(user => {
+                    const initials = getAvatarInitials(user.name);
+                    const card = document.createElement("div");
+                    card.className = "gold-card user-card";
+                    card.innerHTML = `
+                        <div class="user-card-header">
+                            <div class="user-card-avatar" style="background-color: rgba(201,169,110,0.08); color: var(--gold2);">${initials}</div>
+                            <div class="user-card-meta">
+                                <h4 class="user-card-name">${user.name}</h4>
+                                <span class="user-card-username">@${user.username}</span>
+                            </div>
+                        </div>
+                        <p class="user-card-bio">${user.cleanBio}</p>
+                        <div class="user-card-stats">
+                            <div class="user-card-stat">
+                                <span class="user-card-stat-val">${user.age}</span>
+                                <span class="user-card-stat-lbl">Tuổi</span>
+                            </div>
+                            <div class="user-card-stat">
+                                <span class="user-card-stat-val">${user.mutualCount}</span>
+                                <span class="user-card-stat-lbl">Bạn Chung</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%;" data-id="${user.id}">Befriend (Kết Bạn)</button>
+                    `;
+
+                    // Add friend click
+                    card.querySelector(".btn-primary").addEventListener("click", async (e) => {
+                        const trgId = e.target.getAttribute("data-id");
+                        const actionRes = await api.addFriend(userId, trgId);
+                        if (actionRes.success) {
+                            // Update activity log of the session
+                            const currentLogs = JSON.parse(localStorage.getItem(`activity_${userId}`) || "[]");
+                            const timeStr = new Date().toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                            currentLogs.unshift({ text: `Đã gửi kết bạn đến ${user.name}!`, time: timeStr });
+                            localStorage.setItem(`activity_${userId}`, JSON.stringify(currentLogs.slice(0, 15)));
+
+                            // Reload layout
+                            initExploreData();
+                        } else {
+                            alert("Lỗi: " + (actionRes.error || "Không thể gửi lời mời kết bạn."));
+                        }
+                    });
+
+                    container.appendChild(card);
+                });
+            }
+
+            // Real-time debounced search (300ms)
+            const searchInput = document.getElementById("search-input");
+            searchInput.addEventListener("input", (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const filtered = availableUsers.filter(u => 
+                        u.name.toLowerCase().includes(query) || 
+                        u.username.toLowerCase().includes(query)
+                    );
+                    renderGrid(filtered);
+                }, 300);
+            });
+
+            // Initialize Page
+            initExploreData();
+        });
+    </script>
+</body>
+</html>

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>SocialNet - Chọn tài khoản</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -412,10 +413,83 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="fa-solid fa-plus"></i> Tạo tài khoản
                 </button>
+=======
+    <title>Chọn Người Dùng - Social Network Friend Suggestion</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="layout-wrapper" style="min-height: 100vh; justify-content: center; align-items: center; padding: 40px 20px;">
+        <div style="width: 100%; max-width: 1200px;">
+            
+            <div class="topbar" style="border: none; margin-bottom: 20px;">
+                <div>
+                    <h1 class="page-title" style="font-size: 38px;">CHỌN NGƯỜI DÙNG BẮT ĐẦU</h1>
+                    <p style="color: var(--muted); font-size: 15px; margin-top: 5px;">Chọn một tài khoản để truy cập Trang Tổng Quan cá nhân hóa</p>
+                </div>
+                <button class="btn btn-primary" id="btn-add-user">
+                    <span>+</span> Thêm Người Dùng
+                </button>
+            </div>
+
+            <!-- Error container if Java server is offline -->
+            <div id="error-container" class="gold-card" style="display: none; border-color: rgba(231, 76, 60, 0.4); margin-bottom: 30px; background-color: rgba(231, 76, 60, 0.02);">
+                <h3 class="card-title" style="color: #e74c3c;">⚠️ MÁY CHỦ NGOẠI TUYẾN (SERVER OFFLINE)</h3>
+                <p style="color: var(--muted); font-size: 14px; margin-bottom: 15px;">
+                    Không thể kết nối với máy chủ API Java chạy tại địa chỉ <code style="font-family: var(--font-mono); color: var(--gold2);">http://localhost:3001</code>.
+                </p>
+                <div style="background-color: var(--bg3); padding: 15px; border-radius: 6px; border: 1px solid var(--border); font-size: 13px; color: var(--text);">
+                    <p style="font-weight: bold; margin-bottom: 5px; color: var(--gold2);">Hướng dẫn chạy Máy chủ Java:</p>
+                    <ol style="margin-left: 20px; display: flex; flex-direction: column; gap: 4px;">
+                        <li>Mở cửa sổ Command Prompt hoặc PowerShell tại thư mục dự án.</li>
+                        <li>Chạy lệnh biên dịch: <code style="font-family: var(--font-mono); color: var(--gold);">javac -encoding UTF-8 -cp "lib/json.jar" -d bin src/**/*.java</code></li>
+                        <li>Chạy máy chủ: <code style="font-family: var(--font-mono); color: var(--gold);">java -cp "bin;lib/json.jar" Main</code></li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="user-grid" id="user-grid-container">
+                <!-- Cards loaded dynamically via JavaScript -->
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);">
+                    Đang tải danh sách thành viên từ API...
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Modal Form: Add User -->
+    <div class="modal-overlay" id="add-user-modal">
+        <div class="modal-content">
+            <span class="modal-close" id="modal-close-btn">&times;</span>
+            <h3 class="card-title" style="margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">THÊM NGƯỜI DÙNG MỚI</h3>
+            <form id="add-user-form">
+                <div class="form-group">
+                    <label class="form-label" for="new-name">Họ và Tên</label>
+                    <input type="text" id="new-name" class="form-input" placeholder="Nhập họ và tên..." required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="new-username">Tên Tài Khoản (Username)</label>
+                    <input type="text" id="new-username" class="form-input" placeholder="Ví dụ: nva, nguyenvan_a..." required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="new-age">Tuổi</label>
+                    <input type="number" id="new-age" class="form-input" placeholder="Ví dụ: 20" min="1" max="120" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="new-bio">Tiểu sử (Bio)</label>
+                    <textarea id="new-bio" class="form-input" placeholder="Viết vài dòng giới thiệu về bản thân..."></textarea>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
+                    <button type="button" class="btn" id="modal-cancel-btn">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-primary">Lưu Người Dùng</button>
+                </div>
+>>>>>>> e6180d4e3476907484e5820ebfcdfca1b0d9f096
             </form>
         </div>
     </div>
 
+<<<<<<< HEAD
     <!-- Load api.js helper -->
     <script src="js/api.js"></script>
     <script>
@@ -522,6 +596,157 @@
 
         // Initialize on load
         document.addEventListener('DOMContentLoaded', loadUsers);
+=======
+    <script src="js/api.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userGridContainer = document.getElementById("user-grid-container");
+            const errorContainer = document.getElementById("error-container");
+            const addUserModal = document.getElementById("add-user-modal");
+            const btnAddUser = document.getElementById("btn-add-user");
+            const modalCloseBtn = document.getElementById("modal-close-btn");
+            const modalCancelBtn = document.getElementById("modal-cancel-btn");
+            const addUserForm = document.getElementById("add-user-form");
+
+            // Modal Controls
+            btnAddUser.addEventListener("click", () => addUserModal.classList.add("active"));
+            const closeModal = () => addUserModal.classList.remove("active");
+            modalCloseBtn.addEventListener("click", closeModal);
+            modalCancelBtn.addEventListener("click", closeModal);
+
+            // Generate deterministic initials and beautiful dark-gold avatar colors
+            function getAvatarInitials(name) {
+                if (!name) return "?";
+                const parts = name.trim().split(" ");
+                if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            }
+
+            function getDeterministicAge(id) {
+                // Return a consistent age based on hash of user ID
+                let hash = 0;
+                for (let i = 0; i < id.length; i++) {
+                    hash = id.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                return Math.abs(hash % 15) + 19; // Age ranges from 19 to 33
+            }
+
+            async function loadUsers() {
+                userGridContainer.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);">
+                        Đang tải danh sách thành viên từ API...
+                    </div>
+                `;
+
+                // Fetch graph structure to determine degrees/friend counts efficiently
+                const graphRes = await api.getNetworkData();
+                const usersRes = await api.getUsers();
+
+                if (!usersRes.success) {
+                    errorContainer.style.display = "block";
+                    userGridContainer.innerHTML = "";
+                    return;
+                }
+
+                errorContainer.style.display = "none";
+                const users = usersRes.data || [];
+                
+                if (users.length === 0) {
+                    userGridContainer.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);">
+                            Hệ thống chưa có người dùng nào. Nhấp "Thêm Người Dùng" ở góc để tạo mới!
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Compute friend degrees from graph links
+                const friendDegrees = {};
+                if (graphRes.success && graphRes.data && graphRes.data.links) {
+                    graphRes.data.links.forEach(link => {
+                        friendDegrees[link.source] = (friendDegrees[link.source] || 0) + 1;
+                        friendDegrees[link.target] = (friendDegrees[link.target] || 0) + 1;
+                    });
+                }
+
+                userGridContainer.innerHTML = "";
+                // Limit to 12 cards as requested: "Grid 12 user cards"
+                const displayUsers = users.slice(0, 12);
+
+                displayUsers.forEach(user => {
+                    const initials = getAvatarInitials(user.name);
+                    const friendCount = friendDegrees[user.id] || 0;
+                    
+                    // Retrieve age from bio if saved as metadata, otherwise compute deterministic age
+                    let age = getDeterministicAge(user.id);
+                    if (user.bio.includes("Tuổi:")) {
+                        const match = user.bio.match(/Tuổi:\s*(\d+)/);
+                        if (match) age = parseInt(match[1]);
+                    }
+
+                    const cleanBio = user.bio.replace(/Tuổi:\s*\d+;?\s*/, "") || "Không có tiểu sử.";
+
+                    const card = document.createElement("div");
+                    card.className = "gold-card user-card";
+                    card.style.cursor = "pointer";
+                    card.innerHTML = `
+                        <div class="user-card-header">
+                            <div class="user-card-avatar">${initials}</div>
+                            <div class="user-card-meta">
+                                <h4 class="user-card-name">${user.name}</h4>
+                                <span class="user-card-username">@${user.username}</span>
+                            </div>
+                        </div>
+                        <p class="user-card-bio">${cleanBio}</p>
+                        <div class="user-card-stats">
+                            <div class="user-card-stat">
+                                <span class="user-card-stat-val">${age}</span>
+                                <span class="user-card-stat-lbl">Tuổi</span>
+                            </div>
+                            <div class="user-card-stat">
+                                <span class="user-card-stat-val">${friendCount}</span>
+                                <span class="user-card-stat-lbl">Bạn Bè</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%;">Truy Cập Dashboard</button>
+                    `;
+
+                    // Click handler
+                    card.addEventListener("click", () => {
+                        localStorage.setItem("userId", user.id);
+                        localStorage.setItem("userName", user.name);
+                        location.href = "home.html";
+                    });
+
+                    userGridContainer.appendChild(card);
+                });
+            }
+
+            // Form Submit handler
+            addUserForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const name = document.getElementById("new-name").value.trim();
+                const username = document.getElementById("new-username").value.trim();
+                const age = document.getElementById("new-age").value.trim();
+                const rawBio = document.getElementById("new-bio").value.trim();
+
+                // Encode age inside bio so it gets stored in Java user database!
+                const bio = `Tuổi: ${age}; ${rawBio}`;
+
+                const res = await api.createUser(name, username, bio);
+                if (res.success) {
+                    closeModal();
+                    addUserForm.reset();
+                    loadUsers();
+                } else {
+                    alert("Lỗi: " + (res.error || "Tên tài khoản đã tồn tại!"));
+                }
+            });
+
+            // Initialize Page
+            loadUsers();
+        });
+>>>>>>> e6180d4e3476907484e5820ebfcdfca1b0d9f096
     </script>
 </body>
 </html>
