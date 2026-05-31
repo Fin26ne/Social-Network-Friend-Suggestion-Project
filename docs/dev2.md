@@ -10,7 +10,7 @@
 
 ### 3. Create seed sample dataset
 *   **File chịu trách nhiệm**: `DataStore.java`
-*   **Chi tiết**: Hàm `initializeSeedData(Graph graph, BinarySearchTree<String, User> userBst)` tự động tạo dữ liệu mẫu nếu tệp JSON chưa tồn tại, bao gồm đúng 12 tài khoản người dùng Việt Nam (`u1` đến `u12`) và thiết lập tối thiểu 20 mối quan hệ bạn bè (thực tế khởi tạo sẵn 24 liên kết bạn bè).
+*   **Chi tiết**: Hàm `seedIfEmpty(Graph graph, BinarySearchTree<String, User> userBst)` kiểm tra nếu tệp dữ liệu chưa tồn tại hoặc trống sẽ tự động gọi `initializeSeedData(...)` để khởi tạo dữ liệu mẫu gồm đúng 12 tài khoản người dùng Việt Nam (`u1` đến `u12`) và thiết lập tối thiểu 20 mối quan hệ bạn bè (thực tế khởi tạo sẵn 24 liên kết bạn bè).
 
 ### 4. Develop Console Menu interface
 *   **File chịu trách nhiệm**: `ConsoleMenu.java`

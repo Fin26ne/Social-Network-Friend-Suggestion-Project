@@ -26,11 +26,54 @@ public class FriendHandler implements HttpHandler {
 
         try {
             if ("GET".equalsIgnoreCase(method)) {
-                // Get friends list of user: /api/friends/{userId}
-                if (path.matches("^/api/friends/[a-zA-Z0-9_-]+$")) {
-                    String userId = path.substring(path.lastIndexOf("/") + 1);
+                // Check if requesting mutual friends: /api/friends/mutual or /api/mutual
+                if (path.equals("/api/friends/mutual") || path.equals("/api/mutual")) {
+                    java.util.Map<String, String> queryParams = AppServer.parseQueryParams(exchange.getRequestURI().getQuery());
+                    String userId1 = queryParams.get("userId1");
+                    String userId2 = queryParams.get("userId2");
+                    if (userId1 == null || userId2 == null || userId1.isEmpty() || userId2.isEmpty()) {
+                        AppServer.sendJsonResponse(exchange, 400, new JSONObject().put("success", false).put("error", "Both userId1 and userId2 query parameters are required"));
+                        return;
+                    }
+                    if (graphService.getUserById(userId1) == null || graphService.getUserById(userId2) == null) {
+                        AppServer.sendJsonResponse(exchange, 404, new JSONObject().put("success", false).put("error", "One or both users not found"));
+                        return;
+                    }
+
+                    JSONArray mutualArr = new JSONArray();
+                    SinglyLinkedList<String> friends1 = graphService.getFriends(userId1);
+                    SinglyLinkedList<String> friends2 = graphService.getFriends(userId2);
+                    for (String fId : friends1) {
+                        if (friends2.contains(fId)) {
+                            User friend = graphService.getUserById(fId);
+                            if (friend != null) {
+                                mutualArr.put(friend.toJSONObject());
+                            }
+                        }
+                    }
+                    
+                    JSONObject response = new JSONObject();
+                    response.put("success", true);
+                    response.put("data", new JSONObject().put("mutualFriends", mutualArr));
+                    AppServer.sendJsonResponse(exchange, 200, response);
+                } else {
+                    // Get friends list: Support both query parameter (?userId=X) and path parameter (/api/friends/{userId})
+                    String userId = null;
+                    String query = exchange.getRequestURI().getQuery();
+                    if (query != null && query.contains("userId=")) {
+                        java.util.Map<String, String> queryParams = AppServer.parseQueryParams(query);
+                        userId = queryParams.get("userId");
+                    } else if (path.matches("^/api/friends/[a-zA-Z0-9_-]+$")) {
+                        userId = path.substring(path.lastIndexOf("/") + 1);
+                    }
+
+                    if (userId == null || userId.isEmpty()) {
+                        AppServer.sendJsonResponse(exchange, 400, new JSONObject().put("success", false).put("error", "User ID required in query parameter or path"));
+                        return;
+                    }
+
                     if (!graphService.getGraph().hasVertex(userId)) {
-                        AppServer.sendJsonResponse(exchange, 404, new JSONObject().put("error", "User not found"));
+                        AppServer.sendJsonResponse(exchange, 404, new JSONObject().put("success", false).put("error", "User not found"));
                         return;
                     }
 
@@ -42,9 +85,11 @@ public class FriendHandler implements HttpHandler {
                             friendsArr.put(friend.toJSONObject());
                         }
                     }
-                    AppServer.sendJsonResponse(exchange, 200, new JSONObject().put("friends", friendsArr));
-                } else {
-                    AppServer.sendJsonResponse(exchange, 400, new JSONObject().put("error", "User ID required in path"));
+                    
+                    JSONObject response = new JSONObject();
+                    response.put("success", true);
+                    response.put("data", new JSONObject().put("friends", friendsArr));
+                    AppServer.sendJsonResponse(exchange, 200, response);
                 }
             } else if ("POST".equalsIgnoreCase(method)) {
                 String body = AppServer.readRequestBody(exchange);
@@ -54,9 +99,12 @@ public class FriendHandler implements HttpHandler {
 
                 boolean success = graphService.addFriendship(userId1, userId2);
                 if (success) {
-                    AppServer.sendJsonResponse(exchange, 200, new JSONObject().put("message", "Friendship created successfully"));
+                    JSONObject response = new JSONObject();
+                    response.put("success", true);
+                    response.put("data", new JSONObject().put("message", "Friendship created successfully"));
+                    AppServer.sendJsonResponse(exchange, 200, response);
                 } else {
-                    AppServer.sendJsonResponse(exchange, 400, new JSONObject().put("error", "Could not create friendship. Invalid user IDs or already friends."));
+                    AppServer.sendJsonResponse(exchange, 400, new JSONObject().put("success", false).put("error", "Could not create friendship. Invalid user IDs or already friends."));
                 }
             } else if ("DELETE".equalsIgnoreCase(method)) {
                 String body = AppServer.readRequestBody(exchange);
@@ -66,15 +114,19 @@ public class FriendHandler implements HttpHandler {
 
                 boolean success = graphService.removeFriendship(userId1, userId2);
                 if (success) {
-                    AppServer.sendJsonResponse(exchange, 200, new JSONObject().put("message", "Friendship removed successfully"));
+                    JSONObject response = new JSONObject();
+                    response.put("success", true);
+                    response.put("data", new JSONObject().put("message", "Friendship removed successfully"));
+                    AppServer.sendJsonResponse(exchange, 200, response);
                 } else {
-                    AppServer.sendJsonResponse(exchange, 400, new JSONObject().put("error", "Could not remove friendship. Invalid user IDs or not currently friends."));
+                    AppServer.sendJsonResponse(exchange, 400, new JSONObject().put("success", false).put("error", "Could not remove friendship. Invalid user IDs or not currently friends."));
                 }
             } else {
-                AppServer.sendJsonResponse(exchange, 405, new JSONObject().put("error", "Method not allowed"));
+                AppServer.sendJsonResponse(exchange, 405, new JSONObject().put("success", false).put("error", "Method not allowed"));
             }
         } catch (Exception e) {
-            AppServer.sendJsonResponse(exchange, 500, new JSONObject().put("error", "Internal server error: " + e.getMessage()));
+            e.printStackTrace();
+            AppServer.sendJsonResponse(exchange, 500, new JSONObject().put("success", false).put("error", "Internal server error: " + e.getMessage()));
         }
     }
 }

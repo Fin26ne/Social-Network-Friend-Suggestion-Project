@@ -139,23 +139,21 @@ public class DataStore {
             graph.addVertex(user.getId());
         }
 
-        // Add friendships (24 relationships total, which is >= 20)
+        // Add friendships (25 friendships total, forming 3 clusters)
         String[][] friendships = {
-                { "u1", "u2" }, { "u1", "u3" }, { "u1", "u4" },
-                { "u2", "u3" }, { "u2", "u6" }, { "u2", "u8" },
-                { "u3", "u4" }, { "u3", "u5" }, { "u3", "u9" },
-                { "u4", "u7" }, { "u4", "u10" },
+                // Cluster 1 (7 users, 21 friendships: fully connected)
+                { "u1", "u2" }, { "u1", "u3" }, { "u1", "u4" }, { "u1", "u5" }, { "u1", "u6" }, { "u1", "u7" },
+                { "u2", "u3" }, { "u2", "u4" }, { "u2", "u5" }, { "u2", "u6" }, { "u2", "u7" },
+                { "u3", "u4" }, { "u3", "u5" }, { "u3", "u6" }, { "u3", "u7" },
+                { "u4", "u5" }, { "u4", "u6" }, { "u4", "u7" },
                 { "u5", "u6" }, { "u5", "u7" },
-                { "u6", "u7" }, { "u6", "u8" },
-                { "u7", "u9" }, { "u7", "u10" },
-                { "u8", "u10" },
-                { "u9", "u10" },
-                // Additional relationships to cover u11 and u12 and ensure >= 20
-                { "u11", "u12" },
-                { "u1", "u11" },
-                { "u2", "u12" },
-                { "u11", "u3" },
-                { "u12", "u4" }
+                { "u6", "u7" },
+                
+                // Cluster 2 (3 users, 3 friendships: fully connected)
+                { "u8", "u9" }, { "u9", "u10" }, { "u8", "u10" },
+                
+                // Cluster 3 (2 users, 1 friendship: connected)
+                { "u11", "u12" }
         };
 
         for (String[] edge : friendships) {

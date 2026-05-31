@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialNet - Chọn tài khoản</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --accent: #10b981;
+            --accent-hover: #059669;
+            --card-hover-bg: rgba(99, 102, 241, 0.1);
+            --card-hover-border: rgba(99, 102, 241, 0.4);
+            --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 40px 20px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .logo-area {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));
+        }
+
+        .logo-text h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            background: linear-gradient(to right, #a5b4fc, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @media (min-width: 992px) {
+            .main-container {
+                grid-template-columns: 8fr 4fr;
+            }
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        /* User Grid */
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .user-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+            background: var(--card-hover-bg);
+            border-color: var(--card-hover-border);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .user-card:hover::before {
+            opacity: 1;
+        }
+
+        .avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #818cf8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Color variations for avatars based on user ID index */
+        .user-card:nth-child(2n) .avatar { background: linear-gradient(135deg, #10b981, #34d399); }
+        .user-card:nth-child(3n) .avatar { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+        .user-card:nth-child(4n) .avatar { background: linear-gradient(135deg, #ec4899, #f472b6); }
+
+        .user-name {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        .user-handle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .user-meta {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 12px;
+            font-size: 0.85rem;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .meta-label {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .meta-val {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .meta-val.friends-count {
+            color: var(--accent);
+        }
+
+        /* Add User Form Card */
+        .form-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(12px);
+            align-self: flex-start;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
+        .prefix-input {
+            padding-left: 28px;
+        }
+
+        .prefix-span {
+            position: absolute;
+            left: 14px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        textarea.form-control {
+            padding-left: 14px;
+            resize: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Error/Empty states */
+        .error-container {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px dashed rgba(239, 68, 68, 0.3);
+            border-radius: 16px;
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo-area">
+            <i class="fa-solid fa-share-nodes logo-icon"></i>
+            <div class="logo-text">
+                <h1>SocialNet</h1>
+            </div>
+        </div>
+        <p>Hệ thống mô phỏng đồ thị mạng xã hội & gợi ý bạn bè tối ưu</p>
+    </div>
+
+    <div class="main-container">
+        <!-- Left: User Selection List -->
+        <div>
+            <div class="section-title">
+                <i class="fa-solid fa-users"></i>
+                <h2>Chọn tài khoản để bắt đầu</h2>
+            </div>
+            <div class="user-grid" id="user-grid-container">
+                <!-- User Cards will be dynamically injected here -->
+            </div>
+        </div>
+
+        <!-- Right: Create User Form -->
+        <div class="form-card">
+            <div class="section-title" style="margin-bottom: 20px;">
+                <i class="fa-solid fa-user-plus"></i>
+                <h2>Tạo tài khoản mới</h2>
+            </div>
+            <form id="add-user-form">
+                <div class="form-group">
+                    <label for="name-input">Họ và tên</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-signature"></i>
+                        <input type="text" id="name-input" class="form-control" placeholder="Nguyễn Văn A" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="username-input">Tên đăng nhập (Username)</label>
+                    <div class="input-wrapper">
+                        <span class="prefix-span">@</span>
+                        <input type="text" id="username-input" class="form-control prefix-input" placeholder="nguyenvana" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bio-input">Tiểu sử (Bio)</label>
+                    <textarea id="bio-input" class="form-control" rows="3" placeholder="Chia sẻ sở thích của bạn..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i> Tạo tài khoản
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Load api.js helper -->
+    <script src="js/api.js"></script>
+    <script>
+        // Initials extractor
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 3);
+        }
+
+        // Stable age generator
+        function getAge(userId) {
+            let hash = 0;
+            for (let i = 0; i < userId.length; i++) {
+                hash = userId.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return Math.abs(hash % 12) + 19; // Stable age between 19 and 30
+        }
+
+        // Fetch and Render Users Grid
+        async function loadUsers() {
+            const grid = document.getElementById('user-grid-container');
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);"><i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2rem; margin-bottom: 12px;"></i><p>Đang tải dữ liệu mạng xã hội...</p></div>';
+
+            try {
+                // Get users list
+                const usersResult = await window.api.getUsers();
+                const usersList = usersResult.data.users || [];
+
+                // Get entire network data to count friendships
+                const networkResult = await window.api.getNetworkData();
+                const links = networkResult.data.links || [];
+
+                // Calculate friend count for each user
+                const friendCounts = {};
+                usersList.forEach(u => friendCounts[u.id] = 0);
+                links.forEach(l => {
+                    const s = typeof l.source === 'object' ? l.source.id : l.source;
+                    const t = typeof l.target === 'object' ? l.target.id : l.target;
+                    if (friendCounts[s] !== undefined) friendCounts[s]++;
+                    if (friendCounts[t] !== undefined) friendCounts[t]++;
+                });
+
+                if (usersList.length === 0) {
+                    grid.innerHTML = '<div class="error-container"><i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; margin-bottom: 10px;"></i><p>Không có tài khoản nào trong hệ thống.</p></div>';
+                    return;
+                }
+
+                grid.innerHTML = '';
+                usersList.forEach(user => {
+                    const card = document.createElement('div');
+                    card.className = 'user-card';
+                    card.onclick = () => selectUser(user.id);
+
+                    const initials = getInitials(user.name);
+                    const age = getAge(user.id);
+                    const fCount = friendCounts[user.id] || 0;
+
+                    card.innerHTML = `
+                        <div class="avatar">${initials}</div>
+                        <div class="user-name" title="${user.name}">${user.name}</div>
+                        <div class="user-handle">@${user.username}</div>
+                        <div class="user-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Tuổi</span>
+                                <span class="meta-val">${age}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Bạn bè</span>
+                                <span class="meta-val friends-count">${fCount}</span>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error(err);
+                grid.innerHTML = '<div class="error-container"><i class="fa-solid fa-circle-xmark" style="font-size: 2.5rem; margin-bottom: 12px;"></i><h3>Lỗi tải dữ liệu</h3><p>Không thể kết nối tới máy chủ. Vui lòng đảm bảo server Java đang hoạt động trên cổng 3001.</p></div>';
+            }
+        }
+
+        // Select user and redirect
+        function selectUser(userId) {
+            localStorage.setItem('userId', userId);
+            window.location.href = 'home.html';
+        }
+
+        // Add User Form Submission
+        document.getElementById('add-user-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name-input').value.trim();
+            const username = document.getElementById('username-input').value.trim();
+            const bio = document.getElementById('bio-input').value.trim();
+
+            try {
+                await window.api.createUser({ name, username, bio });
+                // Reset form
+                document.getElementById('add-user-form').reset();
+                // Reload grid
+                loadUsers();
+            } catch (err) {
+                alert('Không thể tạo tài khoản: ' + err.message);
+            }
+        });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', loadUsers);
+    </script>
+</body>
+</html>

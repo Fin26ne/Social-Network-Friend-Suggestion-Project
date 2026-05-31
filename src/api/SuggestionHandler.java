@@ -23,7 +23,7 @@ public class SuggestionHandler implements HttpHandler {
         if (AppServer.handleOptions(exchange)) return;
 
         if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-            AppServer.sendJsonResponse(exchange, 405, new JSONObject().put("error", "Method not allowed"));
+            AppServer.sendJsonResponse(exchange, 405, new JSONObject().put("success", false).put("error", "Method not allowed"));
             return;
         }
 
@@ -34,12 +34,12 @@ public class SuggestionHandler implements HttpHandler {
             String heapType = queryParams.getOrDefault("heapType", "min"); // "min" or "max"
 
             if (userId == null || userId.isEmpty()) {
-                AppServer.sendJsonResponse(exchange, 400, new JSONObject().put("error", "userId parameter is required"));
+                AppServer.sendJsonResponse(exchange, 400, new JSONObject().put("success", false).put("error", "userId parameter is required"));
                 return;
             }
 
             if (graphService.getUserById(userId) == null) {
-                AppServer.sendJsonResponse(exchange, 404, new JSONObject().put("error", "User not found"));
+                AppServer.sendJsonResponse(exchange, 404, new JSONObject().put("success", false).put("error", "User not found"));
                 return;
             }
 
@@ -60,14 +60,19 @@ public class SuggestionHandler implements HttpHandler {
                 recsArr.put(rec.toJSONObject());
             }
 
+            JSONObject responseData = new JSONObject();
+            responseData.put("suggestions", recsArr);
+            responseData.put("executionTimeMs", durationMs);
+            responseData.put("heapUsed", heapType);
+
             JSONObject response = new JSONObject();
-            response.put("suggestions", recsArr);
-            response.put("executionTimeMs", durationMs);
-            response.put("heapUsed", heapType);
+            response.put("success", true);
+            response.put("data", responseData);
 
             AppServer.sendJsonResponse(exchange, 200, response);
         } catch (Exception e) {
-            AppServer.sendJsonResponse(exchange, 500, new JSONObject().put("error", "Internal server error: " + e.getMessage()));
+            e.printStackTrace();
+            AppServer.sendJsonResponse(exchange, 500, new JSONObject().put("success", false).put("error", "Internal server error: " + e.getMessage()));
         }
     }
 }

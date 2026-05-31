@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialNet - Trang cá nhân</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --accent: #10b981;
+            --accent-hover: #059669;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --card-hover-bg: rgba(255, 255, 255, 0.02);
+            --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 30px 20px;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto 30px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            backdrop-filter: blur(12px);
+        }
+
+        .back-btn {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+        }
+
+        .active-profile-summary {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-avatar-mini {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .profile-info-mini h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .profile-info-mini span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto 24px auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        .stat-info h4 {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .stat-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* 3-Column Layout */
+        .dashboard-grid {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 3.5fr 4fr 4.5fr;
+            }
+        }
+
+        .column-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 500px;
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 14px;
+        }
+
+        .column-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .column-header h2 i {
+            color: var(--primary);
+        }
+
+        .scrollable-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-right: 4px;
+        }
+
+        /* Scrollbar styling */
+        .scrollable-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollable-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .scrollable-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+        }
+        .scrollable-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* User List Items */
+        .user-item {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .user-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .user-item-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-item-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .user-item-details h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .user-item-details span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .btn-action-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action-circle:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Suggestion card details */
+        .suggestion-item {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .suggestion-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-add-friend {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add-friend:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Score Progress Bar */
+        .score-bar-container {
+            width: 100%;
+        }
+
+        .score-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .score-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            border-radius: 3px;
+        }
+
+        /* D3 Graph Card */
+        .graph-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .canvas-container {
+            width: 100%;
+            height: 320px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        #network-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .graph-legend {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            font-size: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .dot.active { background-color: var(--primary); }
+        .dot.friend { background-color: var(--accent); }
+        .dot.fof { background-color: #3b82f6; }
+
+        /* Tools inside Column 3 */
+        .audit-console {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 12px;
+            height: 160px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #10b981;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .log-item {
+            line-height: 1.4;
+        }
+
+        .log-item.warn { color: #f59e0b; }
+        .log-item.err { color: #ef4444; }
+
+        .traversal-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .btn-traversal {
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: #c7d2fe;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-traversal:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .traversal-result {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 150px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            gap: 10px;
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="index.html" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i> Quay lại chọn tài khoản
+        </a>
+        <div class="active-profile-summary" id="active-profile-bar">
+            <div class="profile-avatar-mini" id="active-avatar-initials">-</div>
+            <div class="profile-info-mini">
+                <h3 id="active-name">Tên người dùng</h3>
+                <span id="active-username">@username</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-info">
+                <h4 id="stat-total-users">0</h4>
+                <p>Tổng số thành viên</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-user-group"></i></div>
+            <div class="stat-info">
+                <h4 id="stat-friend-count">0</h4>
+                <p>Bạn bè của bạn</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-chart-line"></i></div>
+            <div class="stat-info">
+                <h4 id="stat-max-jaccard">0%</h4>
+                <p>Độ trùng khớp cao nhất</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Columns -->
+    <div class="dashboard-grid">
+        <!-- COLUMN 1: Friends List -->
+        <div class="column-card">
+            <div class="column-header">
+                <h2><i class="fa-solid fa-user-group"></i> Bạn bè</h2>
+            </div>
+            <div class="scrollable-list" id="friends-list-container">
+                <!-- Direct friends list goes here -->
+            </div>
+        </div>
+
+        <!-- COLUMN 2: Suggestions & Score -->
+        <div class="column-card">
+            <div class="column-header">
+                <h2><i class="fa-solid fa-wand-magic-sparkles"></i> Gợi ý kết bạn</h2>
+            </div>
+            <div class="scrollable-list" id="suggestions-list-container">
+                <!-- Suggestions with Jaccard progress bars -->
+            </div>
+        </div>
+
+        <!-- COLUMN 3: Activity & D3 Graph -->
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+            <!-- D3 Graph -->
+            <div class="graph-card">
+                <div class="column-header" style="border-bottom: none; padding-bottom: 0;">
+                    <h2><i class="fa-solid fa-circle-nodes"></i> Đồ thị liên kết (Bán kính = 2)</h2>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="network-canvas"></canvas>
+                </div>
+                <div class="graph-legend">
+                    <div class="legend-item"><span class="dot active"></span> Bạn</div>
+                    <div class="legend-item"><span class="dot friend"></span> Bạn bè (Lớp 1)</div>
+                    <div class="legend-item"><span class="dot fof"></span> Bạn của bạn (Lớp 2)</div>
+                </div>
+            </div>
+
+            <!-- Traversals & Logs -->
+            <div class="column-card" style="min-height: auto; padding: 20px;">
+                <h3 style="font-size: 1rem; font-weight: 600;"><i class="fa-solid fa-terminal" style="color: var(--primary);"></i> Phân tích mạng xã hội</h3>
+                
+                <div class="traversal-section">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn-traversal" onclick="runTraversal('bfs')">
+                            <i class="fa-solid fa-magnifying-glass"></i> Chạy BFS
+                        </button>
+                        <button class="btn-traversal" onclick="runTraversal('dfs')">
+                            <i class="fa-solid fa-network-wired"></i> Chạy DFS
+                        </button>
+                    </div>
+                    <div id="traversal-result-box" class="traversal-result" style="display: none;"></div>
+                </div>
+
+                <h3 style="font-size: 1rem; font-weight: 600; margin-top: 15px;"><i class="fa-solid fa-list-check" style="color: var(--primary);"></i> Nhật ký hoạt động</h3>
+                <div class="audit-console" id="audit-log">
+                    <!-- Logs go here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API JS helper -->
+    <script src="js/api.js"></script>
+    <script>
+        const activeUserId = localStorage.getItem('userId');
+
+        // Redirect if not logged in
+        if (!activeUserId) {
+            window.location.href = 'index.html';
+        }
+
+        // Initials Helper
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 3);
+        }
+
+        // Log to console utility
+        function addLog(msg, type = 'info') {
+            const consoleBox = document.getElementById('audit-log');
+            const item = document.createElement('div');
+            item.className = `log-item ${type}`;
+            const time = new Date().toLocaleTimeString();
+            item.innerHTML = `[${time}] ${msg}`;
+            consoleBox.appendChild(item);
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        // Fetch user data, populate page stats, friends list, suggestions and D3 graph
+        async function initPage() {
+            try {
+                // Get active user profile
+                const profileResult = await window.api.getUserById(activeUserId);
+                const activeUser = profileResult.data;
+
+                // Set header profile summary
+                document.getElementById('active-name').innerText = activeUser.name;
+                document.getElementById('active-username').innerText = '@' + activeUser.username;
+                document.getElementById('active-avatar-initials').innerText = getInitials(activeUser.name);
+
+                addLog(`Đã tải thông tin tài khoản: ${activeUser.name}`);
+
+                // Load Stats & Data
+                await refreshDashboard();
+
+            } catch (err) {
+                console.error(err);
+                addLog('Lỗi tải dữ liệu tài khoản chính.', 'err');
+            }
+        }
+
+        // Refresh Lists & Stats & Graph
+        async function refreshDashboard() {
+            try {
+                // Total users count
+                const usersResult = await window.api.getUsers();
+                const totalUsers = usersResult.data.users || [];
+                document.getElementById('stat-total-users').innerText = totalUsers.length;
+
+                // Friends list
+                const friendsResult = await window.api.getFriends(activeUserId);
+                const friendsList = friendsResult.data.friends || [];
+                document.getElementById('stat-friend-count').innerText = friendsList.length;
+
+                renderFriendsList(friendsList);
+
+                // Recommendations list
+                const suggestionsResult = await window.api.getSuggestions(activeUserId, 5, 'min');
+                const suggestionsList = suggestionsResult.data.suggestions || [];
+                const executionTime = suggestionsResult.data.executionTimeMs || 0;
+
+                renderSuggestionsList(suggestionsList, executionTime);
+
+                // Update Highest Jaccard score
+                let maxJaccard = 0;
+                suggestionsList.forEach(s => {
+                    if (s.jaccardSimilarity > maxJaccard) {
+                        maxJaccard = s.jaccardSimilarity;
+                    }
+                });
+                document.getElementById('stat-max-jaccard').innerText = (maxJaccard * 100).toFixed(0) + '%';
+
+                // Load network graph data and process depth=2 subnetwork
+                const networkResult = await window.api.getNetworkData();
+                const allNodes = networkResult.data.nodes || [];
+                const allLinks = networkResult.data.links || [];
+
+                const subnetwork = getDepth2Subnetwork(activeUserId, allNodes, allLinks);
+                initD3Graph(subnetwork.nodes, subnetwork.links, activeUserId);
+
+            } catch (err) {
+                console.error(err);
+                addLog('Không thể kết nối đến server để cập nhật dữ liệu.', 'err');
+            }
+        }
+
+        // Render Friends List Column 1
+        function renderFriendsList(friends) {
+            const container = document.getElementById('friends-list-container');
+            if (friends.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-regular fa-face-frown"></i>
+                        <p>Bạn chưa kết bạn với ai.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            friends.forEach(f => {
+                const item = document.createElement('div');
+                item.className = 'user-item';
+                item.innerHTML = `
+                    <div class="user-item-info">
+                        <div class="user-item-avatar">${getInitials(f.name)}</div>
+                        <div class="user-item-details">
+                            <h4>${f.name}</h4>
+                            <span>@${f.username}</span>
+                        </div>
+                    </div>
+                    <button class="btn-action-circle" onclick="unfriend('${f.id}', '${f.name}')" title="Huỷ kết bạn">
+                        <i class="fa-solid fa-user-minus"></i>
+                    </button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Render Suggestions Column 2
+        function renderSuggestionsList(suggestions, executionTime) {
+            const container = document.getElementById('suggestions-list-container');
+            if (suggestions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-face-smile"></i>
+                        <p>Không có gợi ý mới. Bạn đã kết bạn với tất cả mọi người!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            suggestions.forEach(s => {
+                const percent = (s.jaccardSimilarity * 100).toFixed(0);
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `
+                    <div class="suggestion-row">
+                        <div class="user-item-info">
+                            <div class="user-item-avatar" style="background: var(--primary);">${getInitials(s.user.name)}</div>
+                            <div class="user-item-details">
+                                <h4>${s.user.name}</h4>
+                                <span>@${s.user.username} (${s.mutualFriends} bạn chung)</span>
+                            </div>
+                        </div>
+                        <button class="btn-add-friend" onclick="connect('${s.user.id}', '${s.user.name}')">
+                            <i class="fa-solid fa-user-plus"></i> Kết bạn
+                        </button>
+                    </div>
+                    <div class="score-bar-container">
+                        <div class="score-bar-label">
+                            <span>Độ tương đồng</span>
+                            <span>${percent}%</span>
+                        </div>
+                        <div class="score-bar-bg">
+                            <div class="score-bar-fill" style="width: ${percent}%;"></div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+
+            addLog(`Đã gợi ý ${suggestions.length} tài khoản trong ${executionTime.toFixed(3)} ms`);
+        }
+
+        // Establish Friendship
+        async function connect(targetId, targetName) {
+            try {
+                await window.api.addFriend(activeUserId, targetId);
+                addLog(`Đã kết bạn với ${targetName}!`, 'info');
+                await refreshDashboard();
+            } catch (err) {
+                alert('Lỗi kết bạn: ' + err.message);
+            }
+        }
+
+        // Sever Friendship
+        async function unfriend(targetId, targetName) {
+            if (!confirm(`Bạn có chắc chắn muốn huỷ kết bạn với ${targetName}?`)) return;
+            try {
+                await window.api.removeFriend(activeUserId, targetId);
+                addLog(`Đã huỷ kết bạn với ${targetName}.`, 'warn');
+                await refreshDashboard();
+            } catch (err) {
+                alert('Lỗi huỷ kết bạn: ' + err.message);
+            }
+        }
+
+        // BFS / DFS Traversals locally or via API
+        async function runTraversal(type) {
+            try {
+                // Call standard network traversal endpoint
+                const res = await window.api.getNetworkData();
+                const nodes = res.data.nodes || [];
+                const links = res.data.links || [];
+
+                // Compute local BFS/DFS traversal order starting from activeUser
+                const order = runLocalTraversal(type, activeUserId, nodes, links);
+                
+                const box = document.getElementById('traversal-result-box');
+                box.style.display = 'block';
+                box.innerText = `${type.toUpperCase()}: ` + order.join(' ➔ ');
+                addLog(`Chạy thuật toán ${type.toUpperCase()} xuất phát từ bạn.`);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function runLocalTraversal(type, startId, allNodes, allLinks) {
+            const order = [];
+            const visited = {};
+            const adj = {};
+
+            allNodes.forEach(n => adj[n.id] = []);
+            allLinks.forEach(l => {
+                const s = typeof l.source === 'object' ? l.source.id : l.source;
+                const t = typeof l.target === 'object' ? l.target.id : l.target;
+                if (adj[s]) adj[s].push(t);
+                if (adj[t]) adj[t].push(s);
+            });
+
+            // Sort neighbors alphabetically for stable comparison
+            allNodes.forEach(n => {
+                if (adj[n.id]) adj[n.id].sort();
+            });
+
+            if (type === 'bfs') {
+                const queue = [startId];
+                visited[startId] = true;
+
+                while (queue.length > 0) {
+                    const curr = queue.shift();
+                    order.push(curr);
+
+                    adj[curr].forEach(neighbor => {
+                        if (!visited[neighbor]) {
+                            visited[neighbor] = true;
+                            queue.push(neighbor);
+                        }
+                    });
+                }
+            } else {
+                const dfsHelper = (curr) => {
+                    visited[curr] = true;
+                    order.push(curr);
+
+                    adj[curr].forEach(neighbor => {
+                        if (!visited[neighbor]) {
+                            dfsHelper(neighbor);
+                        }
+                    });
+                };
+                dfsHelper(startId);
+            }
+
+            return order;
+        }
+
+        // Subnetwork of depth <= 2 around the selected active user
+        function getDepth2Subnetwork(activeUserId, allNodes, allLinks) {
+            const neighbors = new Set();
+            const neighborsOfNeighbors = new Set();
+
+            const adj = {};
+            allNodes.forEach(n => adj[n.id] = new Set());
+            allLinks.forEach(l => {
+                const s = typeof l.source === 'object' ? l.source.id : l.source;
+                const t = typeof l.target === 'object' ? l.target.id : l.target;
+                if (adj[s]) adj[s].add(t);
+                if (adj[t]) adj[t].add(s);
+            });
+
+            if (adj[activeUserId]) {
+                adj[activeUserId].forEach(friendId => {
+                    neighbors.add(friendId);
+                    if (adj[friendId]) {
+                        adj[friendId].forEach(fofId => {
+                            if (fofId !== activeUserId && !neighbors.has(fofId)) {
+                                neighborsOfNeighbors.add(fofId);
+                            }
+                        });
+                    }
+                });
+            }
+
+            const subNodesSet = new Set([activeUserId, ...neighbors, ...neighborsOfNeighbors]);
+            const subNodes = allNodes.filter(n => subNodesSet.has(n.id)).map(n => {
+                let depth = 0;
+                if (neighbors.has(n.id)) depth = 1;
+                else if (neighborsOfNeighbors.has(n.id)) depth = 2;
+                return { id: n.id, name: n.name, username: n.username, depth };
+            });
+
+            // Keep only links where both source and target are in our subNodesSet
+            const subLinks = allLinks
+                .filter(l => {
+                    const s = typeof l.source === 'object' ? l.source.id : l.source;
+                    const t = typeof l.target === 'object' ? l.target.id : l.target;
+                    return subNodesSet.has(s) && subNodesSet.has(t);
+                })
+                .map(l => {
+                    const s = typeof l.source === 'object' ? l.source.id : l.source;
+                    const t = typeof l.target === 'object' ? l.target.id : l.target;
+                    return { source: s, target: t };
+                });
+
+            return { nodes: subNodes, links: subLinks };
+        }
+
+        // D3 Canvas force simulation representation
+        let simulation;
+        function initD3Graph(nodes, links, activeId) {
+            const canvas = document.getElementById('network-canvas');
+            const context = canvas.getContext('2d');
+            
+            // Adjust canvas resolution for size
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            const width = canvas.width;
+            const height = canvas.height;
+
+            if (simulation) simulation.stop();
+
+            simulation = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).id(d => d.id).distance(80))
+                .force("charge", d3.forceManyBody().strength(-200))
+                .force("center", d3.forceCenter(width / 2, height / 2))
+                .force("collide", d3.forceCollide().radius(22));
+
+            simulation.on("tick", () => {
+                context.clearRect(0, 0, width, height);
+
+                // Draw links
+                context.strokeStyle = "rgba(255, 255, 255, 0.08)";
+                context.lineWidth = 1.5;
+                links.forEach(d => {
+                    context.beginPath();
+                    context.moveTo(d.source.x, d.source.y);
+                    context.lineTo(d.target.x, d.target.y);
+                    context.stroke();
+                });
+
+                // Draw nodes
+                nodes.forEach(d => {
+                    context.beginPath();
+                    context.arc(d.x, d.y, 14, 0, 2 * Math.PI);
+                    
+                    if (d.id === activeId) {
+                        context.fillStyle = "#6366f1"; // Indigo/Purple
+                    } else if (d.depth === 1) {
+                        context.fillStyle = "#10b981"; // Green
+                    } else {
+                        context.fillStyle = "#3b82f6"; // Blue
+                    }
+                    context.fill();
+                    context.strokeStyle = "rgba(255, 255, 255, 0.3)";
+                    context.lineWidth = 1;
+                    context.stroke();
+
+                    // Text labels
+                    context.fillStyle = "#f3f4f6";
+                    context.font = "bold 10px Outfit, sans-serif";
+                    context.textAlign = "center";
+                    context.fillText(d.name, d.x, d.y + 24);
+                });
+            });
+
+            // Drag support in canvas
+            d3.select(canvas).call(d3.drag()
+                .container(canvas)
+                .subject(event => simulation.find(event.x, event.y, 25))
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+
+            function dragstarted(event) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                event.subject.fx = event.subject.x;
+                event.subject.fy = event.subject.y;
+            }
+
+            function dragged(event) {
+                event.subject.fx = event.x;
+                event.subject.fy = event.y;
+            }
+
+            function dragended(event) {
+                if (!event.active) simulation.alphaTarget(0);
+                event.subject.fx = null;
+                event.subject.fy = null;
+            }
+        }
+
+        // Initialize Page
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>
