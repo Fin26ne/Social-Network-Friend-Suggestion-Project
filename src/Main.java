@@ -7,8 +7,16 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
+        // Force console encoding to UTF-8 for proper Vietnamese text rendering
+        try {
+            System.setOut(new java.io.PrintStream(System.out, true, "UTF-8"));
+            System.setErr(new java.io.PrintStream(System.err, true, "UTF-8"));
+        } catch (java.io.UnsupportedEncodingException e) {
+            System.err.println("Warning: UTF-8 encoding not supported for console output.");
+        }
+
         String dataDirectoryPath = "backend-java/data";
-        
+
         System.out.println("Initializing Social Network Graph...");
         GraphService graphService = new GraphService(dataDirectoryPath);
 
@@ -27,7 +35,7 @@ public class Main {
         if (!consoleOnly) {
             final int port = 3001;
             apiServer = new AppServer(port, graphService);
-            
+
             // Start ApiServer in a background thread (daemon = true) exactly once
             Thread serverThread = new Thread(new Runnable() {
                 @Override

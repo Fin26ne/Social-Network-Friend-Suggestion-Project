@@ -34,4 +34,5 @@ if exist "C:\Program Files\Java\jdk1.8.0_202\bin\java.exe" (
 echo Opening web application and research dashboard in default browser...
 start http://localhost:3001
 start http://localhost:3001/research.html
-"%JAVA_CMD%" -cp "bin;lib/json.jar" Main
+chcp 65001 >nul
+"%JAVA_CMD%" -Dfile.encoding=UTF-8 -cp "bin;lib/json.jar" Main

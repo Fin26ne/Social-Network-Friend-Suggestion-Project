@@ -14,7 +14,7 @@ public class ConsoleMenu {
 
     public ConsoleMenu(GraphService graphService) {
         this.graphService = graphService;
-        this.scanner = new Scanner(System.in);
+        this.scanner = new Scanner(System.in, "UTF-8");
     }
 
     public void start() {
@@ -90,7 +90,7 @@ public class ConsoleMenu {
         }
         System.out.println("Users list (" + users.size() + " total):");
         for (User user : users) {
-            System.out.printf("- [%s] %s (@%s) - %s\n", user.getId(), user.getName(), user.getUsername(), user.getBio());
+            System.out.printf("- [%s] %s (@%s) - %s\n", user.getId(), removeAccent(user.getName()), user.getUsername(), removeAccent(user.getBio()));
         }
     }
 
@@ -109,7 +109,7 @@ public class ConsoleMenu {
             }
 
             User created = graphService.addUser(name, username, bio);
-            System.out.println("User added successfully: " + created);
+            System.out.println("User added successfully: " + removeAccent(created.getName()) + " (@" + created.getUsername() + ")");
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         } catch (Exception e) {
@@ -181,13 +181,13 @@ public class ConsoleMenu {
             }
 
             SinglyLinkedList<String> friends = graphService.getFriends(id);
-            System.out.println("Friends of " + user.getName() + " (" + friends.size() + " total):");
+            System.out.println("Friends of " + removeAccent(user.getName()) + " (" + friends.size() + " total):");
             if (friends.isEmpty()) {
                 System.out.println("  (No friends yet)");
             } else {
                 for (String fId : friends) {
                     User friend = graphService.getUserById(fId);
-                    System.out.println("  - [" + fId + "] " + (friend != null ? friend.getName() : "Unknown"));
+                    System.out.println("  - [" + fId + "] " + (friend != null ? removeAccent(friend.getName()) : "Unknown"));
                 }
             }
 
@@ -203,12 +203,12 @@ public class ConsoleMenu {
                 }
 
                 SinglyLinkedList<String> friends2 = graphService.getFriends(id2);
-                System.out.println("Mutual friends between " + user.getName() + " and " + user2.getName() + ":");
+                System.out.println("Mutual friends between " + removeAccent(user.getName()) + " and " + removeAccent(user2.getName()) + ":");
                 boolean found = false;
                 for (String fId : friends) {
                     if (friends2.contains(fId)) {
                         User mf = graphService.getUserById(fId);
-                        System.out.println("  - [" + fId + "] " + (mf != null ? mf.getName() : "Unknown"));
+                        System.out.println("  - [" + fId + "] " + (mf != null ? removeAccent(mf.getName()) : "Unknown"));
                         found = true;
                     }
                 }
@@ -254,14 +254,14 @@ public class ConsoleMenu {
             }
             long duration = System.nanoTime() - startTime;
 
-            System.out.println("\nRecommendations for " + user.getName() + ":");
+            System.out.println("\nRecommendations for " + removeAccent(user.getName()) + ":");
             if (recs.isEmpty()) {
                 System.out.println("  (No recommendations found)");
             } else {
                 int rank = 1;
                 for (Recommendation rec : recs) {
                     System.out.printf("  Rank %d: %s (Mutual Friends: %d, Jaccard: %.2f)\n", 
-                            rank++, rec.getUser().getName(), rec.getMutualFriends(), rec.getJaccardSimilarity());
+                            rank++, removeAccent(rec.getUser().getName()), rec.getMutualFriends(), rec.getJaccardSimilarity());
                 }
             }
             System.out.printf("Query executed in %.4f ms\n", duration / 1_000_000.0);
@@ -375,5 +375,16 @@ public class ConsoleMenu {
             }
             System.out.println();
         }
+    }
+
+    private static String removeAccent(String s) {
+        if (s == null) return null;
+        String normalized = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD);
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        String result = pattern.matcher(normalized).replaceAll("");
+        // Replace Vietnamese specific characters that Normalizer doesn't handle fully
+        result = result.replaceAll("[Đ]", "D");
+        result = result.replaceAll("[đ]", "d");
+        return result;
     }
 }
