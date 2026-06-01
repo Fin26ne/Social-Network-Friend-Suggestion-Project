@@ -1,0 +1,79 @@
+@startuml use_case_diagram
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+
+skinparam usecase {
+  BackgroundColor #E8F4FD
+  BorderColor #2E86C1
+  FontColor #1B4F72
+  ArrowColor #2E86C1
+  StereotypeFontColor #7B7D7D
+}
+
+skinparam actor {
+  BackgroundColor #F9E79F
+  BorderColor #B7950B
+  FontColor #1B4F72
+}
+
+skinparam rectangle {
+  BackgroundColor #FDFEFE
+  BorderColor #2E86C1
+  RoundCorner 15
+}
+
+left to right direction
+
+actor "Người dùng\n(User)" as User <<Primary>>
+actor "Hệ thống Java\n(System)" as System <<Secondary>>
+
+rectangle "Social Network Friend Suggestion System" {
+
+  usecase "UC01 — Chọn tài khoản\n(Select Profile)" as UC01
+  usecase "UC02 — Xem danh sách bạn bè\n(View Friends)" as UC02
+  usecase "UC03 — Thêm bạn bè\n(Add Friend)" as UC03
+  usecase "UC04 — Xóa bạn bè\n(Remove Friend)" as UC04
+  usecase "UC05 — Xem gợi ý kết bạn\n(View Suggestions)" as UC05
+  usecase "UC06 — Tìm kiếm người dùng\n(Search Users)" as UC06
+  usecase "UC07 — Xem mạng lưới kết nối\n(View Network Graph)" as UC07
+  usecase "UC08 — Xem kết quả nghiên cứu\n(View Research Results)" as UC08
+  usecase "UC09 — Thêm người dùng mới\n(Add New User)" as UC09
+
+  usecase "UC10 — Tính điểm Jaccard\n(Calculate Jaccard Score)" as UC10
+  usecase "UC11 — Duyệt BFS Level-2\n(BFS Traversal)" as UC11
+  usecase "UC12 — Xếp hạng bằng MinHeap\n(Rank via MinHeap)" as UC12
+  usecase "UC13 — Chạy Benchmark\n(Run Benchmark)" as UC13
+}
+
+' User connections
+User --> UC01
+User --> UC02
+User --> UC03
+User --> UC04
+User --> UC05
+User --> UC06
+User --> UC07
+User --> UC08
+User --> UC09
+
+' System connections
+UC10 --> System
+UC11 --> System
+UC12 --> System
+UC13 --> System
+
+' Include relationships
+UC05 ..> UC11 : <<include>>
+UC05 ..> UC10 : <<include>>
+UC05 ..> UC12 : <<include>>
+
+' Extend relationship (UC03 extends UC05: arrow from UC05 to UC03)
+UC05 .> UC03 : <<extend>>
+
+' Include for benchmark
+UC08 ..> UC13 : <<include>>
+
+@enduml
