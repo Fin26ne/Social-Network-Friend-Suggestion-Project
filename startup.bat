@@ -6,7 +6,7 @@ echo Creating output directories...
 if not exist bin mkdir bin
 
 echo Compiling Java source files...
-powershell -ExecutionPolicy Bypass -File compile.ps1
+javac -encoding UTF-8 -cp "lib/json.jar" -d bin src/Main.java src/BenchmarkRunner.java src/api/*.java src/benchmark/*.java src/console/*.java src/datastructures/*.java src/graph/*.java src/model/*.java src/service/*.java src/services/*.java
 
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Compilation failed!
