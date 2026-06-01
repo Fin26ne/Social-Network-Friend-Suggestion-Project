@@ -113,9 +113,9 @@
         <a href="#">MẠNG LƯỚI</a>
         <a href="#" class="active">NGHIÊN CỨU</a>
     </div>
-    <div class="user-profile">
-        <span>Phạm Thị Lan</span>
-        <div class="avatar-badge">PT</div>
+    <div class="user-profile" id="user-profile-btn" style="cursor: pointer;" onclick="location.href='home.html'">
+        <span id="badge-name">Phạm Thị Lan</span>
+        <div class="avatar-badge" id="badge-avatar">PT</div>
     </div>
 </div>
 
@@ -256,14 +256,34 @@
     Dữ liệu Benchmark thời gian thực hệ thống mạng xã hội nội bộ — Toàn quyền bảo lưu.
 </div>
 
+<script src="js/api.js"></script>
 <script>
     // Dữ liệu mốc tĩnh ban đầu theo ảnh thực nghiệm của team
     let datasetRQ1 = [ { label: '100', v1: 207200, v2: 627600 }, { label: '500', v1: 372520, v2: 350100 }, { label: '1000', v1: 389140, v2: 314920 }, { label: '5000', v1: 479800, v2: 465820 }, { label: '10000', v1: 422700, v2: 402520 } ];
     let datasetRQ2 = [ { label: '100', v1: 0, v2: 10 }, { label: '500', v1: 1219, v2: 244 }, { label: '1000', v1: 1219, v2: 977 }, { label: '2000', v1: 2438, v2: 3906 }, { label: '5000', v1: 8532, v2: 24414 } ];
     let datasetRQ3 = [ { label: '100', v1: 399520, v2: 215820 }, { label: '1000', v1: 172060, v2: 377120 }, { label: '5000', v1: 543420, v2: 156740 }, { label: '10000', v1: 582340, v2: 40280 } ];
 
+    function getAvatarInitials(name) {
+        if (!name) return "?";
+        const parts = name.trim().split(" ");
+        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
     window.onload = function() {
         drawCharts();
+        
+        // Load dynamic user profile details
+        const userId = localStorage.getItem("userId");
+        if (userId && window.api) {
+            window.api.getUserById(userId).then(res => {
+                if (res.success && res.data) {
+                    const self = res.data;
+                    document.getElementById("badge-name").textContent = self.name;
+                    document.getElementById("badge-avatar").textContent = getAvatarInitials(self.name);
+                }
+            });
+        }
     };
 
     // LOGIC CHÍNH XỬ LÝ DUAL MODE: KHỚP API THẬT HOẶC TỰ ĐỘNG CHUYỂN SANG MOCK REAL-TIME
