@@ -37,10 +37,6 @@
     },
     {
         "userId1": "u1",
-        "userId2": "u11"
-    },
-    {
-        "userId1": "u1",
         "userId2": "u12"
     },
     {
@@ -50,6 +46,14 @@
     {
         "userId1": "u10",
         "userId2": "u8"
+    },
+    {
+        "userId1": "u10",
+        "userId2": "u11"
+    },
+    {
+        "userId1": "u10",
+        "userId2": "u12"
     },
     {
         "userId1": "u11",
