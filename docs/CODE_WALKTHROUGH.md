@@ -11,38 +11,39 @@ Hệ thống được tổ chức thành 4 Layer kiến trúc rõ rệt để t�
 4. **LAYER 4 — API (`src/api/`)**: Server HTTP thuần sử dụng `com.sun.net.httpserver` bọc các Handler để tiếp nhận yêu cầu từ Frontend và phản hồi định dạng JSON chuẩn.
 
 Sơ đồ mô tả mối quan hệ giữa các Layer:
-```text
-+-------------------------------------------------------------+
-|                     LAYER 4 — API (REST)                    |
-|  [AppServer] -> [UserHandler], [FriendHandler],             |
-|                 [SuggestionHandler], [BenchmarkHandler]     |
-+------------------------------+------------------------------+
-                               | sử dụng
-                               v
-+-------------------------------------------------------------+
-|                   LAYER 3 — SERVICES                        |
-|  [GraphService] <---+---> [RecommendationEngine]            |
-|       |             |           |                           |
-|       | sử dụng     | sử dụng   | sử dụng                   |
-|       v             v           v                           |
-|  [DataStore]   [MyGraph]   [MyMinHeap] / [MyMaxHeap]        |
-+---------------------+-----------+---------------------------+
-                      |           |
-                      | sử dụng   | sử dụng
-                      v           v
-+-------------------------------------------------------------+
-|                 LAYER 2 — MODELS (Dữ liệu)                  |
-|  [User] <=========> [Recommendation]                        |
-+---------------------+-----------+---------------------------+
-                      |           |
-                      | sử dụng   | sử dụng
-                      v           v
-+-------------------------------------------------------------+
-|              LAYER 1 — CUSTOM DATA STRUCTURES               |
-|  [MySinglyLinkedList] <--- [MyQueue]                        |
-|  [MyBST] <--- [MyGraph]                                     |
-|  [MyAdjacencyMatrix], [MyDFS]                               |
-+-------------------------------------------------------------+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#f8fafc', 'primaryTextColor': '#0f172a', 'primaryBorderColor': '#cbd5e1', 'lineColor': '#64748b'}}}%%
+flowchart TD
+    classDef api fill:#0ea5e9,stroke:#0369a1,color:#fff,rx:5px,ry:5px
+    classDef service fill:#f59e0b,stroke:#b45309,color:#fff,rx:5px,ry:5px
+    classDef model fill:#10b981,stroke:#047857,color:#fff,rx:5px,ry:5px
+    classDef data fill:#8b5cf6,stroke:#5b21b6,color:#fff,rx:5px,ry:5px
+
+    subgraph L4 [LAYER 4 — API REST]
+        API[AppServer, Handlers] ::: api
+    end
+
+    subgraph L3 [LAYER 3 — SERVICES]
+        GS[GraphService] ::: service
+        RE[RecommendationEngine] ::: service
+        DS[DataStore] ::: service
+    end
+
+    subgraph L2 [LAYER 2 — MODELS]
+        M_USER[User, Friendship] ::: model
+        M_REC[Recommendation] ::: model
+    end
+
+    subgraph L1 [LAYER 1 — CUSTOM DATA STRUCTURES]
+        DS_LL[MySinglyLinkedList, MyQueue] ::: data
+        DS_BST[MyBST, MyGraph] ::: data
+        DS_HEAP[MyMinHeap, MyMaxHeap] ::: data
+    end
+
+    L4 -->|Sử dụng| L3
+    L3 -->|Phụ thuộc dữ liệu| L2
+    L3 -->|Tối ưu thuật toán| L1
+    L2 -->|Lưu trữ trong| L1
 ```
 
 ---
