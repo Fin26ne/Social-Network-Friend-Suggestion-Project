@@ -36,8 +36,7 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo Compilation successful! Starting Java application...
 
-echo Opening web application and research dashboard in default browser...
-start http://localhost:3001
-start http://localhost:3001/research.html
+echo Opening web application and research dashboard in default browser (with 2s delay)...
+start /b cmd /c "timeout /t 2 >nul & start http://localhost:3001 & start http://localhost:3001/research.html"
 chcp 65001 >nul
 "%JAVA_CMD%" -Dfile.encoding=UTF-8 -cp "bin;lib/json.jar" Main
