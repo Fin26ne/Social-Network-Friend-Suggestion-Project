@@ -13,15 +13,38 @@ for /f "tokens=5" %%a in ('netstat -aon ^| findstr :3001 ^| findstr LISTENING 2^
 
 set "JAVA_CMD=java"
 set "JAVAC_CMD=javac"
-if exist "C:\Program Files\Java\jdk1.8.0_202\bin\java.exe" (
-    set "JAVA_CMD=C:\Program Files\Java\jdk1.8.0_202\bin\java.exe"
-    set "JAVAC_CMD=C:\Program Files\Java\jdk1.8.0_202\bin\javac.exe"
-) else if defined JAVA_HOME (
-    if exist "%JAVA_HOME%\bin\java.exe" (
-        set "JAVA_CMD=%JAVA_HOME%\bin\java.exe"
+
+rem Check for JDK 17 (specifically 17.0.12 or general 17)
+if exist "C:\Program Files\Java\jdk-17.0.12\bin\java.exe" (
+    set "JAVA_CMD=C:\Program Files\Java\jdk-17.0.12\bin\java.exe"
+    set "JAVAC_CMD=C:\Program Files\Java\jdk-17.0.12\bin\javac.exe"
+) else (
+    for /d %%i in ("C:\Program Files\Java\jdk-17*") do (
+        if exist "%%i\bin\java.exe" (
+            set "JAVA_CMD=%%i\bin\java.exe"
+            set "JAVAC_CMD=%%i\bin\javac.exe"
+        )
     )
-    if exist "%JAVA_HOME%\bin\javac.exe" (
-        set "JAVAC_CMD=%JAVA_HOME%\bin\javac.exe"
+    for /d %%i in ("C:\Program Files\Java\jdk17*") do (
+        if exist "%%i\bin\java.exe" (
+            set "JAVA_CMD=%%i\bin\java.exe"
+            set "JAVAC_CMD=%%i\bin\javac.exe"
+        )
+    )
+)
+
+rem If JDK 17 is not found, check for JDK 1.8 or JAVA_HOME
+if "%JAVA_CMD%"=="java" (
+    if exist "C:\Program Files\Java\jdk1.8.0_202\bin\java.exe" (
+        set "JAVA_CMD=C:\Program Files\Java\jdk1.8.0_202\bin\java.exe"
+        set "JAVAC_CMD=C:\Program Files\Java\jdk1.8.0_202\bin\javac.exe"
+    ) else if defined JAVA_HOME (
+        if exist "%JAVA_HOME%\bin\java.exe" (
+            set "JAVA_CMD=%JAVA_HOME%\bin\java.exe"
+        )
+        if exist "%JAVA_HOME%\bin\javac.exe" (
+            set "JAVAC_CMD=%JAVA_HOME%\bin\javac.exe"
+        )
     )
 )
 
