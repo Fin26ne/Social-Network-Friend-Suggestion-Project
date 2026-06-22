@@ -1,65 +1,58 @@
 @echo off
-echo ==================================================
-echo      SOCIAL NETWORK FRIEND SUGGESTION STARTUP
-echo ==================================================
-echo Creating output directories...
-if not exist bin mkdir bin
+chcp 65001 > nul
+cls
 
-echo Checking and freeing port 3001 if occupied...
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr :3001 ^| findstr LISTENING 2^>nul') do (
-    echo Found process %%a using port 3001. Killing it...
-    taskkill /f /pid %%a >nul 2>&1
-)
+echo ===================================================
+echo   Social Network Friend Suggestion System
+echo   CSD201 - FPT University
+echo ===================================================
+echo.
 
-set "JAVA_CMD=java"
-set "JAVAC_CMD=javac"
+echo [1/3] Bien dich Java...
+echo.
 
-rem Check for JDK 17 (specifically 17.0.12 or general 17)
-if exist "C:\Program Files\Java\jdk-17.0.12\bin\java.exe" (
-    set "JAVA_CMD=C:\Program Files\Java\jdk-17.0.12\bin\java.exe"
-    set "JAVAC_CMD=C:\Program Files\Java\jdk-17.0.12\bin\javac.exe"
-) else (
-    for /d %%i in ("C:\Program Files\Java\jdk-17*") do (
-        if exist "%%i\bin\java.exe" (
-            set "JAVA_CMD=%%i\bin\java.exe"
-            set "JAVAC_CMD=%%i\bin\javac.exe"
-        )
-    )
-    for /d %%i in ("C:\Program Files\Java\jdk17*") do (
-        if exist "%%i\bin\java.exe" (
-            set "JAVA_CMD=%%i\bin\java.exe"
-            set "JAVAC_CMD=%%i\bin\javac.exe"
-        )
+echo Kiem tra port 3003...
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3003 2^>nul') do (
+    if not "%%a"=="0" (
+        taskkill /PID %%a /F > nul 2>&1
     )
 )
+ping -n 2 127.0.0.1 > nul
+echo Port 3003 san sang.
+echo.
 
-rem If JDK 17 is not found, check for JDK 1.8 or JAVA_HOME
-if "%JAVA_CMD%"=="java" (
-    if exist "C:\Program Files\Java\jdk1.8.0_202\bin\java.exe" (
-        set "JAVA_CMD=C:\Program Files\Java\jdk1.8.0_202\bin\java.exe"
-        set "JAVAC_CMD=C:\Program Files\Java\jdk1.8.0_202\bin\javac.exe"
-    ) else if defined JAVA_HOME (
-        if exist "%JAVA_HOME%\bin\java.exe" (
-            set "JAVA_CMD=%JAVA_HOME%\bin\java.exe"
-        )
-        if exist "%JAVA_HOME%\bin\javac.exe" (
-            set "JAVAC_CMD=%JAVA_HOME%\bin\javac.exe"
-        )
-    )
-)
+if not exist backend-java\bin mkdir backend-java\bin
 
-echo Compiling Java source files...
-"%JAVAC_CMD%" -encoding UTF-8 -cp "lib/json.jar" -d bin src/Main.java src/BenchmarkRunner.java src/api/*.java src/benchmark/*.java src/console/*.java src/datastructures/*.java src/graph/*.java src/model/*.java src/service/*.java src/services/*.java
+javac -encoding UTF-8 -cp backend-java\lib\json-20240303.jar -d backend-java\bin backend-java\src\Main.java backend-java\src\api\*.java backend-java\src\benchmark\*.java backend-java\src\console\*.java backend-java\src\datastructures\*.java backend-java\src\graph\*.java backend-java\src\model\*.java backend-java\src\service\*.java backend-java\src\services\*.java
 
-if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Compilation failed!
+if %errorlevel% neq 0 (
+    echo.
+    echo LOI BIEN DICH - Kiem tra lai code
+    echo.
     pause
-    exit /b %ERRORLEVEL%
+    exit /b 1
 )
 
-echo Compilation successful! Starting Java application...
+echo [1/3] Bien dich thanh cong!
+echo.
+echo [2/3] Mo browser sau khi server san sang...
+echo.
 
-echo Opening web application and research dashboard in default browser (with 2s delay)...
-start /b cmd /c "timeout /t 2 >nul & start http://localhost:3001 & start http://localhost:3001/research.html"
-chcp 65001 >nul
-"%JAVA_CMD%" -Dfile.encoding=UTF-8 -cp "bin;lib/json.jar" Main
+start "" cmd /c "ping -n 4 127.0.0.1 > nul & start http://localhost:3003/home.html & ping -n 1 127.0.0.1 > nul & start http://localhost:3003/research.html & exit"
+
+echo [3/3] Khoi dong Java Server...
+echo.
+echo ===================================================
+echo   Dashboard  : http://localhost:3003/home.html
+echo   Research   : http://localhost:3003/research.html
+echo   API Test   : http://localhost:3003/api/users
+echo ===================================================
+echo.
+echo   Nhan Ctrl+C de dung server.
+echo.
+
+java -Dfile.encoding=UTF-8 -cp backend-java\bin;backend-java\lib\json-20240303.jar Main
+
+echo.
+echo Server da dung.
+pause

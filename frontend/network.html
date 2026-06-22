@@ -3,610 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Network Friend Suggestion</title>
+    <title>Social Network - Mạng lưới</title>
     <link rel="stylesheet" href="css/style.css">
-    <!-- D3.js CDN -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        /* CSS specifically for the full-screen canvas graph layout */
         .network-layout {
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            gap: 25px;
-            flex-grow: 1;
-            height: calc(100vh - 150px);
+            display: flex;
+            height: calc(100vh - 80px); /* 80px approx topbar height */
         }
-
-        @media (max-width: 1000px) {
-            .network-layout {
-                grid-template-columns: 1fr;
-                height: auto;
-            }
-        }
-
-        .canvas-card {
-            background-color: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            position: relative;
-            overflow: hidden;
+        
+        .network-sidebar {
+            width: 350px;
+            background: var(--bg2);
+            border-left: 1px solid var(--border);
+            padding: 2rem;
             display: flex;
             flex-direction: column;
-            height: 100%;
-            min-height: 450px;
-        }
-
-        .graph-controls {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 10;
-            display: flex;
-            gap: 10px;
-        }
-
-        .info-sidebar {
-            background-color: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+            gap: 1.5rem;
             overflow-y: auto;
-            transition: var(--transition);
         }
 
-        .node-color-legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
-            background-color: var(--bg3);
-            border: 1px solid var(--border);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 12px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
+        #network-container {
+            flex: 1;
+            height: 100%;
+            border: none;
+            border-radius: 0;
+            background: var(--bg);
         }
     </style>
 </head>
-<body>
+<body style="overflow: hidden;">
+    <div class="grain"></div>
 
-    <div class="layout-wrapper">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo-container">
-                <span class="logo-icon">👑</span>
-                <span class="logo-text">AURASuggest</span>
-            </div>
-            <nav>
-                <ul class="nav-links">
-                    <li class="nav-item">
-                        <a href="home.html">
-                            <span class="nav-icon">📊</span>
-                            <span>Tổng Quan</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="explore.html">
-                            <span class="nav-icon">🔍</span>
-                            <span>Khám Phá</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="network.html">
-                            <span class="nav-icon">🕸️</span>
-                            <span>Mạng Lưới</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="research.html">
-                            <span class="nav-icon">🔬</span>
-                            <span>Nghiên Cứu</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-            
-            <div style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px;">
-                <button class="btn" style="width: 100%;" id="btn-switch-user">
-                    <span>🔄</span> Đổi Tài Khoản
-                </button>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            
-            <!-- Topbar -->
-            <div class="topbar">
-                <div>
-                    <h2 class="page-title">Mạng Lưới Liên Kết Xã Hội</h2>
-                    <p style="color: var(--muted); font-size: 14px;">Bản đồ đồ thị phân tích toàn vẹn hệ thống thành viên</p>
-                </div>
-                
-                <div class="user-profile-badge" id="user-badge">
-                    <div class="user-avatar" id="badge-avatar">?</div>
-                    <span class="user-name" id="badge-name">Đang tải...</span>
-                </div>
-            </div>
-
-            <!-- Legend strip -->
-            <div class="node-color-legend">
-                <div class="legend-item">
-                    <div class="legend-dot" style="background-color: #C9A96E; box-shadow: 0 0 8px #C9A96E;"></div>
-                    <span>Bạn (Self)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot" style="background-color: #3498db;"></div>
-                    <span>Bạn bè (Friend)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot" style="background-color: #2ecc71;"></div>
-                    <span>Gợi ý kết bạn (Suggestion)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot" style="background-color: #95a5a6;"></div>
-                    <span>Thành viên khác (Other)</span>
-                </div>
-            </div>
-
-            <!-- Graph Layout -->
-            <div class="network-layout">
-                
-                <!-- Left: Interactive Canvas -->
-                <div class="canvas-card">
-                    <!-- Floating graph controls -->
-                    <div class="graph-controls">
-                        <button class="btn btn-primary" id="btn-toggle-view" style="font-size: 12px; padding: 8px 16px;">
-                            <span>🌐</span> Xem Toàn Bộ Mạng
-                        </button>
-                        <button class="btn" id="btn-reset-zoom" style="font-size: 12px; padding: 8px 16px;">
-                            <span>🎯</span> Căn Giữa
-                        </button>
-                    </div>
-                    <canvas id="network-canvas" style="flex-grow: 1; display: block; cursor: grab;"></canvas>
-                </div>
-
-                <!-- Right: Information Drawer -->
-                <aside class="info-sidebar" id="drawer-container">
-                    <div id="drawer-empty-state" style="margin: auto; text-align: center; color: var(--muted);">
-                        <span style="font-size: 40px; display: block; margin-bottom: 15px;">🖱️</span>
-                        Nhấp vào một nút trên sơ đồ mạng lưới để xem hồ sơ liên kết chi tiết.
-                    </div>
-                    <div id="drawer-content-state" style="display: none;">
-                        <h3 class="card-title" id="drawer-title" style="margin-bottom: 5px;">Tên thành viên</h3>
-                        <span id="drawer-username" style="font-family: var(--font-mono); color: var(--gold); font-size: 13px; display: block; margin-bottom: 20px;">@username</span>
-                        
-                        <div style="border-top: 1px solid var(--border); padding-top: 15px; margin-bottom: 20px;">
-                            <label class="form-label">Giới thiệu bản thân</label>
-                            <p id="drawer-bio" style="color: var(--text); font-size: 14px; background-color: var(--bg3); padding: 12px; border-radius: 6px; border: 1px solid var(--border);">Tiểu sử...</p>
-                        </div>
-
-                        <div style="margin-bottom: 20px;">
-                            <label class="form-label" id="label-mutuals">Bạn chung</label>
-                            <span id="drawer-mutual-val" style="font-family: var(--font-mono); font-weight: bold; font-size: 18px; color: var(--gold2);">0</span>
-                        </div>
-
-                        <div style="border-top: 1px solid var(--border); padding-top: 15px;">
-                            <label class="form-label" id="label-friends-list">Danh sách bạn bè</label>
-                            <div class="item-list" id="drawer-friends-container" style="max-height: 250px; overflow-y: auto; gap: 8px;">
-                                <!-- Filled dynamically -->
-                            </div>
-                        </div>
-
-                        <div id="drawer-action-container" style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
-                            <!-- Action button added dynamically -->
-                        </div>
-                    </div>
-                </aside>
-
-            </div>
-
-        </main>
+    <div class="topbar">
+        <div class="brand">SocialNet</div>
+        <div class="nav-links">
+            <a href="home.html">Trang chủ</a>
+            <a href="explore.html">Khám phá</a>
+            <a href="network.html" class="active">Mạng lưới</a>
+            <a href="research.html">Nghiên cứu</a>
+        </div>
+        <div class="nav-user">
+            <span id="current-user-name">Đang tải...</span>
+            <div id="current-user-avatar" class="user-avatar">?</div>
+            <a href="index.html" class="btn btn-sm" style="margin-left: 1rem;">Đổi tài khoản</a>
+        </div>
     </div>
 
-    <script src="js/api.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const userId = localStorage.getItem("userId");
-            if (!userId) {
-                location.href = "index.html";
-                return;
+    <div class="network-layout">
+        <div id="network-container">
+            <div class="empty-state" style="margin-top: 20%;">Đang tải mạng lưới...</div>
+        </div>
+        
+        <div class="network-sidebar" id="node-info">
+            <div class="empty-state">Chọn một người dùng để xem thông tin chi tiết</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getUser, getNetworkData, getSuggestions, addFriend } from './js/api.js';
+        import { getCurrentUserId, createAvatar } from './js/app.js';
+        import { renderNetworkGraph } from './js/network.js';
+
+        const userId = getCurrentUserId();
+        if (!userId) {
+            window.location.href = 'index.html';
+        }
+
+        let currentUser = null;
+
+        async function init() {
+            try {
+                currentUser = await getUser(userId);
+
+                // Update Header
+                document.getElementById('current-user-name').textContent = currentUser.displayName;
+                document.getElementById('current-user-avatar').textContent = createAvatar(currentUser.displayName);
+
+                loadNetwork();
+            } catch (error) {
+                console.error("Lỗi khởi tạo", error);
             }
+        }
 
-            // Active Page Detection
-            const page = location.pathname.split('/').pop() || "network.html";
-            document.querySelector('a[href="'+page+'"]')?.classList.add('active');
-
-            // Switch User
-            document.getElementById("btn-switch-user").addEventListener("click", () => {
-                localStorage.removeItem("userId");
-                localStorage.removeItem("userName");
-                location.href = "index.html";
-            });
-
-            // Graph States
-            let showFullNetwork = false; // Default to depth-2 subgraph as requested for toggle
-            let cachedGraphData = null;
-            let directFriendIds = [];
-            let suggestionIds = [];
-            let simulation = null;
-            let nodes = [];
-            let links = [];
-
-            // UI Elements
-            const canvas = document.getElementById("network-canvas");
-            const btnToggleView = document.getElementById("btn-toggle-view");
-            const btnResetZoom = document.getElementById("btn-reset-zoom");
-            const drawerEmptyState = document.getElementById("drawer-empty-state");
-            const drawerContentState = document.getElementById("drawer-content-state");
-
-            // Profile Badge
-            api.getUserById(userId).then(res => {
-                if (res.success) {
-                    const self = res.data;
-                    document.getElementById("badge-name").textContent = self.name;
-                    document.getElementById("badge-avatar").textContent = getInitials(self.name);
-                }
-            });
-
-            function getInitials(name) {
-                if (!name) return "?";
-                const parts = name.trim().split(" ");
-                if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        async function loadNetwork() {
+            try {
+                const data = await getNetworkData();
+                renderNetworkGraph('network-container', data, showNodeInfo);
+            } catch (error) {
+                document.getElementById('network-container').innerHTML = '<div class="empty-state" style="margin-top: 20%;">Lỗi tải mạng lưới</div>';
             }
+        }
 
-            async function initNetwork() {
-                // Fetch direct friends
-                const friendsRes = await api.getFriends(userId);
-                if (friendsRes.success) {
-                    directFriendIds = (friendsRes.data || []).map(f => f.id);
+        async function showNodeInfo(nodeData) {
+            const sidebar = document.getElementById('node-info');
+            sidebar.innerHTML = '<div class="empty-state">Đang tải...</div>';
+            
+            try {
+                const [targetUser, suggestions] = await Promise.all([
+                    getUser(nodeData.id),
+                    getSuggestions(nodeData.id)
+                ]);
+
+                // Check if friend
+                let isFriend = false;
+                if (currentUser.friends && currentUser.friends.includes(targetUser.id)) {
+                    isFriend = true;
+                }
+                const isSelf = targetUser.id === userId;
+
+                let actionBtn = '';
+                if (!isSelf && !isFriend) {
+                    actionBtn = `<button class="btn btn-primary btn-add" style="width: 100%; margin-top: 1rem;" data-id="${targetUser.id}">Thêm bạn bè</button>`;
+                } else if (!isSelf && isFriend) {
+                    actionBtn = `<button class="btn" style="width: 100%; margin-top: 1rem;" disabled>Đã là bạn bè</button>`;
+                } else if (isSelf) {
+                    actionBtn = `<button class="btn" style="width: 100%; margin-top: 1rem;" disabled>Đây là bạn</button>`;
                 }
 
-                // Fetch recommendations/suggestions
-                const sugRes = await api.getSuggestions(userId, 5, "min");
-                if (sugRes.success) {
-                    suggestionIds = (sugRes.data || []).map(s => s.user.id);
-                }
-
-                // Fetch all graph
-                const graphRes = await api.getNetworkData();
-                if (graphRes.success) {
-                    cachedGraphData = graphRes.data;
-                    buildAndDrawGraph();
-                }
-            }
-
-            function buildAndDrawGraph() {
-                if (!cachedGraphData) return;
-
-                const width = canvas.parentElement.clientWidth;
-                const height = canvas.parentElement.clientHeight;
-                canvas.width = width;
-                canvas.height = height;
-
-                const ctx = canvas.getContext("2d");
-
-                const allNodes = cachedGraphData.nodes;
-                const allLinks = cachedGraphData.links;
-
-                // 1. Filtering nodes based on showFullNetwork toggle
-                let visibleNodeIds = new Set();
-                if (showFullNetwork) {
-                    allNodes.forEach(n => visibleNodeIds.add(n.id));
-                    btnToggleView.innerHTML = `<span>🕸️</span> Xem Gợi Ý Bậc 2`;
-                    btnToggleView.className = "btn";
-                } else {
-                    visibleNodeIds.add(userId);
-                    directFriendIds.forEach(id => visibleNodeIds.add(id));
-                    
-                    // Direct friends of friends
-                    const friendSet = new Set(directFriendIds);
-                    allLinks.forEach(link => {
-                        const s = typeof link.source === 'object' ? link.source.id : link.source;
-                        const t = typeof link.target === 'object' ? link.target.id : link.target;
-                        if (friendSet.has(s) && !friendSet.has(t) && t !== userId) {
-                            visibleNodeIds.add(t);
-                        } else if (friendSet.has(t) && !friendSet.has(s) && s !== userId) {
-                            visibleNodeIds.add(s);
-                        }
-                    });
-                    btnToggleView.innerHTML = `<span>🌐</span> Xem Toàn Bộ Mạng`;
-                    btnToggleView.className = "btn btn-primary";
-                }
-
-                // Clean nodes and links
-                nodes = allNodes.filter(n => visibleNodeIds.has(n.id)).map(n => ({...n}));
-                const nodeMap = {};
-                nodes.forEach(n => nodeMap[n.id] = n);
-
-                links = allLinks.filter(link => {
-                    const s = typeof link.source === 'object' ? link.source.id : link.source;
-                    const t = typeof link.target === 'object' ? link.target.id : link.target;
-                    return visibleNodeIds.has(s) && visibleNodeIds.has(t);
-                }).map(link => ({
-                    source: typeof link.source === 'object' ? link.source.id : link.source,
-                    target: typeof link.target === 'object' ? link.target.id : link.target
-                }));
-
-                // Reset simulation if exists
-                if (simulation) simulation.stop();
-
-                simulation = d3.forceSimulation(nodes)
-                    .force("link", d3.forceLink(links).id(d => d.id).distance(90))
-                    .force("charge", d3.forceManyBody().strength(-200))
-                    .force("center", d3.forceCenter(width / 2, height / 2))
-                    .force("collision", d3.forceCollide().radius(28));
-
-                // Zoom / Pan
-                let transform = d3.zoomIdentity;
-                const zoomBehavior = d3.zoom()
-                    .scaleExtent([0.15, 6])
-                    .on("zoom", (event) => {
-                        transform = event.transform;
-                        render();
-                    });
-
-                d3.select(canvas).call(zoomBehavior);
-
-                btnResetZoom.addEventListener("click", () => {
-                    d3.select(canvas).transition().duration(500).call(zoomBehavior.transform, d3.zoomIdentity);
-                });
-
-                function getNodeColor(nodeId) {
-                    if (nodeId === userId) return "#C9A96E"; // Self (Gold)
-                    if (directFriendIds.includes(nodeId)) return "#3498db"; // Friends (Blue)
-                    if (suggestionIds.includes(nodeId)) return "#2ecc71"; // Suggestions (Green)
-                    return "#95a5a6"; // Others (Gray)
-                }
-
-                function render() {
-                    ctx.clearRect(0, 0, width, height);
-                    ctx.save();
-                    ctx.translate(transform.x, transform.y);
-                    ctx.scale(transform.k, transform.k);
-
-                    // 1. Draw Links
-                    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
-                    ctx.lineWidth = 1.2;
-                    links.forEach(link => {
-                        ctx.beginPath();
-                        ctx.moveTo(link.source.x, link.source.y);
-                        ctx.lineTo(link.target.x, link.target.y);
-                        ctx.stroke();
-                    });
-
-                    // 2. Draw Nodes
-                    nodes.forEach(node => {
-                        ctx.beginPath();
-                        ctx.arc(node.x, node.y, 9, 0, 2 * Math.PI);
-                        ctx.fillStyle = getNodeColor(node.id);
-                        ctx.shadowColor = getNodeColor(node.id);
-                        ctx.shadowBlur = node.id === userId ? 15 : 3;
-                        ctx.fill();
-
-                        ctx.shadowBlur = 0; // Reset
-
-                        // Text labels
-                        ctx.font = "500 12px Outfit";
-                        ctx.fillStyle = node.id === userId ? "var(--gold2)" : "rgba(232, 228, 220, 0.8)";
-                        ctx.fillText(node.name, node.x + 14, node.y + 4);
-                    });
-
-                    ctx.restore();
-                }
-
-                simulation.on("tick", render);
-
-                // Dragging Support
-                d3.select(canvas).call(d3.drag()
-                    .subject(dragsubject)
-                    .on("start", dragstarted)
-                    .on("drag", dragged)
-                    .on("end", dragended)
-                );
-
-                function dragsubject(event) {
-                    const p = transform.invert([event.x, event.y]);
-                    let closestNode = null;
-                    let minDistance = 25; // Search radius
-
-                    nodes.forEach(node => {
-                        const dx = node.x - p[0];
-                        const dy = node.y - p[1];
-                        const d = Math.sqrt(dx * dx + dy * dy);
-                        if (d < minDistance) {
-                            closestNode = node;
-                            minDistance = d;
-                        }
-                    });
-
-                    return closestNode;
-                }
-
-                function dragstarted(event) {
-                    if (!event.active) simulation.alphaTarget(0.3).restart();
-                    event.subject.fx = event.subject.x;
-                    event.subject.fy = event.subject.y;
-                    canvas.style.cursor = "grabbing";
-                }
-
-                function dragged(event) {
-                    const p = transform.invert([event.x, event.y]);
-                    event.subject.fx = p[0];
-                    event.subject.fy = p[1];
-                }
-
-                function dragended(event) {
-                    if (!event.active) simulation.alphaTarget(0);
-                    event.subject.fx = null;
-                    event.subject.fy = null;
-                    canvas.style.cursor = "grab";
-                }
-
-                // Click event handling to show profile details drawer
-                canvas.addEventListener("click", (e) => {
-                    const rect = canvas.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    
-                    const p = transform.invert([x, y]);
-                    let clickedNode = null;
-                    let minDistance = 15;
-
-                    nodes.forEach(node => {
-                        const dx = node.x - p[0];
-                        const dy = node.y - p[1];
-                        const d = Math.sqrt(dx * dx + dy * dy);
-                        if (d < minDistance) {
-                            clickedNode = node;
-                            minDistance = d;
-                        }
-                    });
-
-                    if (clickedNode) {
-                        showNodeDetails(clickedNode);
-                    }
-                });
-            }
-
-            // Populate and slide-out selected node info sidebar
-            async function showNodeDetails(node) {
-                drawerEmptyState.style.display = "none";
-                drawerContentState.style.display = "block";
-
-                document.getElementById("drawer-title").textContent = node.name;
-                document.getElementById("drawer-username").textContent = `@${node.username}`;
-                
-                // Get bio and age metadata
-                let age = 22;
-                if (node.bio.includes("Tuổi:")) {
-                    const match = node.bio.match(/Tuổi:\s*(\d+)/);
-                    if (match) age = parseInt(match[1]);
-                }
-                const cleanBio = node.bio.replace(/Tuổi:\s*\d+;?\s*/, "") || "Không có tiểu sử.";
-                document.getElementById("drawer-bio").textContent = `[Tuổi: ${age}] ${cleanBio}`;
-
-                // Calculate mutual friends
-                const isSelf = node.id === userId;
-                const isFriend = directFriendIds.includes(node.id);
-                
-                const mutualLabel = document.getElementById("label-mutuals");
-                const mutualVal = document.getElementById("drawer-mutual-val");
-                
-                if (isSelf) {
-                    mutualLabel.textContent = "Số lượng bạn bè";
-                    const fRes = await api.getFriends(userId);
-                    mutualVal.textContent = fRes.success ? fRes.data.length : 0;
-                } else {
-                    mutualLabel.textContent = "Bạn chung";
-                    const mRes = await api.getMutualFriends(userId, node.id);
-                    mutualVal.textContent = mRes.success ? mRes.data.length : 0;
-                }
-
-                // Load selected node's friends list
-                const drawerFriendsContainer = document.getElementById("drawer-friends-container");
-                drawerFriendsContainer.innerHTML = `<div style="color:var(--muted); font-size:12px;">Đang tải danh sách...</div>`;
-                
-                const nodeFriendsRes = await api.getFriends(node.id);
-                if (nodeFriendsRes.success) {
-                    const list = nodeFriendsRes.data || [];
-                    if (list.length === 0) {
-                        drawerFriendsContainer.innerHTML = `<div style="color:var(--muted); font-size:12px; font-style:italic;">Không có bạn bè.</div>`;
-                    } else {
-                        drawerFriendsContainer.innerHTML = "";
-                        list.forEach(f => {
-                            const initials = getInitials(f.name);
-                            const item = document.createElement("div");
-                            item.className = "list-item";
-                            item.style.padding = "10px";
-                            item.innerHTML = `
-                                <div class="list-item-info">
-                                    <div class="list-item-avatar" style="width:28px; height:28px; font-size:12px;">${initials}</div>
-                                    <div class="list-item-details">
-                                        <span class="list-item-name" style="font-size:12px;">${f.name}</span>
-                                        <span class="list-item-username" style="font-size:9px;">@${f.username}</span>
+                let suggestionsHTML = '';
+                if (suggestions && suggestions.length > 0) {
+                    const top3 = suggestions.slice(0, 3);
+                    suggestionsHTML = `
+                        <div style="margin-top: 2rem;">
+                            <div class="section-title">Gợi ý cho ${targetUser.displayName}</div>
+                            <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                                ${top3.map(s => `
+                                    <div class="user-item">
+                                        <div class="user-avatar" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                            ${createAvatar(s.user.displayName)}
+                                        </div>
+                                        <div class="user-info">
+                                            <div class="user-name" style="font-size: 0.9rem;">${s.user.displayName}</div>
+                                            <div class="user-meta">${s.mutualFriends} bạn chung</div>
+                                        </div>
                                     </div>
-                                </div>
-                            `;
-                            drawerFriendsContainer.appendChild(item);
-                        });
-                    }
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    suggestionsHTML = `
+                        <div style="margin-top: 2rem;">
+                            <div class="section-title">Gợi ý cho ${targetUser.displayName}</div>
+                            <div class="empty-state">Không có gợi ý</div>
+                        </div>
+                    `;
                 }
 
-                // Action button container
-                const actionContainer = document.getElementById("drawer-action-container");
-                actionContainer.innerHTML = "";
+                sidebar.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="user-avatar" style="width: 64px; height: 64px; font-size: 1.5rem;">
+                            ${createAvatar(targetUser.displayName)}
+                        </div>
+                        <div>
+                            <h2 style="color: var(--gold);">${targetUser.displayName}</h2>
+                            <div class="user-meta" style="font-size: 0.9rem;">${targetUser.age} tuổi</div>
+                        </div>
+                    </div>
+                    ${targetUser.bio ? `<div style="font-size: 0.95rem; color: var(--text); padding: 1rem; background: var(--surface); border-radius: 4px; border: 1px solid var(--border);">${targetUser.bio}</div>` : ''}
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                        <div class="card" style="padding: 1rem; text-align: center;">
+                            <div style="font-size: 1.5rem; color: var(--gold); font-family: 'DM Mono';">${targetUser.friends ? targetUser.friends.length : 0}</div>
+                            <div style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase;">Bạn bè</div>
+                        </div>
+                    </div>
+                    ${actionBtn}
+                    ${suggestionsHTML}
+                `;
 
-                if (!isSelf) {
-                    if (isFriend) {
-                        const btn = document.createElement("button");
-                        btn.className = "btn btn-danger";
-                        btn.style.width = "100%";
-                        btn.textContent = "Unfriend (Hủy Kết Bạn)";
-                        btn.addEventListener("click", async () => {
-                            const conf = confirm(`Hủy kết bạn với ${node.name}?`);
-                            if (conf) {
-                                const act = await api.removeFriend(userId, node.id);
-                                if (act.success) {
-                                    // Update activity log of the session
-                                    const currentLogs = JSON.parse(localStorage.getItem(`activity_${userId}`) || "[]");
-                                    const timeStr = new Date().toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                                    currentLogs.unshift({ text: `Đã hủy kết bạn với ${node.name}.`, time: timeStr });
-                                    localStorage.setItem(`activity_${userId}`, JSON.stringify(currentLogs.slice(0, 15)));
-
-                                    initNetwork();
-                                    showNodeDetails(node);
-                                }
-                            }
-                        });
-                        actionContainer.appendChild(btn);
-                    } else {
-                        const btn = document.createElement("button");
-                        btn.className = "btn btn-primary";
-                        btn.style.width = "100%";
-                        btn.textContent = "Befriend (Kết Bạn)";
-                        btn.addEventListener("click", async () => {
-                            const act = await api.addFriend(userId, node.id);
-                            if (act.success) {
-                                // Update activity log of the session
-                                const currentLogs = JSON.parse(localStorage.getItem(`activity_${userId}`) || "[]");
-                                const timeStr = new Date().toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                                currentLogs.unshift({ text: `Đã kết bạn với ${node.name}!`, time: timeStr });
-                                localStorage.setItem(`activity_${userId}`, JSON.stringify(currentLogs.slice(0, 15)));
-
-                                initNetwork();
-                                showNodeDetails(node);
-                            }
-                        });
-                        actionContainer.appendChild(btn);
-                    }
+                if (!isSelf && !isFriend) {
+                    sidebar.querySelector('.btn-add').addEventListener('click', async (e) => {
+                        const targetId = e.target.dataset.id;
+                        e.target.disabled = true;
+                        e.target.textContent = 'Đang thêm...';
+                        try {
+                            await addFriend(userId, targetId);
+                            // Refresh
+                            await init();
+                            // Also click the same node again to refresh sidebar
+                            showNodeInfo(nodeData);
+                        } catch (err) {
+                            e.target.disabled = false;
+                            e.target.textContent = 'Thêm bạn bè';
+                            alert('Lỗi thêm bạn');
+                        }
+                    });
                 }
+
+            } catch (error) {
+                sidebar.innerHTML = '<div class="empty-state">Lỗi tải thông tin</div>';
             }
+        }
 
-            // View toggle button
-            btnToggleView.addEventListener("click", () => {
-                showFullNetwork = !showFullNetwork;
-                buildAndDrawGraph();
-            });
-
-            // Initialize Page
-            initNetwork();
-        });
+        init();
     </script>
 </body>
 </html>

@@ -7,6 +7,11 @@
 # Project output directories
 /bin/
 /out/
+/backend-java/bin/
+/backend-java/out/
+/backend-java/sources.txt
+/sources.txt
+/backend-java/data/benchmark_results.json
 
 # IDE specific files and directories
 .idea/
@@ -18,3 +23,4 @@
 /nbproject/
 /build/
 /dist/
+

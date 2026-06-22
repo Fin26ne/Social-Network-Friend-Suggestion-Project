@@ -1,640 +1,936 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Network Friend Suggestion</title>
-    <!-- Style CSS -->
+    <title>Social Network - Research</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        :root {
-            --color-bfs: #3498db;
-            --color-dfs: #C9A96E;
-            --color-list: #C9A96E;
-            --color-matrix: #be185d;
-            --color-maxheap: #95a5a6;
-            --color-minheap: #3498db;
+        /* Typography */
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap');
+        
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 48px;
+            font-style: italic;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
         }
-
-        .meta-tag {
-            font-family: var(--font-mono);
+        
+        .hero-subtitle {
             color: var(--muted);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
         }
-
-        .status-tag {
-            background-color: var(--bg3);
-            color: var(--muted);
-            padding: 4px 8px;
+        
+        .badges-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        
+        .badge {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            padding: 4px 12px;
+            background: rgba(201, 169, 110, 0.1);
+            color: var(--gold);
+            border: 1px solid rgba(201, 169, 110, 0.3);
             border-radius: 4px;
-            font-size: 0.72rem;
-            font-family: var(--font-sans);
+        }
+
+        .section-number {
+            font-family: 'DM Mono', monospace;
+            color: rgba(201, 169, 110, 0.4);
+            font-size: 14px;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: rgba(201, 169, 110, 0.3);
+            margin: 4rem 0 3rem 0;
+            width: 100%;
+        }
+
+        .chart-container {
+            background: var(--surface);
             border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+        }
+
+        canvas {
+            width: 100%;
+            height: 350px;
+            display: block;
+        }
+
+        .conclusion-box {
+            border-left: 3px solid var(--gold);
+            background: var(--goldglow);
+            padding: 16px;
+            border-radius: 0 12px 12px 0;
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Canvas Tooltip */
+        #chart-tooltip {
+            position: absolute;
+            background: rgba(8, 10, 15, 0.95);
+            border: 1px solid rgba(201, 169, 110, 0.3);
+            border-radius: 6px;
+            padding: 8px 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s, top 0.1s, left 0.1s;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text);
+            z-index: 100;
+            white-space: nowrap;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .winner-badge {
+            background: var(--gold);
+            color: var(--bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
             font-weight: 600;
-            display: inline-block;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .summary-card {
+            background: var(--surface);
+            border: 1px solid rgba(201, 169, 110, 0.3);
+            border-radius: 12px;
+            padding: 20px;
             text-align: center;
         }
 
-        .status-tag.active-blue {
-            background-color: rgba(52, 152, 219, 0.1);
-            color: #3498db;
-            border-color: rgba(52, 152, 219, 0.2);
-        }
-
-        .status-tag.active-gold {
-            background-color: rgba(201, 169, 110, 0.1);
+        .summary-card h4 {
             color: var(--gold);
-            border-color: rgba(201, 169, 110, 0.2);
+            margin-bottom: 1rem;
+            font-family: 'DM Mono', monospace;
         }
 
-        .status-tag.active-matrix {
-            background-color: rgba(190, 24, 93, 0.1);
-            color: #be185d;
-            border-color: rgba(190, 24, 93, 0.2);
+        .summary-card p {
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            align-items: center;
+        }
+        .layout-grid.reverse {
+            grid-template-columns: 2fr 1fr;
         }
     </style>
 </head>
-
 <body>
+    <div class="grain"></div>
 
-    <div class="layout-wrapper">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo-container">
-                <span class="logo-icon">👑</span>
-                <span class="logo-text">AURASuggest</span>
-            </div>
-            <nav>
-                <ul class="nav-links">
-                    <li class="nav-item">
-                        <a href="home.html">
-                            <span class="nav-icon">📊</span>
-                            <span>Tổng Quan</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="explore.html">
-                            <span class="nav-icon">🔍</span>
-                            <span>Khám Phá</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="network.html">
-                            <span class="nav-icon">🕸️</span>
-                            <span>Mạng Lưới</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="research.html">
-                            <span class="nav-icon">🔬</span>
-                            <span>Nghiên Cứu</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
-            <div style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px;">
-                <button class="btn" style="width: 100%;" id="btn-switch-user">
-                    <span>🔄</span> Đổi Tài Khoản
-                </button>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-
-            <!-- Topbar -->
-            <div class="topbar">
-                <div>
-                    <h2 class="page-title">Nghiên Cứu Thuật Toán & Benchmark</h2>
-                    <p style="color: var(--muted); font-size: 14px;">Thực nghiệm thực tế hiệu năng và dung lượng bộ nhớ
-                        giải thuật đồ thị</p>
-                </div>
-
-                <div class="user-profile-badge" id="user-badge" onclick="location.href='home.html'">
-                    <div class="user-avatar" id="badge-avatar">?</div>
-                    <span class="user-name" id="badge-name">Đang tải...</span>
-                </div>
-            </div>
-
-            <!-- Content Cards -->
-            <section class="gold-card" style="margin-bottom: 40px;">
-                <div class="meta-tag">01 — TỐC ĐỘ DUYỆT ĐỒ THỊ</div>
-                <div class="section-header-flex"
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 class="card-title" style="margin-bottom: 0;">RQ1: BFS vs DFS</h2>
-                    <button class="btn btn-primary" onclick="handleBenchmarkClick('rq1')">Chạy Thực Nghiệm
-                        Real-time</button>
-                </div>
-                <div class="research-grid">
-                    <div class="analysis-pane"
-                        style="display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <p class="description-text"
-                                style="font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6;">
-                                <strong>Giả thuyết:</strong> BFS duyệt theo chiều rộng nên sẽ thu thập đủ các ứng viên
-                                Level-2 (bạn của bạn) với thời gian nhanh hơn DFS trong đồ thị thưa.
-                            </p>
-                            <div class="premium-table-wrapper">
-                                <table class="premium-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Số Node (N)</th>
-                                            <th>BFS (ns)</th>
-                                            <th>DFS (ns)</th>
-                                            <th>Candidates BFS</th>
-                                            <th>Candidates DFS</th>
-                                            <th>Nhanh hơn</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="table-rq1">
-                                        <!-- Loaded dynamically -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="conclusion-text" id="summary-rq1">
-                            Hệ thống đã sẵn sàng cho đo lường real-time.
-                        </div>
-                    </div>
-                    <div class="research-chart-card"
-                        style="display: flex; flex-direction: column; align-items: center;">
-                        <div class="chart-legend"
-                            style="display: flex; gap: 24px; margin-bottom: 16px; font-size: 0.8rem; font-weight: 500;">
-                            <div class="legend-dot" style="display: flex; align-items: center; gap: 8px;">
-                                <div class="dot-indicator"
-                                    style="width: 12px; height: 4px; border-radius: 2px; background-color: var(--color-bfs);">
-                                </div>
-                                <span>BFS Time</span>
-                            </div>
-                            <div class="legend-dot" style="display: flex; align-items: center; gap: 8px;">
-                                <div class="dot-indicator"
-                                    style="width: 12px; height: 4px; border-radius: 2px; background-color: var(--color-dfs);">
-                                </div>
-                                <span>DFS Time</span>
-                            </div>
-                        </div>
-                        <div class="research-chart-canvas-wrapper"
-                            style="flex-grow: 1; min-height: 250px; width: 100%;">
-                            <canvas id="canvasRQ1"
-                                style="width: 100%; height: 100%; border: none; background: transparent;"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="gold-card" style="margin-bottom: 40px;">
-                <div class="meta-tag">02 — BỘ NHỚ LƯU TRỮ</div>
-                <div class="section-header-flex"
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 class="card-title" style="margin-bottom: 0;">RQ2: Adjacency List vs Matrix</h2>
-                    <button class="btn btn-primary" onclick="handleBenchmarkClick('rq2')">Tính Toán Bộ Nhớ Thật</button>
-                </div>
-                <div class="research-grid">
-                    <div class="analysis-pane"
-                        style="display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <p class="description-text"
-                                style="font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6;">
-                                <strong>Giả thuyết:</strong> Với đồ thị mạng xã hội thưa (edge density &lt; 0.1%), danh
-                                sách kề (Adjacency List) sẽ tiết kiệm bộ nhớ đáng kể so với ma trận kề O(N²).
-                            </p>
-                            <div class="premium-table-wrapper">
-                                <table class="premium-table">
-                                    <thead>
-                                        <tr>
-                                            <th>N</th>
-                                            <th>Edges</th>
-                                            <th>List (KB)</th>
-                                            <th>Matrix (KB)</th>
-                                            <th>Tiết kiệm</th>
-                                            <th>Kết quả</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="table-rq2">
-                                        <!-- Loaded dynamically -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="conclusion-text" id="summary-rq2">
-                            Bấm nút để quét dung lượng bộ nhớ hệ thống đang chiếm dụng.
-                        </div>
-                    </div>
-                    <div class="research-chart-card"
-                        style="display: flex; flex-direction: column; align-items: center;">
-                        <div class="chart-legend"
-                            style="display: flex; gap: 24px; margin-bottom: 16px; font-size: 0.8rem; font-weight: 500;">
-                            <div class="legend-dot" style="display: flex; align-items: center; gap: 8px;">
-                                <div class="dot-indicator"
-                                    style="width: 12px; height: 4px; border-radius: 2px; background-color: var(--color-list);">
-                                </div>
-                                <span>Adj List (KB)</span>
-                            </div>
-                            <div class="legend-dot" style="display: flex; align-items: center; gap: 8px;">
-                                <div class="dot-indicator"
-                                    style="width: 12px; height: 4px; border-radius: 2px; background-color: var(--color-matrix);">
-                                </div>
-                                <span>Adj Matrix (KB)</span>
-                            </div>
-                        </div>
-                        <div class="research-chart-canvas-wrapper"
-                            style="flex-grow: 1; min-height: 250px; width: 100%;">
-                            <canvas id="canvasRQ2"
-                                style="width: 100%; height: 100%; border: none; background: transparent;"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="gold-card" style="margin-bottom: 40px;">
-                <div class="meta-tag">03 — TỐI ƯU TÌM KIẾM TOP-K</div>
-                <div class="section-header-flex"
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 class="card-title" style="margin-bottom: 0;">RQ3: MinHeap-K vs MaxHeap</h2>
-                    <button class="btn btn-primary" onclick="handleBenchmarkClick('rq3')">Đo Tải Thuật Toán
-                        Top-K</button>
-                </div>
-                <div class="research-grid">
-                    <div class="analysis-pane"
-                        style="display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <p class="description-text"
-                                style="font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6;">
-                                <strong>Giả thuyết:</strong> Dùng MinHeap kích thước cố định K có độ phức tạp O(N log K)
-                                sẽ vượt trội hơn việc đẩy toàn bộ vào MaxHeap O(N log N).
-                            </p>
-                            <div class="premium-table-wrapper">
-                                <table class="premium-table">
-                                    <thead>
-                                        <tr>
-                                            <th>N</th>
-                                            <th>K</th>
-                                            <th>MaxHeap (ns)</th>
-                                            <th>MinHeap-K (ns)</th>
-                                            <th>Hiệu năng</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="table-rq3">
-                                        <!-- Loaded dynamically -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="conclusion-text" id="summary-rq3">
-                            Bấm để kiểm thử tốc độ lọc Top-5 ứng viên thời gian thực.
-                        </div>
-                    </div>
-                    <div class="research-chart-card"
-                        style="display: flex; flex-direction: column; align-items: center;">
-                        <div class="chart-legend"
-                            style="display: flex; gap: 24px; margin-bottom: 16px; font-size: 0.8rem; font-weight: 500;">
-                            <div class="legend-dot" style="display: flex; align-items: center; gap: 8px;">
-                                <div class="dot-indicator"
-                                    style="width: 12px; height: 4px; border-radius: 2px; background-color: var(--color-maxheap);">
-                                </div>
-                                <span>MaxHeap</span>
-                            </div>
-                            <div class="legend-dot" style="display: flex; align-items: center; gap: 8px;">
-                                <div class="dot-indicator"
-                                    style="width: 12px; height: 4px; border-radius: 2px; background-color: var(--color-minheap);">
-                                </div>
-                                <span>MinHeap-K</span>
-                            </div>
-                        </div>
-                        <div class="research-chart-canvas-wrapper"
-                            style="flex-grow: 1; min-height: 250px; width: 100%;">
-                            <canvas id="canvasRQ3"
-                                style="width: 100%; height: 100%; border: none; background: transparent;"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <footer
-                style="margin-top: auto; padding-top: 40px; text-align: center; font-family: var(--font-mono); font-size: 12px; color: var(--muted);">
-                Dữ liệu thực nghiệm hệ thống mạng xã hội nội bộ — Toàn quyền bảo lưu © 2026
-            </footer>
-
-        </main>
+    <div class="topbar">
+        <div class="brand">SocialNet</div>
+        <div class="nav-links">
+            <a href="home.html">Trang chủ</a>
+            <a href="explore.html">Khám phá</a>
+            <a href="network.html">Mạng lưới</a>
+            <a href="research.html" class="active">Nghiên cứu</a>
+        </div>
+        <div class="nav-user">
+            <span id="current-user-name">Đang tải...</span>
+            <div id="current-user-avatar" class="user-avatar">?</div>
+            <a href="index.html" class="btn btn-sm" style="margin-left: 1rem;">Đổi tài khoản</a>
+        </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="js/api.js"></script>
-    <script>
-        // Dữ liệu mốc tĩnh ban đầu theo ảnh thực nghiệm của team
-        let datasetRQ1 = [{ label: '100', v1: 207200, v2: 627600 }, { label: '500', v1: 372520, v2: 350100 }, { label: '1000', v1: 389140, v2: 314920 }, { label: '5000', v1: 479800, v2: 465820 }, { label: '10000', v1: 422700, v2: 402520 }];
-        let datasetRQ2 = [{ label: '100', v1: 0, v2: 10 }, { label: '500', v1: 1219, v2: 244 }, { label: '1000', v1: 1219, v2: 977 }, { label: '2000', v1: 2438, v2: 3906 }, { label: '5000', v1: 8532, v2: 24414 }];
-        let datasetRQ3 = [{ label: '100', v1: 399520, v2: 215820 }, { label: '1000', v1: 172060, v2: 377120 }, { label: '5000', v1: 543420, v2: 156740 }, { label: '10000', v1: 582340, v2: 40280 }];
+    <div id="chart-tooltip"></div>
 
-        function getAvatarInitials(name) {
-            if (!name) return "?";
-            const parts = name.trim().split(" ");
-            if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    <div class="container" style="padding-bottom: 5rem;">
+        <div style="margin-bottom: 3rem;">
+            <h1 class="hero-title">Research Questions</h1>
+            <div class="hero-subtitle">Topic 05 — Social Network Friend Suggestion | CSD201 FPT</div>
+            <div class="badges-row">
+                <div class="badge">RQ1 BFS vs DFS</div>
+                <div class="badge">RQ2 List vs Matrix</div>
+                <div class="badge">RQ3 Heap O(N log K)</div>
+            </div>
+        </div>
+
+        <!-- Bảng điều khiển thử nghiệm hiệu năng -->
+        <div class="card" style="padding: 2rem; margin-bottom: 3rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 16px;">
+            <h3 style="color: var(--gold); margin-bottom: 1.5rem; font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-style: italic;">Bảng điều khiển thử nghiệm hiệu năng</h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+                <!-- Control RQ1 -->
+                <div style="border-right: 1px solid var(--border); padding-right: 1.5rem;">
+                    <h4 style="color: var(--gold); font-family: 'DM Mono', monospace; font-size: 13px; margin-bottom: 1rem; text-transform: uppercase;">RQ1: Tốc độ Duyệt BFS vs DFS</h4>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px;">Kích thước nút (N):</label>
+                        <input id="input-rq1-sizes" type="text" class="input-control" value="100,500,1000,5000,10000" style="width: 100%; font-family: 'DM Mono'; font-size: 13px; padding: 8px;">
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px;">Bậc trung bình (Degree):</label>
+                        <input id="input-rq1-degree" type="number" class="input-control" value="20" min="2" max="100" style="width: 100%; font-family: 'DM Mono'; font-size: 13px; padding: 8px;">
+                    </div>
+                    <button id="btn-run-rq1" class="btn btn-primary btn-sm" style="width: 100%;">Chạy kiểm thử RQ1</button>
+                </div>
+
+                <!-- Control RQ2 -->
+                <div style="border-right: 1px solid var(--border); padding-right: 1.5rem;">
+                    <h4 style="color: var(--gold); font-family: 'DM Mono', monospace; font-size: 13px; margin-bottom: 1rem; text-transform: uppercase;">RQ2: Bộ nhớ List vs Matrix</h4>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px;">Kích thước nút (N) (tối đa 15.000):</label>
+                        <input id="input-rq2-sizes" type="text" class="input-control" value="100,500,1000,2000,5000" style="width: 100%; font-family: 'DM Mono'; font-size: 13px; padding: 8px;">
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px;">Mật độ cạnh (Density, 0.0001 - 0.2):</label>
+                        <input id="input-rq2-density" type="number" class="input-control" value="0.001" step="0.0001" min="0.0001" max="0.2" style="width: 100%; font-family: 'DM Mono'; font-size: 13px; padding: 8px;">
+                    </div>
+                    <button id="btn-run-rq2" class="btn btn-primary btn-sm" style="width: 100%;">Chạy kiểm thử RQ2</button>
+                </div>
+
+                <!-- Control RQ3 -->
+                <div>
+                    <h4 style="color: var(--gold); font-family: 'DM Mono', monospace; font-size: 13px; margin-bottom: 1rem; text-transform: uppercase;">RQ3: MaxHeap vs MinHeap-K</h4>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px;">Kích thước ứng viên (N):</label>
+                        <input id="input-rq3-sizes" type="text" class="input-control" value="100,1000,5000,10000" style="width: 100%; font-family: 'DM Mono'; font-size: 13px; padding: 8px;">
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px;">Giá trị K (1 - 100):</label>
+                        <input id="input-rq3-k" type="number" class="input-control" value="5" min="1" max="100" style="width: 100%; font-family: 'DM Mono'; font-size: 13px; padding: 8px;">
+                    </div>
+                    <button id="btn-run-rq3" class="btn btn-primary btn-sm" style="width: 100%;">Chạy kiểm thử RQ3</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RQ1: BFS vs DFS -->
+        <div class="section-number">01 — TỐC ĐỘ DUYỆT ĐỒ THỊ</div>
+        <h2 style="margin-bottom: 2rem; color: var(--gold);">RQ1: BFS vs DFS</h2>
+        
+        <div class="layout-grid">
+            <div>
+                <p style="color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem;">
+                    <strong>Giả thuyết:</strong> BFS duyệt theo chiều rộng nên sẽ thu thập đủ các ứng viên Level-2 (bạn của bạn) với thời gian nhanh hơn DFS trong đồ thị thưa, do DFS có xu hướng đi sâu và thăm nhiều node không liên quan trước khi quay lui.
+                </p>
+                <div class="chart-container" style="padding: 16px;">
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; justify-content: center; font-size: 0.8rem; font-family: 'DM Mono', monospace;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:2px;background:#C9A96E"></div> BFS Time</div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:2px;background:#6EB2C9"></div> DFS Time</div>
+                    </div>
+                    <canvas id="chart-rq1"></canvas>
+                </div>
+            </div>
+            
+            <div>
+                <table id="table-rq1">
+                    <thead>
+                        <tr>
+                            <th>Số Node (N)</th>
+                            <th>BFS (ns)</th>
+                            <th>DFS (ns)</th>
+                            <th>Candidates BFS</th>
+                            <th>Candidates DFS</th>
+                            <th>Nhanh hơn</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div id="conclusion-rq1" class="conclusion-box">Đang tải dữ liệu...</div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- RQ2: Adjacency List vs Matrix -->
+        <div class="section-number">02 — BỘ NHỚ LƯU TRỮ</div>
+        <h2 style="margin-bottom: 2rem; color: var(--gold);">RQ2: Adjacency List vs Matrix</h2>
+        
+        <div class="layout-grid reverse">
+            <div>
+                <table id="table-rq2">
+                    <thead>
+                        <tr>
+                            <th>N</th>
+                            <th>Edges</th>
+                            <th>List (KB)</th>
+                            <th>Matrix (KB)</th>
+                            <th>Tiết kiệm</th>
+                            <th>Kết quả</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div id="conclusion-rq2" class="conclusion-box">Đang tải dữ liệu...</div>
+            </div>
+
+            <div>
+                <p style="color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem;">
+                    <strong>Giả thuyết:</strong> Với đồ thị mạng xã hội thưa (edge density < 0.1%), danh sách kề (Adjacency List) sẽ tiết kiệm bộ nhớ đáng kể so với ma trận kề (Adjacency Matrix) O(N²).
+                </p>
+                <div class="chart-container" style="padding: 16px;">
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; justify-content: center; font-size: 0.8rem; font-family: 'DM Mono', monospace;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:2px;background:#C9A96E"></div> Adj List (KB)</div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:2px;background:#E08F8F"></div> Adj Matrix (KB)</div>
+                    </div>
+                    <canvas id="chart-rq2"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- RQ3: MinHeap-K vs MaxHeap -->
+        <div class="section-number">03 — TỐI ƯU TÌM KIẾM TOP-K</div>
+        <h2 style="margin-bottom: 2rem; color: var(--gold);">RQ3: MinHeap-K vs MaxHeap</h2>
+        
+        <div class="layout-grid">
+            <div>
+                <p style="color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem;">
+                    <strong>Giả thuyết:</strong> Dùng MinHeap kích thước cố định K có độ phức tạp O(N log K) sẽ vượt trội hơn việc đẩy toàn bộ vào MaxHeap O(N log N) sau đó rút K phần tử, đặc biệt khi N cực lớn.
+                </p>
+                <div class="chart-container" style="padding: 16px;">
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; justify-content: center; font-size: 0.8rem; font-family: 'DM Mono', monospace;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:12px;background:#6a7382;border-radius:2px"></div> MaxHeap (O(N log N))</div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:12px;background:#C9A96E;border-radius:2px"></div> MinHeap-K (O(N log K))</div>
+                    </div>
+                    <canvas id="chart-rq3"></canvas>
+                </div>
+            </div>
+            
+            <div>
+                <table id="table-rq3">
+                    <thead>
+                        <tr>
+                            <th>N</th>
+                            <th>K</th>
+                            <th>MaxHeap (ns)</th>
+                            <th>MinHeap-K (ns)</th>
+                            <th>Hiệu năng</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div id="conclusion-rq3" class="conclusion-box">Đang tải dữ liệu...</div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Summary -->
+        <div class="section-number">04 — TỔNG KẾT</div>
+        <h2 style="margin-bottom: 2rem; color: var(--gold);">Báo cáo tổng quan</h2>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <h4>RQ1: Duyệt Level-2</h4>
+                <p id="sum-rq1">Đang tải...</p>
+            </div>
+            <div class="summary-card">
+                <h4>RQ2: Bộ nhớ lưu trữ</h4>
+                <p id="sum-rq2">Đang tải...</p>
+            </div>
+            <div class="summary-card">
+                <h4>RQ3: Thuật toán Top-K</h4>
+                <p id="sum-rq3">Đang tải...</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getUser } from './js/api.js';
+        import { getCurrentUserId, createAvatar } from './js/app.js';
+
+        // Custom Chart Engine
+        // Helper to format Y axis labels cleanly
+        function formatYLabel(val, unit) {
+            if (unit === 'ms') {
+                if (val === 0) return '0';
+                if (val < 0.001) return val.toFixed(5);
+                if (val < 0.01) return val.toFixed(4);
+                if (val < 0.1) return val.toFixed(3);
+                if (val < 1) return val.toFixed(2);
+                if (val < 10) return val.toFixed(1);
+                return val.toFixed(0);
+            }
+            if (val >= 1000000) {
+                return (val / 1000000).toFixed(val % 1000000 === 0 ? 0 : 1) + 'M';
+            } else if (val >= 1000) {
+                return (val / 1000).toFixed(val % 1000 === 0 ? 0 : 1) + 'K';
+            }
+            return val.toFixed(0);
         }
 
-        // Add Activity Log helper
-        function addActivity(text) {
-            const userId = localStorage.getItem("userId");
-            if (!userId) return;
-            const currentLogs = JSON.parse(localStorage.getItem(`activity_${userId}`) || "[]");
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            currentLogs.unshift({ text, time: timeStr });
-            localStorage.setItem(`activity_${userId}`, JSON.stringify(currentLogs.slice(0, 15)));
-        }
+        // Custom Chart Engine
+        class ChartEngine {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.tooltip = document.getElementById('chart-tooltip');
+                this.dpr = window.devicePixelRatio || 1;
+                this.points = [];
+                
+                // Resize for retina displays
+                const rect = this.canvas.getBoundingClientRect();
+                this.canvas.width = rect.width * this.dpr;
+                this.canvas.height = rect.height * this.dpr;
+                this.ctx.scale(this.dpr, this.dpr);
+                
+                this.width = rect.width;
+                this.height = rect.height;
+                this.padX = 55; // Slightly larger for Y-axis labels
+                this.padY = 40;
 
-        function updateTableRQ1() {
-            const tbody = document.getElementById("table-rq1");
-            tbody.innerHTML = "";
-            datasetRQ1.forEach((d, idx) => {
-                let candidates = idx === 0 ? 79 : idx === 1 ? 263 : idx === 2 ? 282 : idx === 3 ? 411 : 371;
-                let winner = d.v1 < d.v2 ? 'BFS' : 'DFS';
-                let winnerClass = winner === 'BFS' ? 'active-blue' : 'active-gold';
-
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td class="num-col">${parseInt(d.label).toLocaleString()}</td>
-                    <td class="num-col">${d.v1.toLocaleString()}</td>
-                    <td class="num-col">${d.v2.toLocaleString()}</td>
-                    <td class="num-col">${candidates}</td>
-                    <td class="num-col">${candidates}</td>
-                    <td><span class="status-tag ${winnerClass}">${winner}</span></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function updateTableRQ2() {
-            const tbody = document.getElementById("table-rq2");
-            tbody.innerHTML = "";
-            datasetRQ2.forEach((d, idx) => {
-                let edges = idx === 0 ? 10 : idx === 1 ? 250 : idx === 2 ? 998 : idx === 3 ? 3992 : 24962;
-                let pct = d.v2 === 0 ? 100 : ((d.v2 - d.v1) / d.v2 * 100);
-                let winner = d.v1 < d.v2 ? 'List' : 'Matrix';
-                let winnerClass = winner === 'List' ? 'active-gold' : 'active-matrix';
-
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td class="num-col">${parseInt(d.label).toLocaleString()}</td>
-                    <td class="num-col">${edges.toLocaleString()}</td>
-                    <td class="num-col">${d.v1.toLocaleString()}</td>
-                    <td class="num-col">${d.v2.toLocaleString()}</td>
-                    <td class="num-col">${pct.toFixed(1)}%</td>
-                    <td><span class="status-tag ${winnerClass}">${winner}</span></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function updateTableRQ3() {
-            const tbody = document.getElementById("table-rq3");
-            tbody.innerHTML = "";
-            datasetRQ3.forEach((d, idx) => {
-                let winner = d.v2 < d.v1 ? 'MinHeap-K' : 'MaxHeap';
-                let winnerClass = winner === 'MinHeap-K' ? 'active-blue' : '';
-
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td class="num-col">${parseInt(d.label).toLocaleString()}</td>
-                    <td class="num-col">5</td>
-                    <td class="num-col">${d.v1.toLocaleString()}</td>
-                    <td class="num-col">${d.v2.toLocaleString()}</td>
-                    <td><span class="status-tag ${winnerClass}">${winner}</span></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            // LocalStorage and Auth Guard
-            const userId = localStorage.getItem("userId");
-            if (!userId) {
-                location.href = "index.html";
-                return;
+                this.canvas.addEventListener('mousemove', (e) => this.handleHover(e));
+                this.canvas.addEventListener('mouseleave', () => { this.tooltip.style.opacity = 0; });
             }
 
-            // Active Page Detection
-            const page = location.pathname.split('/').pop() || "research.html";
-            document.querySelector('a[href="' + page + '"]')?.classList.add('active');
+            handleHover(e) {
+                if (!this.points.length) return;
+                const rect = this.canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
 
-            // Switch User Button
-            document.getElementById("btn-switch-user").addEventListener("click", () => {
-                localStorage.removeItem("userId");
-                localStorage.removeItem("userName");
-                location.href = "index.html";
-            });
+                let closest = null;
+                let minDist = 30; // Max hover distance
 
-            // Load dynamic user profile details
-            if (window.api) {
-                window.api.getUserById(userId).then(res => {
-                    if (res.success && res.data) {
-                        const self = res.data;
-                        document.getElementById("badge-name").textContent = self.name;
-                        document.getElementById("badge-avatar").textContent = getAvatarInitials(self.name);
+                this.points.forEach(p => {
+                    const dist = Math.sqrt(Math.pow(mouseX - p.x, 2) + Math.pow(mouseY - p.y, 2));
+                    if (dist < minDist) {
+                        minDist = dist;
+                        closest = p;
                     }
                 });
+
+                if (closest) {
+                    this.tooltip.innerHTML = closest.label;
+                    this.tooltip.style.left = (e.clientX + 15) + 'px';
+                    this.tooltip.style.top = (e.clientY - 15) + 'px';
+                    this.tooltip.style.opacity = 1;
+                } else {
+                    this.tooltip.style.opacity = 0;
+                }
             }
 
-            // Load initial view
-            updateTableRQ1();
-            updateTableRQ2();
-            updateTableRQ3();
-            drawCharts();
+            drawAxes(labelsCount, minY, maxY, options) {
+                const opt = options || {};
+                const useLog = opt.logarithmic;
+                const unit = opt.unit || '';
 
-            // Resize charts with responsive resizing
-            window.addEventListener('resize', () => {
-                drawCharts();
-            });
-        });
+                this.ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+                this.ctx.lineWidth = 1;
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.padX, this.padY / 2);
+                this.ctx.lineTo(this.padX, this.height - this.padY);
+                this.ctx.lineTo(this.width - this.padX / 2, this.height - this.padY);
+                this.ctx.stroke();
 
-        // LOGIC CHÍNH XỬ LÝ DUAL MODE: KHỚP API THẬT HOẶC TỰ ĐỘNG CHUYỂN SANG MOCK REAL-TIME
-        function handleBenchmarkClick(apiEndpoint) {
-            if (apiEndpoint === 'rq3') {
-                // RQ3 has real backend integration!
-                fetch('/api/benchmark')
-                    .then(response => {
-                        if (!response.ok) throw new Error("Backend chưa sẵn sàng");
-                        return response.json();
-                    })
-                    .then(res => {
-                        if (res.success && res.data && res.data.benchmarkResults) {
-                            // Map sizes from backend to datasetRQ3 format
-                            datasetRQ3 = res.data.benchmarkResults.map(r => ({
-                                label: r.size.toString(),
-                                v1: Math.round(r.maxHeapTimeMs * 1000000), // convert ms to ns
-                                v2: Math.round(r.minHeapTimeMs * 1000000)  // convert ms to ns
-                            }));
-                            updateTableRQ3();
-                            document.getElementById('summary-rq3').innerHTML = "Đã lấy dữ liệu đo tải thực tế từ Java backend (Top-10 recommendations).";
-                            addActivity("Đã đo tải thuật toán Top-K (MinHeap vs MaxHeap) từ Java API.");
-                            drawCharts();
+                // Horizontal grid lines and Y-axis labels
+                this.ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+                this.ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                this.ctx.font = '9px "DM Mono"';
+                this.ctx.textAlign = 'right';
+                this.ctx.textBaseline = 'middle';
+
+                const usableH = this.height - this.padY * 1.5;
+
+                for (let i = 0; i <= 4; i++) {
+                    const y = this.height - this.padY - (i * usableH / 4);
+                    
+                    // Draw grid line (except bottom axis)
+                    if (i > 0) {
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(this.padX, y);
+                        this.ctx.lineTo(this.width - this.padX / 2, y);
+                        this.ctx.stroke();
+                    }
+
+                    // Compute and draw Y label
+                    let val = 0;
+                    if (useLog) {
+                        const logMin = Math.log10(Math.max(0.00001, minY));
+                        const logMax = Math.log10(Math.max(0.0001, maxY));
+                        const logVal = logMin + (i * (logMax - logMin) / 4);
+                        val = Math.pow(10, logVal);
+                    } else {
+                        val = minY + (i * (maxY - minY) / 4);
+                    }
+                    this.ctx.fillText(formatYLabel(val, unit), this.padX - 8, y);
+                }
+            }
+        }
+
+        class LineChart extends ChartEngine {
+            constructor(canvasId, data, options) {
+                super(canvasId);
+                this.data = data;
+                this.options = options || {};
+                this.draw();
+            }
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                const labels = this.data.labels;
+                const datasets = this.data.datasets;
+                
+                let maxY = 0;
+                let minY = Infinity;
+                datasets.forEach(ds => ds.data.forEach(val => {
+                    if (val > maxY) maxY = val;
+                    if (val < minY) minY = val;
+                }));
+                if (minY === Infinity) minY = 0;
+                
+                const useLog = this.options.logarithmic;
+                if (useLog) {
+                    minY = Math.max(0.00001, minY);
+                }
+                
+                maxY = maxY * 1.1; // 10% padding top
+                if (maxY === 0) maxY = 1;
+
+                this.drawAxes(labels.length, minY, maxY, this.options);
+                this.points = [];
+
+                const usableW = this.width - this.padX * 1.5;
+                const usableH = this.height - this.padY * 1.5;
+                const stepX = usableW / Math.max(1, labels.length - 1);
+
+                // Draw X labels
+                this.ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                this.ctx.font = '10px "DM Mono"';
+                this.ctx.textAlign = 'center';
+                labels.forEach((l, i) => {
+                    const x = this.padX + i * stepX;
+                    this.ctx.fillText(l, x, this.height - this.padY / 2);
+                });
+
+                const getValY = (val) => {
+                    if (useLog) {
+                        const logVal = Math.log10(Math.max(0.00001, val));
+                        const logMin = Math.log10(Math.max(0.00001, minY));
+                        const logMax = Math.log10(Math.max(0.0001, maxY));
+                        if (logMax === logMin) return 0;
+                        const ratio = (logVal - logMin) / (logMax - logMin);
+                        return ratio * usableH;
+                    } else {
+                        return (val / maxY * usableH);
+                    }
+                };
+
+                // Draw Lines
+                datasets.forEach(ds => {
+                    this.ctx.strokeStyle = ds.color;
+                    this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    
+                    let prevX = 0, prevY = 0;
+
+                    ds.data.forEach((val, i) => {
+                        const x = this.padX + i * stepX;
+                        const y = this.height - this.padY - getValY(val);
+                        
+                        if (i === 0) {
+                            this.ctx.moveTo(x, y);
                         } else {
-                            throw new Error("Dữ liệu không đúng định dạng");
+                            // Simple bezier for smoothness
+                            const cpX = (prevX + x) / 2;
+                            this.ctx.bezierCurveTo(cpX, prevY, cpX, y, x, y);
                         }
-                    })
-                    .catch(err => {
-                        console.log("Cơ chế fallback FE: Đang chạy Mock dữ liệu Real-time động.");
-                        runMockRealtime('rq3');
+                        prevX = x;
+                        prevY = y;
+
+                        this.points.push({
+                            x, y,
+                            label: `${ds.label}: ${val.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 4})} ${this.options.unit}<br>N: ${labels[i]}`
+                        });
                     });
-            } else {
-                // RQ1 & RQ2 are frontend-only simulation benchmarks, run fallback directly
-                console.log("Đang chạy mô phỏng hiệu năng frontend.");
-                runMockRealtime(apiEndpoint);
+                    this.ctx.stroke();
+
+                    // Draw Points
+                    this.ctx.fillStyle = ds.color;
+                    ds.data.forEach((val, i) => {
+                        const x = this.padX + i * stepX;
+                        const y = this.height - this.padY - getValY(val);
+                        this.ctx.beginPath();
+                        this.ctx.arc(x, y, 4, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        this.ctx.strokeStyle = 'var(--surface)';
+                        this.ctx.lineWidth = 1;
+                        this.ctx.stroke();
+                    });
+                });
             }
         }
 
-        // Bộ sinh số liệu biến động real-time ngẫu nhiên dành riêng cho FE
-        function runMockRealtime(type) {
-            if (type === 'rq1') {
-                datasetRQ1 = datasetRQ1.map(d => ({ ...d, v1: Math.round(d.v1 * (0.9 + Math.random() * 0.2)), v2: Math.round(d.v2 * (0.9 + Math.random() * 0.2)) }));
-                updateTableRQ1();
-                document.getElementById('summary-rq1').innerHTML = "Đo lường Mock Real-time hoàn tất. Đồ thị và bảng đã tự render lại động.";
-                addActivity("Đã chạy thử nghiệm RQ1 (BFS vs DFS).");
-            } else if (type === 'rq2') {
-                datasetRQ2 = datasetRQ2.map(d => ({ ...d, v1: Math.round(d.v1 * (0.97 + Math.random() * 0.06)), v2: Math.round(d.v2 * (0.97 + Math.random() * 0.06)) }));
-                updateTableRQ2();
-                document.getElementById('summary-rq2').innerHTML = "Quét mô phỏng dung lượng RAM thành công. Đã cập nhật lại trực quan hóa.";
-                addActivity("Đã chạy thử nghiệm RQ2 (Adjacency List vs Matrix).");
-            } else if (type === 'rq3') {
-                datasetRQ3 = datasetRQ3.map(d => ({ ...d, v1: Math.round(d.v1 * (0.85 + Math.random() * 0.3)), v2: Math.round(d.v2 * (0.85 + Math.random() * 0.3)) }));
-                updateTableRQ3();
-                document.getElementById('summary-rq3').innerHTML = "Đo tải Heap thành công. Giải thuật MinHeap-K giữ vững lợi thế O(N log K).";
-                addActivity("Đã chạy thử nghiệm RQ3 (MinHeap vs MaxHeap).");
-            }
-            drawCharts();
-        }
-
-        function drawCharts() {
-            renderLineChart('canvasRQ1', datasetRQ1, '#3498db', '#C9A96E');
-            renderLineChart('canvasRQ2', datasetRQ2, '#C9A96E', '#be185d');
-            renderBarChart('canvasRQ3', datasetRQ3);
-        }
-
-        function renderLineChart(canvasId, dataset, color1, color2) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-
-            // Set scale size based on parent client rect to guarantee sharpness
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-
-            const W = canvas.width, H = canvas.height, padding = 45;
-            ctx.clearRect(0, 0, W, H);
-
-            let maxVal = 0;
-            dataset.forEach(d => {
-                if (d.v1 > maxVal) maxVal = d.v1;
-                if (d.v2 > maxVal) maxVal = d.v2;
-            });
-            if (maxVal === 0) maxVal = 1;
-
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-            ctx.lineWidth = 1;
-            for (let i = 0; i <= 4; i++) {
-                let y = padding + (H - 2 * padding) * (i / 4);
-                ctx.beginPath();
-                ctx.moveTo(padding, y);
-                ctx.lineTo(W - padding, y);
-                ctx.stroke();
+        class BarChart extends ChartEngine {
+            constructor(canvasId, data, options) {
+                super(canvasId);
+                this.data = data;
+                this.options = options || {};
+                this.draw();
             }
 
-            const pts1 = [], pts2 = [];
-            dataset.forEach((d, idx) => {
-                let x = padding + (W - 2 * padding) * (idx / (dataset.length - 1));
-                let y1 = H - padding - (H - 2 * padding) * (d.v1 / maxVal);
-                let y2 = H - padding - (H - 2 * padding) * (d.v2 / maxVal);
-                pts1.push({ x, y: y1 });
-                pts2.push({ x, y: y2 });
+            draw() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                const labels = this.data.labels;
+                const datasets = this.data.datasets;
+                
+                let maxY = 0;
+                let minY = Infinity;
+                datasets.forEach(ds => ds.data.forEach(val => { 
+                    if (val > maxY) maxY = val; 
+                    if (val < minY) minY = val;
+                }));
+                if (minY === Infinity) minY = 0;
+                
+                const useLog = this.options.logarithmic;
+                if (useLog) {
+                    minY = Math.max(0.00001, minY);
+                }
+                
+                maxY = maxY * 1.1;
+                if (maxY === 0) maxY = 1;
 
-                ctx.fillStyle = 'rgba(232, 228, 220, 0.45)';
-                ctx.font = '500 11px var(--font-sans)';
-                ctx.textAlign = 'center';
-                ctx.fillText(d.label, x, H - padding + 20);
-            });
-            drawSmoothLine(ctx, pts1, color1);
-            drawSmoothLine(ctx, pts2, color2);
-        }
+                this.drawAxes(labels.length, minY, maxY, this.options);
+                this.points = [];
 
-        function drawSmoothLine(ctx, points, color) {
-            if (points.length === 0) return;
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 2.5;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.beginPath();
-            ctx.moveTo(points[0].x, points[0].y);
-            for (let i = 1; i < points.length; i++) {
-                ctx.lineTo(points[i].x, points[i].y);
+                const usableW = this.width - this.padX * 1.5;
+                const usableH = this.height - this.padY * 1.5;
+                const groupWidth = usableW / labels.length;
+                const barWidth = groupWidth * 0.3;
+                const gap = 4;
+
+                this.ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                this.ctx.font = '10px "DM Mono"';
+                this.ctx.textAlign = 'center';
+
+                const getValY = (val) => {
+                    if (useLog) {
+                        const logVal = Math.log10(Math.max(0.00001, val));
+                        const logMin = Math.log10(Math.max(0.00001, minY));
+                        const logMax = Math.log10(Math.max(0.0001, maxY));
+                        if (logMax === logMin) return 0;
+                        const ratio = (logVal - logMin) / (logMax - logMin);
+                        return ratio * usableH;
+                    } else {
+                        return (val / maxY * usableH);
+                    }
+                };
+
+                labels.forEach((label, i) => {
+                    const groupX = this.padX + i * groupWidth;
+                    this.ctx.fillText(label, groupX + groupWidth / 2, this.height - this.padY / 2);
+
+                    datasets.forEach((ds, j) => {
+                        const val = ds.data[i];
+                        const barH = getValY(val);
+                        const x = groupX + (groupWidth/2) - barWidth - (gap/2) + (j * (barWidth + gap));
+                        const y = this.height - this.padY - barH;
+
+                        // Draw rounded bar
+                        this.ctx.fillStyle = ds.color;
+                        this.ctx.beginPath();
+                        this.ctx.roundRect(x, y, barWidth, barH, [4, 4, 0, 0]);
+                        this.ctx.fill();
+
+                        this.points.push({
+                            x: x + barWidth/2, y: y + barH/2,
+                            label: `${ds.label}: ${val.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 4})} ${this.options.unit}<br>N: ${label}`
+                        });
+                    });
+                });
             }
-            ctx.stroke();
-            points.forEach(pt => {
-                ctx.fillStyle = '#080A0F'; // bg dark
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(pt.x, pt.y, 4, 0, 2 * Math.PI);
-                ctx.fill();
-                ctx.stroke();
-            });
         }
 
-        function renderBarChart(canvasId, dataset) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
+        const mockData = {
+            rq1: [
+                { n: 100, bfsTimeNs: 12000, dfsTimeNs: 15000, bfsNodesVisited: 40, dfsNodesVisited: 40, winner: 'BFS' },
+                { n: 1000, bfsTimeNs: 45000, dfsTimeNs: 72000, bfsNodesVisited: 350, dfsNodesVisited: 350, winner: 'BFS' },
+                { n: 10000, bfsTimeNs: 280000, dfsTimeNs: 950000, bfsNodesVisited: 4200, dfsNodesVisited: 4200, winner: 'BFS' }
+            ],
+            rq2: [
+                { n: 100, edgeCount: 10, listMemoryKB: 0.1, matrixMemoryKB: 10, winner: 'List', memorySavedPercent: 99 },
+                { n: 1000, edgeCount: 1000, listMemoryKB: 16, matrixMemoryKB: 1000, winner: 'List', memorySavedPercent: 98.4 },
+                { n: 5000, edgeCount: 25000, listMemoryKB: 400, matrixMemoryKB: 25000, winner: 'List', memorySavedPercent: 98.4 }
+            ],
+            rq3: [
+                { n: 100, k: 5, maxHeapTimeNs: 8000, minHeapTimeNs: 5000, winner: 'MinHeap-K' },
+                { n: 1000, k: 5, maxHeapTimeNs: 45000, minHeapTimeNs: 12000, winner: 'MinHeap-K' },
+                { n: 10000, k: 5, maxHeapTimeNs: 650000, minHeapTimeNs: 95000, winner: 'MinHeap-K' }
+            ]
+        };
 
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
+        function formatNum(n) { return new Intl.NumberFormat().format(n); }
 
-            const W = canvas.width, H = canvas.height, padding = 45;
-            ctx.clearRect(0, 0, W, H);
+        function renderRQ1(list) {
+            const rq1Body = document.querySelector('#table-rq1 tbody');
+            rq1Body.innerHTML = list.map(d => `
+                <tr>
+                    <td>${formatNum(d.size)}</td>
+                    <td>${formatNum(d.bfsTimeNs)}</td>
+                    <td>${formatNum(d.dfsTimeNs)}</td>
+                    <td>${formatNum(d.bfsCandidates)}</td>
+                    <td>${formatNum(d.dfsCandidates)}</td>
+                    <td><span class="winner-badge">${d.bfsTimeNs < d.dfsTimeNs ? 'BFS' : 'DFS'}</span></td>
+                </tr>
+            `).join('');
 
-            let maxVal = 0;
-            dataset.forEach(d => {
-                if (d.v1 > maxVal) maxVal = d.v1;
-                if (d.v2 > maxVal) maxVal = d.v2;
-            });
-            if (maxVal === 0) maxVal = 1;
+            const lastRQ1 = list[list.length - 1];
+            const winner = lastRQ1.bfsTimeNs < lastRQ1.dfsTimeNs ? 'BFS' : 'DFS';
+            const fasterTime = winner === 'BFS' ? lastRQ1.dfsTimeNs / lastRQ1.bfsTimeNs : lastRQ1.bfsTimeNs / lastRQ1.dfsTimeNs;
+            const rq1Ratio = fasterTime.toFixed(1);
+            document.getElementById('conclusion-rq1').innerHTML = `Với N = ${formatNum(lastRQ1.size)} node: <strong>${winner}</strong> nhanh hơn ${rq1Ratio} lần (${formatNum(lastRQ1.bfsTimeNs)}ns vs ${formatNum(lastRQ1.dfsTimeNs)}ns).`;
+            document.getElementById('sum-rq1').innerHTML = `<strong>${winner}</strong> tối ưu tốc độ hơn ${rq1Ratio}x khi N cực lớn.`;
 
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-            ctx.lineWidth = 1;
-            for (let i = 0; i <= 4; i++) {
-                let y = padding + (H - 2 * padding) * (i / 4);
-                ctx.beginPath();
-                ctx.moveTo(padding, y);
-                ctx.lineTo(W - padding, y);
-                ctx.stroke();
+            new LineChart('chart-rq1', {
+                labels: list.map(d => d.size),
+                datasets: [
+                    { label: 'BFS', data: list.map(d => d.bfsTimeNs), color: '#C9A96E' },
+                    { label: 'DFS', data: list.map(d => d.dfsTimeNs), color: '#6EB2C9' }
+                ]
+            }, { unit: 'ns', logarithmic: true });
+        }
+
+        function renderRQ2(list) {
+            const rq2Body = document.querySelector('#table-rq2 tbody');
+            rq2Body.innerHTML = list.map(d => {
+                const winner = d.listMemKb < d.matrixMemKb ? 'List' : 'Matrix';
+                const savings = ((d.matrixMemKb - d.listMemKb) / d.matrixMemKb * 100).toFixed(1);
+                return `
+                    <tr>
+                        <td>${formatNum(d.size)}</td>
+                        <td>${formatNum(d.edges)}</td>
+                        <td>${formatNum(Math.round(d.listMemKb))}</td>
+                        <td>${formatNum(Math.round(d.matrixMemKb))}</td>
+                        <td style="color:var(--goldglow)">${savings}%</td>
+                        <td><span class="winner-badge">${winner}</span></td>
+                    </tr>
+                `;
+            }).join('');
+
+            const lastRQ2 = list[list.length - 1];
+            const savings = ((lastRQ2.matrixMemKb - lastRQ2.listMemKb) / lastRQ2.matrixMemKb * 100).toFixed(1);
+            document.getElementById('conclusion-rq2').innerHTML = `Với N = ${formatNum(lastRQ2.size)} node, danh sách kề tiết kiệm <strong>${savings}%</strong> bộ nhớ so với ma trận kề (${Math.round(lastRQ2.listMemKb)} KB vs ${Math.round(lastRQ2.matrixMemKb)} KB).`;
+            document.getElementById('sum-rq2').innerHTML = `<strong>Adjacency List</strong> tiết kiệm RAM ${savings}% cho đồ thị mạng xã hội thưa.`;
+
+            new LineChart('chart-rq2', {
+                labels: list.map(d => d.size),
+                datasets: [
+                    { label: 'Adj List', data: list.map(d => d.listMemKb), color: '#C9A96E' },
+                    { label: 'Adj Matrix', data: list.map(d => d.matrixMemKb), color: '#E08F8F' }
+                ]
+            }, { unit: 'KB', logarithmic: true });
+        }
+
+        function renderRQ3(list) {
+            const rq3Body = document.querySelector('#table-rq3 tbody');
+            rq3Body.innerHTML = list.map(d => `
+                <tr>
+                    <td>${formatNum(d.size)}</td>
+                    <td>${document.getElementById('input-rq3-k').value}</td>
+                    <td>${d.maxHeapTimeMs.toFixed(4)}</td>
+                    <td>${d.minHeapTimeMs.toFixed(4)}</td>
+                    <td><span class="winner-badge">${d.minHeapTimeMs < d.maxHeapTimeMs ? 'MinHeap-K' : 'MaxHeap'}</span></td>
+                </tr>
+            `).join('');
+
+            const lastRQ3 = list[list.length - 1];
+            const winner = lastRQ3.minHeapTimeMs < lastRQ3.maxHeapTimeMs ? 'MinHeap-K' : 'MaxHeap';
+            const speedup = (lastRQ3.maxHeapTimeMs / lastRQ3.minHeapTimeMs).toFixed(1);
+            document.getElementById('conclusion-rq3').innerHTML = `Với N = ${formatNum(lastRQ3.size)} ứng viên: Duy trì <strong>${winner}</strong> nhanh hơn MaxHeap toàn cục <strong>${speedup} lần</strong>.`;
+            document.getElementById('sum-rq3').innerHTML = `Thuật toán <strong>MinHeap-K</strong> đạt tốc độ O(N log K) tối ưu hơn ${speedup}x so với O(N log N).`;
+
+            new BarChart('chart-rq3', {
+                labels: list.map(d => d.size),
+                datasets: [
+                    { label: 'MaxHeap', data: list.map(d => d.maxHeapTimeMs), color: '#6a7382' },
+                    { label: 'MinHeap-K', data: list.map(d => d.minHeapTimeMs), color: '#C9A96E' }
+                ]
+            }, { unit: 'ms', logarithmic: true });
+        }
+
+        function renderAllCharts(data) {
+            // Map RQ1
+            const rq1List = data.rq1.map(d => ({
+                size: d.n,
+                bfsTimeNs: d.bfsTimeNs,
+                dfsTimeNs: d.dfsTimeNs,
+                bfsCandidates: d.bfsNodesVisited,
+                dfsCandidates: d.dfsNodesVisited
+            }));
+            renderRQ1(rq1List);
+
+            // Map RQ2
+            const rq2List = data.rq2.map(d => ({
+                size: d.n,
+                edges: d.edgeCount,
+                listMemKb: d.listMemoryKB,
+                matrixMemKb: d.matrixMemoryKB
+            }));
+            renderRQ2(rq2List);
+
+            // Map RQ3
+            const rq3List = data.rq3.map(d => ({
+                size: d.n,
+                maxHeapTimeMs: d.maxHeapTimeNs / 1_000_000.0,
+                minHeapTimeMs: d.minHeapTimeNs / 1_000_000.0
+            }));
+            renderRQ3(rq3List);
+        }
+
+        async function init() {
+            const userId = getCurrentUserId();
+            if (userId) {
+                getUser(userId).then(u => {
+                    document.getElementById('current-user-name').textContent = u.displayName;
+                    document.getElementById('current-user-avatar').textContent = createAvatar(u.displayName);
+                }).catch(e => console.error("Could not load user"));
             }
 
-            const groupW = (W - 2 * padding) / dataset.length;
-            const barW = 16;
-            dataset.forEach((d, idx) => {
-                let groupX = padding + (idx * groupW) + groupW / 2;
-                let h1 = (H - 2 * padding) * (d.v1 / maxVal);
-                let h2 = (H - 2 * padding) * (d.v2 / maxVal);
-                let x1 = groupX - barW - 4, x2 = groupX + 4;
-                let y1 = H - padding - h1, y2 = H - padding - h2;
+            try {
+                const response = await fetch('http://localhost:3003/api/suggestions/benchmark');
+                if (!response.ok) throw new Error('API failed');
+                const result = await response.json();
+                renderAllCharts(result.data);
+            } catch (err) {
+                console.warn('Using mock data for benchmarks (API not ready/failed)', err);
+                renderAllCharts(mockData);
+                // Add a small banner
+                const banner = document.createElement('div');
+                banner.className = 'banner';
+                banner.innerHTML = '⚠ Đang hiển thị dữ liệu giả định. Vui lòng chạy Server Java để xem đo lường thực tế.';
+                document.body.prepend(banner);
+            }
 
-                ctx.fillStyle = '#95a5a6'; // MaxHeap gray
-                ctx.fillRect(x1, y1, barW, h1);
+            // Debounce helper to prevent spamming the backend while typing
+            function debounce(func, wait) {
+                let timeout;
+                return function(...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
+                };
+            }
 
-                ctx.fillStyle = '#3498db'; // MinHeap blue
-                ctx.fillRect(x2, y2, barW, h2);
+            async function runRQ1() {
+                const btn = document.getElementById('btn-run-rq1');
+                const originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = 'Đang đo lường...';
+                try {
+                    const sizes = document.getElementById('input-rq1-sizes').value;
+                    const degree = document.getElementById('input-rq1-degree').value;
+                    const res = await fetch(`http://localhost:3003/api/suggestions/benchmark?type=rq1&sizes=${sizes}&avgDegree=${degree}`);
+                    if (!res.ok) throw new Error('Benchmark failed');
+                    const result = await res.json();
+                    renderRQ1(result.data.benchmarkResults);
+                } catch (err) {
+                    console.error(err);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            }
 
-                ctx.fillStyle = 'rgba(232, 228, 220, 0.45)';
-                ctx.font = '500 11px var(--font-sans)';
-                ctx.textAlign = 'center';
-                ctx.fillText(d.label, groupX, H - padding + 20);
-            });
+            async function runRQ2() {
+                const btn = document.getElementById('btn-run-rq2');
+                const originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = 'Đang đo lường...';
+                try {
+                    const sizes = document.getElementById('input-rq2-sizes').value;
+                    const density = document.getElementById('input-rq2-density').value;
+                    const res = await fetch(`http://localhost:3003/api/suggestions/benchmark?type=rq2&sizes=${sizes}&edgeDensity=${density}`);
+                    if (!res.ok) throw new Error('Benchmark failed');
+                    const result = await res.json();
+                    renderRQ2(result.data.benchmarkResults);
+                } catch (err) {
+                    console.error(err);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            }
+
+            async function runRQ3() {
+                const btn = document.getElementById('btn-run-rq3');
+                const originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = 'Đang đo lường...';
+                try {
+                    const sizes = document.getElementById('input-rq3-sizes').value;
+                    const k = document.getElementById('input-rq3-k').value;
+                    const res = await fetch(`http://localhost:3003/api/suggestions/benchmark?type=rq3&sizes=${sizes}&k=${k}`);
+                    if (!res.ok) throw new Error('Benchmark failed');
+                    const result = await res.json();
+                    renderRQ3(result.data.benchmarkResults);
+                } catch (err) {
+                    console.error(err);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            }
+
+            // Debounced wrappers for auto re-rendering on input changes
+            const debouncedRQ1 = debounce(runRQ1, 800);
+            const debouncedRQ2 = debounce(runRQ2, 800);
+            const debouncedRQ3 = debounce(runRQ3, 800);
+
+            // Bind click handlers (immediate)
+            document.getElementById('btn-run-rq1').addEventListener('click', runRQ1);
+            document.getElementById('btn-run-rq2').addEventListener('click', runRQ2);
+            document.getElementById('btn-run-rq3').addEventListener('click', runRQ3);
+
+            // Bind change handlers (debounced auto re-render)
+            document.getElementById('input-rq1-sizes').addEventListener('input', debouncedRQ1);
+            document.getElementById('input-rq1-degree').addEventListener('input', debouncedRQ1);
+            document.getElementById('input-rq2-sizes').addEventListener('input', debouncedRQ2);
+            document.getElementById('input-rq2-density').addEventListener('input', debouncedRQ2);
+            document.getElementById('input-rq3-sizes').addEventListener('input', debouncedRQ3);
+            document.getElementById('input-rq3-k').addEventListener('input', debouncedRQ3);
         }
+
+        init();
     </script>
 </body>
-
 </html>
