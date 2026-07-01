@@ -89,4 +89,17 @@ public class MinHeap<T extends Comparable<T>> {
         System.arraycopy(heap, 0, newHeap, 0, size);
         heap = newHeap;
     }
+
+    public static void main(String[] args) {
+        System.out.println("=== MIN HEAP TEST ===");
+        MinHeap<Double> minHeap = new MinHeap<>();
+        minHeap.insert(0.45);
+        minHeap.insert(0.95);
+        minHeap.insert(0.12);
+        minHeap.insert(0.72);
+        System.out.println("Min element: " + minHeap.peekMin());
+        System.out.println("Extract Min: " + minHeap.extractMin());
+        System.out.println("Extract Min: " + minHeap.extractMin());
+        System.out.println("Extract Min: " + minHeap.extractMin());
+    }
 }

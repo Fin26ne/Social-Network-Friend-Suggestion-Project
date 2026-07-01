@@ -1,0 +1,161 @@
+{
+  "metadata": {
+    "runByHostUser": "TUF",
+    "availableProcessors": 12,
+    "javaVersion": "17.0.19",
+    "osArch": "amd64",
+    "generatedAt": "2026-06-30T08:06:56.686625100",
+    "osName": "Windows 11"
+  },
+  "rq2": [
+    {
+      "winner": "List",
+      "edgeDensity": 0.001,
+      "listMemoryBytes": 8480,
+      "edgeCount": 10,
+      "listMemoryKB": 8.28125,
+      "matrixMemoryBytes": 10832,
+      "matrixMemoryKB": 10.578125,
+      "memorySavedPercent": 21.71344165435746,
+      "n": 100
+    },
+    {
+      "winner": "List",
+      "edgeDensity": 0.001,
+      "listMemoryBytes": 52000,
+      "edgeCount": 250,
+      "listMemoryKB": 50.78125,
+      "matrixMemoryBytes": 254032,
+      "matrixMemoryKB": 248.078125,
+      "memorySavedPercent": 79.53013793537822,
+      "n": 500
+    },
+    {
+      "winner": "List",
+      "edgeDensity": 0.001,
+      "listMemoryBytes": 128000,
+      "edgeCount": 1000,
+      "listMemoryKB": 125,
+      "matrixMemoryBytes": 1008032,
+      "matrixMemoryKB": 984.40625,
+      "memorySavedPercent": 87.30199041300276,
+      "n": 1000
+    },
+    {
+      "winner": "List",
+      "edgeDensity": 0.001,
+      "listMemoryBytes": 352000,
+      "edgeCount": 4000,
+      "listMemoryKB": 343.75,
+      "matrixMemoryBytes": 4016032,
+      "matrixMemoryKB": 3921.90625,
+      "memorySavedPercent": 91.23512960056095,
+      "n": 2000
+    },
+    {
+      "winner": "List",
+      "edgeDensity": 0.001,
+      "listMemoryBytes": 1600000,
+      "edgeCount": 25000,
+      "listMemoryKB": 1562.5,
+      "matrixMemoryBytes": 25040032,
+      "matrixMemoryKB": 24453.15625,
+      "memorySavedPercent": 93.61023180801047,
+      "n": 5000
+    }
+  ],
+  "rq1": [
+    {
+      "dfsNodesVisited": 78,
+      "dfsTimeNs": 239660,
+      "winner": "BFS",
+      "bfsFasterBy": 2.11377668019051,
+      "bfsTimeNs": 113380,
+      "bfsNodesVisited": 78,
+      "avgDegree": 20,
+      "n": 100
+    },
+    {
+      "dfsNodesVisited": 308,
+      "dfsTimeNs": 448260,
+      "winner": "BFS",
+      "bfsFasterBy": 2.360008423712751,
+      "bfsTimeNs": 189940,
+      "bfsNodesVisited": 308,
+      "avgDegree": 20,
+      "n": 500
+    },
+    {
+      "dfsNodesVisited": 382,
+      "dfsTimeNs": 423500,
+      "winner": "BFS",
+      "bfsFasterBy": 1.566198224852071,
+      "bfsTimeNs": 270400,
+      "bfsNodesVisited": 382,
+      "avgDegree": 20,
+      "n": 1000
+    },
+    {
+      "dfsNodesVisited": 326,
+      "dfsTimeNs": 187040,
+      "winner": "BFS",
+      "bfsFasterBy": 1.1214773953711477,
+      "bfsTimeNs": 166780,
+      "bfsNodesVisited": 326,
+      "avgDegree": 20,
+      "n": 5000
+    },
+    {
+      "dfsNodesVisited": 317,
+      "dfsTimeNs": 150480,
+      "winner": "BFS",
+      "bfsFasterBy": 1.0476190476190477,
+      "bfsTimeNs": 143640,
+      "bfsNodesVisited": 317,
+      "avgDegree": 20,
+      "n": 10000
+    }
+  ],
+  "rq3": [
+    {
+      "maxHeapTimeNs": 10340,
+      "minHeapTimeNs": 12640,
+      "speedupFactor": 0.8180379746835443,
+      "winner": "MaxHeap",
+      "maxHeapOps": 105,
+      "minHeapOps": 100,
+      "k": 5,
+      "n": 100
+    },
+    {
+      "maxHeapTimeNs": 45380,
+      "minHeapTimeNs": 70000,
+      "speedupFactor": 0.6482857142857142,
+      "winner": "MaxHeap",
+      "maxHeapOps": 1005,
+      "minHeapOps": 1000,
+      "k": 5,
+      "n": 1000
+    },
+    {
+      "maxHeapTimeNs": 196140,
+      "minHeapTimeNs": 264120,
+      "speedupFactor": 0.7426169922762381,
+      "winner": "MaxHeap",
+      "maxHeapOps": 5005,
+      "minHeapOps": 5000,
+      "k": 5,
+      "n": 5000
+    },
+    {
+      "maxHeapTimeNs": 268120,
+      "minHeapTimeNs": 178460,
+      "speedupFactor": 1.5024095035302028,
+      "winner": "MinHeap-K",
+      "maxHeapOps": 10005,
+      "minHeapOps": 10000,
+      "k": 5,
+      "n": 10000
+    }
+  ]
+}

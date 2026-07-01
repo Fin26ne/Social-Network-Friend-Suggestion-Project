@@ -89,8 +89,8 @@ public class BenchmarkHandler implements HttpHandler {
                     int avgDegree = 20;
                     String sizesStr = queryParams.get("sizes");
                     if (sizesStr != null && !sizesStr.trim().isEmpty()) {
-                        // Tăng giới hạn tối đa của RQ1 lên 100000 (100k) theo yêu cầu giáo viên
-                        ns = parseSizes(sizesStr, 100000);
+                        // Bỏ giới hạn tối đa của RQ1 (đặt là Integer.MAX_VALUE) theo yêu cầu
+                        ns = parseSizes(sizesStr, Integer.MAX_VALUE);
                     }
                     String avgDegreeStr = queryParams.get("avgDegree");
                     if (avgDegreeStr != null) {
@@ -115,8 +115,8 @@ public class BenchmarkHandler implements HttpHandler {
                     double edgeDensity = 0.001;
                     String sizesStr = queryParams.get("sizes");
                     if (sizesStr != null && !sizesStr.trim().isEmpty()) {
-                        // Tăng giới hạn tối đa của RQ2 lên 15000 (15k) để bảo vệ bộ nhớ ma trận
-                        ns = parseSizes(sizesStr, 15000); // lower limit for matrix
+                        // Computation is now O(1) math, safe to use massive sizes
+                        ns = parseSizes(sizesStr, Integer.MAX_VALUE);
                     }
                     String densityStr = queryParams.get("edgeDensity");
                     if (densityStr != null) {
@@ -140,8 +140,8 @@ public class BenchmarkHandler implements HttpHandler {
                     int k = 5;
                     String sizesStr = queryParams.get("sizes");
                     if (sizesStr != null && !sizesStr.trim().isEmpty()) {
-                        // Tăng giới hạn tối đa của RQ3 lên 100000 (100k) theo yêu cầu giáo viên
-                        ns = parseSizes(sizesStr, 100000);
+                        // Bỏ giới hạn tối đa của RQ3 (đặt là Integer.MAX_VALUE) theo yêu cầu
+                        ns = parseSizes(sizesStr, Integer.MAX_VALUE);
                     }
                     String kStr = queryParams.get("k");
                     if (kStr != null) {
@@ -179,6 +179,17 @@ public class BenchmarkHandler implements HttpHandler {
     private int[] parseSizes(String sizesStr, int maxVal) {
         try {
             String[] parts = sizesStr.split(",");
+            
+            if (parts.length == 1) {
+                int maxN = Math.max(10, Math.min(maxVal, Integer.parseInt(parts[0].trim())));
+                if (maxN >= 50) {
+                    int step = maxN / 5;
+                    return new int[]{step, step * 2, step * 3, step * 4, maxN};
+                } else {
+                    return new int[]{maxN};
+                }
+            }
+
             int limit = Math.min(8, parts.length); // Max 8 data points
             int[] ns = new int[limit];
             for (int i = 0; i < limit; i++) {

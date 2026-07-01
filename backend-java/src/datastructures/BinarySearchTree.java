@@ -140,4 +140,17 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
         list.add(node.key);
         inOrderKeys(node.right, list);
     }
+
+    public static void main(String[] args) {
+        System.out.println("=== BINARY SEARCH TREE TEST ===");
+        BinarySearchTree<String, String> bst = new BinarySearchTree<>();
+        bst.put("U003", "Nguyen");
+        bst.put("U001", "Tri");
+        bst.put("U002", "Thien");
+        System.out.println("Get U002: " + bst.get("U002"));
+        System.out.println("Contains U004? " + bst.contains("U004"));
+        System.out.println("Keys in order: " + bst.inOrderKeys());
+        bst.remove("U002");
+        System.out.println("Keys after removing U002: " + bst.inOrderKeys());
+    }
 }

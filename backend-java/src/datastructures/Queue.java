@@ -68,4 +68,16 @@ public class Queue<T> {
         rear = null;
         size = 0;
     }
+
+    public static void main(String[] args) {
+        System.out.println("=== QUEUE TEST ===");
+        Queue<String> q = new Queue<>();
+        q.enqueue("A");
+        q.enqueue("B");
+        q.enqueue("C");
+        System.out.println("Queue size: " + q.size());
+        System.out.println("Front (peek): " + q.peek());
+        System.out.println("Dequeue: " + q.dequeue());
+        System.out.println("Front after dequeue: " + q.peek());
+    }
 }

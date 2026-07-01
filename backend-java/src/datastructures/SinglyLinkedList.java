@@ -140,4 +140,16 @@ public class SinglyLinkedList<T> implements Iterable<T> {
         sb.append("]");
         return sb.toString();
     }
+
+    public static void main(String[] args) {
+        System.out.println("=== SINGLY LINKED LIST TEST ===");
+        SinglyLinkedList<String> list = new SinglyLinkedList<>();
+        list.add("Anh Yeu");
+        list.add("Em Yeu");
+        list.add("CSD201");
+        System.out.println("Danh sach goc: " + list);
+        System.out.println("Chua 'Em Yeu'? " + list.contains("Em Yeu"));
+        list.remove("Em Yeu");
+        System.out.println("Sau khi xoa 'Em Yeu': " + list);
+    }
 }

@@ -1,0 +1,102 @@
+[
+    {
+        "userId1": "u1",
+        "userId2": "u2"
+    },
+    {
+        "userId1": "u1",
+        "userId2": "u3"
+    },
+    {
+        "userId1": "u1",
+        "userId2": "u4"
+    },
+    {
+        "userId1": "u1",
+        "userId2": "u5"
+    },
+    {
+        "userId1": "u1",
+        "userId2": "u6"
+    },
+    {
+        "userId1": "u1",
+        "userId2": "u7"
+    },
+    {
+        "userId1": "u10",
+        "userId2": "u9"
+    },
+    {
+        "userId1": "u10",
+        "userId2": "u8"
+    },
+    {
+        "userId1": "u11",
+        "userId2": "u12"
+    },
+    {
+        "userId1": "u2",
+        "userId2": "u3"
+    },
+    {
+        "userId1": "u2",
+        "userId2": "u4"
+    },
+    {
+        "userId1": "u2",
+        "userId2": "u5"
+    },
+    {
+        "userId1": "u2",
+        "userId2": "u6"
+    },
+    {
+        "userId1": "u2",
+        "userId2": "u7"
+    },
+    {
+        "userId1": "u3",
+        "userId2": "u4"
+    },
+    {
+        "userId1": "u3",
+        "userId2": "u5"
+    },
+    {
+        "userId1": "u3",
+        "userId2": "u6"
+    },
+    {
+        "userId1": "u3",
+        "userId2": "u7"
+    },
+    {
+        "userId1": "u4",
+        "userId2": "u5"
+    },
+    {
+        "userId1": "u4",
+        "userId2": "u6"
+    },
+    {
+        "userId1": "u4",
+        "userId2": "u7"
+    },
+    {
+        "userId1": "u5",
+        "userId2": "u6"
+    },
+    {
+        "userId1": "u5",
+        "userId2": "u7"
+    },
+    {
+        "userId1": "u6",
+        "userId2": "u7"
+    },
+    {
+        "userId1": "u8",
+        "userId2": "u9"
+    }
+]

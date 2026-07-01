@@ -315,4 +315,15 @@ public class Graph {
             this.matrix = matrix;
         }
     }
+
+    public static void main(String[] args) {
+        System.out.println("=== GRAPH BFS TEST ===");
+        Graph socialNetwork = new Graph();
+        socialNetwork.addEdge("A", "B");
+        socialNetwork.addEdge("B", "C");
+        socialNetwork.addEdge("C", "D");
+        socialNetwork.addEdge("A", "C");
+        System.out.println("Neighbors of A: " + socialNetwork.getNeighbors("A"));
+        System.out.println("BFS Traversal from A: " + socialNetwork.bfs("A"));
+    }
 }

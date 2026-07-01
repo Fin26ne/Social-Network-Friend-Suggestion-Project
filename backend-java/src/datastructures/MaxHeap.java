@@ -89,4 +89,17 @@ public class MaxHeap<T extends Comparable<T>> {
         System.arraycopy(heap, 0, newHeap, 0, size);
         heap = newHeap;
     }
+
+    public static void main(String[] args) {
+        System.out.println("=== MAX HEAP TEST ===");
+        MaxHeap<Double> maxHeap = new MaxHeap<>();
+        maxHeap.insert(0.45);
+        maxHeap.insert(0.95);
+        maxHeap.insert(0.12);
+        maxHeap.insert(0.72);
+        System.out.println("Max element: " + maxHeap.peekMax());
+        System.out.println("Extract Max: " + maxHeap.extractMax());
+        System.out.println("Extract Max: " + maxHeap.extractMax());
+        System.out.println("Extract Max: " + maxHeap.extractMax());
+    }
 }

@@ -186,117 +186,46 @@
 
     <div class="container" style="padding-bottom: 5rem;">
         <div style="margin-bottom: 3rem;">
-            <h1 class="hero-title">Research Questions</h1>
+            <h1 class="hero-title">Research & Analysis</h1>
             <div class="hero-subtitle">Topic 05 — Social Network Friend Suggestion | CSD201 FPT</div>
             <div class="badges-row">
-                <div class="badge">RQ1 BFS vs DFS</div>
-                <div class="badge">RQ2 List vs Matrix</div>
-                <div class="badge">RQ3 Heap O(N log K)</div>
+                <div class="badge">Phân tích hiệu năng bộ nhớ</div>
+                <div class="badge">Adjacency List vs Adjacency Matrix</div>
             </div>
         </div>
 
-        <!-- Bảng điều khiển thử nghiệm hiệu năng -->
-        <div class="card" style="padding: 2rem; margin-bottom: 3rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 16px;">
-            <h3 style="color: var(--gold); margin-bottom: 1.5rem; font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-style: italic;">Bảng điều khiển thử nghiệm hiệu năng</h3>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
-                <!-- Control RQ1 -->
-                <div style="border-right: 1px solid var(--border); padding-right: 1.5rem;">
-                    <h4 style="color: var(--gold); font-family: 'DM Mono', monospace; font-size: 13px; margin-bottom: 1rem; text-transform: uppercase;">RQ1: Tốc độ Duyệt BFS vs DFS</h4>
-                    <div style="margin-bottom: 1rem;">
-                        <label style="display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px;">Kích thước nút (N):</label>
-                        <input id="input-rq1-sizes" type="text" class="input-control" value="100,500,1000,5000,10000" style="width: 100%; font-family: 'DM Mono'; font-size: 13px; padding: 8px;">
-                    </div>
-                    <div style="margin-bottom: 1rem;">
-                        <label style="display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px;">Bậc trung bình (Degree):</label>
-                        <input id="input-rq1-degree" type="number" class="input-control" value="20" min="2" max="100" style="width: 100%; font-family: 'DM Mono'; font-size: 13px; padding: 8px;">
-                    </div>
-                    <button id="btn-run-rq1" class="btn btn-primary btn-sm" style="width: 100%;">Chạy kiểm thử RQ1</button>
-                </div>
-
-                <!-- Control RQ2 -->
-                <div style="border-right: 1px solid var(--border); padding-right: 1.5rem;">
-                    <h4 style="color: var(--gold); font-family: 'DM Mono', monospace; font-size: 13px; margin-bottom: 1rem; text-transform: uppercase;">RQ2: Bộ nhớ List vs Matrix</h4>
-                    <div style="margin-bottom: 1rem;">
-                        <label style="display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px;">Kích thước nút (N) (tối đa 15.000):</label>
-                        <input id="input-rq2-sizes" type="text" class="input-control" value="100,500,1000,2000,5000" style="width: 100%; font-family: 'DM Mono'; font-size: 13px; padding: 8px;">
-                    </div>
-                    <div style="margin-bottom: 1rem;">
-                        <label style="display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px;">Mật độ cạnh (Density, 0.0001 - 0.2):</label>
-                        <input id="input-rq2-density" type="number" class="input-control" value="0.001" step="0.0001" min="0.0001" max="0.2" style="width: 100%; font-family: 'DM Mono'; font-size: 13px; padding: 8px;">
-                    </div>
-                    <button id="btn-run-rq2" class="btn btn-primary btn-sm" style="width: 100%;">Chạy kiểm thử RQ2</button>
-                </div>
-
-                <!-- Control RQ3 -->
-                <div>
-                    <h4 style="color: var(--gold); font-family: 'DM Mono', monospace; font-size: 13px; margin-bottom: 1rem; text-transform: uppercase;">RQ3: MaxHeap vs MinHeap-K</h4>
-                    <div style="margin-bottom: 1rem;">
-                        <label style="display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px;">Kích thước ứng viên (N):</label>
-                        <input id="input-rq3-sizes" type="text" class="input-control" value="100,1000,5000,10000" style="width: 100%; font-family: 'DM Mono'; font-size: 13px; padding: 8px;">
-                    </div>
-                    <div style="margin-bottom: 1rem;">
-                        <label style="display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px;">Giá trị K (1 - 100):</label>
-                        <input id="input-rq3-k" type="number" class="input-control" value="5" min="1" max="100" style="width: 100%; font-family: 'DM Mono'; font-size: 13px; padding: 8px;">
-                    </div>
-                    <button id="btn-run-rq3" class="btn btn-primary btn-sm" style="width: 100%;">Chạy kiểm thử RQ3</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- RQ1: BFS vs DFS -->
-        <div class="section-number">01 — TỐC ĐỘ DUYỆT ĐỒ THỊ</div>
-        <h2 style="margin-bottom: 2rem; color: var(--gold);">RQ1: BFS vs DFS</h2>
-        
-        <div class="layout-grid">
-            <div>
-                <p style="color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem;">
-                    <strong>Giả thuyết:</strong> BFS duyệt theo chiều rộng nên sẽ thu thập đủ các ứng viên Level-2 (bạn của bạn) với thời gian nhanh hơn DFS trong đồ thị thưa, do DFS có xu hướng đi sâu và thăm nhiều node không liên quan trước khi quay lui.
-                </p>
-                <div class="chart-container" style="padding: 16px;">
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; justify-content: center; font-size: 0.8rem; font-family: 'DM Mono', monospace;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:2px;background:#C9A96E"></div> BFS Time</div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:2px;background:#6EB2C9"></div> DFS Time</div>
-                    </div>
-                    <canvas id="chart-rq1"></canvas>
-                </div>
-            </div>
+        <!-- Bảng điều khiển thử nghiệm bộ nhớ -->
+        <div class="card" style="padding: 2rem; margin-bottom: 3rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; max-width: 600px; margin: 0 auto 3rem auto;">
+            <h3 style="color: var(--gold); margin-bottom: 1.5rem; font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-style: italic; text-align: center;">Cấu hình đo lường hiệu năng bộ nhớ</h3>
             
             <div>
-                <table id="table-rq1">
-                    <thead>
-                        <tr>
-                            <th>Số Node (N)</th>
-                            <th>BFS (ns)</th>
-                            <th>DFS (ns)</th>
-                            <th>Candidates BFS</th>
-                            <th>Candidates DFS</th>
-                            <th>Nhanh hơn</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <div id="conclusion-rq1" class="conclusion-box">Đang tải dữ liệu...</div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px;">Kích thước nút (N) (nhập các số cách nhau bởi dấu phẩy, tối đa 15.000):</label>
+                    <input id="input-rq2-sizes" type="text" class="input-control" value="1000,2000,3000,4000,5000" style="width: 100%; font-family: 'DM Mono'; font-size: 14px; padding: 10px; border-radius: 8px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px;">Mật độ cạnh (Density, từ 0.0001 đến 0.2):</label>
+                    <input id="input-rq2-density" type="number" class="input-control" value="0.001" step="0.0001" min="0.0001" max="0.2" style="width: 100%; font-family: 'DM Mono'; font-size: 14px; padding: 10px; border-radius: 8px; box-sizing: border-box;">
+                </div>
+                <button id="btn-run-rq2" class="btn btn-primary" style="width: 100%; padding: 10px; font-size: 15px; font-weight: 500;">Chạy thử nghiệm hiệu năng bộ nhớ</button>
             </div>
         </div>
-
-        <div class="section-divider"></div>
 
         <!-- RQ2: Adjacency List vs Matrix -->
-        <div class="section-number">02 — BỘ NHỚ LƯU TRỮ</div>
-        <h2 style="margin-bottom: 2rem; color: var(--gold);">RQ2: Adjacency List vs Matrix</h2>
+        <div class="section-number">01 — PHÂN TÍCH BỘ NHỚ LƯU TRỮ</div>
+        <h2 style="margin-bottom: 2rem; color: var(--gold);">Hiệu năng bộ nhớ: Adjacency List vs Adjacency Matrix</h2>
         
-        <div class="layout-grid reverse">
+        <div class="layout-grid reverse" style="margin-bottom: 3rem;">
             <div>
                 <table id="table-rq2">
                     <thead>
                         <tr>
-                            <th>N</th>
-                            <th>Edges</th>
+                            <th>Số Node (N)</th>
+                            <th>Số cạnh (E)</th>
                             <th>List (KB)</th>
                             <th>Matrix (KB)</th>
                             <th>Tiết kiệm</th>
-                            <th>Kết quả</th>
+                            <th>Tối ưu</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -306,73 +235,52 @@
 
             <div>
                 <p style="color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem;">
-                    <strong>Giả thuyết:</strong> Với đồ thị mạng xã hội thưa (edge density < 0.1%), danh sách kề (Adjacency List) sẽ tiết kiệm bộ nhớ đáng kể so với ma trận kề (Adjacency Matrix) O(N²).
+                    <strong>Giả thuyết:</strong> Mạng xã hội trong thực tế là đồ thị thưa (mật độ cạnh thấp, &lt; 1%). Danh sách kề (Adjacency List) chỉ lưu trữ các cạnh thực sự tồn tại nên sẽ tiết kiệm bộ nhớ đáng kể so với Ma trận kề (Adjacency Matrix) luôn tiêu tốn bộ nhớ cố định O(N²).
                 </p>
                 <div class="chart-container" style="padding: 16px;">
                     <div style="display: flex; gap: 1rem; margin-bottom: 1rem; justify-content: center; font-size: 0.8rem; font-family: 'DM Mono', monospace;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:2px;background:#C9A96E"></div> Adj List (KB)</div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:2px;background:#E08F8F"></div> Adj Matrix (KB)</div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:2px;background:#C9A96E"></div> Danh sách kề (KB)</div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:2px;background:#E08F8F"></div> Ma trận kề (KB)</div>
                     </div>
                     <canvas id="chart-rq2"></canvas>
                 </div>
             </div>
         </div>
-
-        <div class="section-divider"></div>
-
-        <!-- RQ3: MinHeap-K vs MaxHeap -->
-        <div class="section-number">03 — TỐI ƯU TÌM KIẾM TOP-K</div>
-        <h2 style="margin-bottom: 2rem; color: var(--gold);">RQ3: MinHeap-K vs MaxHeap</h2>
-        
-        <div class="layout-grid">
-            <div>
-                <p style="color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem;">
-                    <strong>Giả thuyết:</strong> Dùng MinHeap kích thước cố định K có độ phức tạp O(N log K) sẽ vượt trội hơn việc đẩy toàn bộ vào MaxHeap O(N log N) sau đó rút K phần tử, đặc biệt khi N cực lớn.
-                </p>
-                <div class="chart-container" style="padding: 16px;">
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; justify-content: center; font-size: 0.8rem; font-family: 'DM Mono', monospace;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:12px;background:#6a7382;border-radius:2px"></div> MaxHeap (O(N log N))</div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:12px;background:#C9A96E;border-radius:2px"></div> MinHeap-K (O(N log K))</div>
+        <!-- Chi tiết công thức tính bộ nhớ -->
+        <div class="card" style="padding: 2.5rem; margin-bottom: 4rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 16px;">
+            <h3 style="color: var(--gold); margin-bottom: 2rem; font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-style: italic; text-align: center;">Công thức tính dung lượng bộ nhớ thực tế (JVM 64-bit)</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem;">
+                <div style="border-right: 1px solid var(--border); padding-right: 1.5rem;">
+                    <h4 style="color: var(--gold); font-family: 'DM Mono', monospace; font-size: 14px; margin-bottom: 1.2rem; text-transform: uppercase;">Ma trận kề (Adjacency Matrix)</h4>
+                    <div style="font-family: 'DM Mono', monospace; font-size: 17px; margin-bottom: 1.2rem; color: #E08F8F; font-weight: 600;">
+                        Dung lượng (Bytes) = N² + 8N + 32
                     </div>
-                    <canvas id="chart-rq3"></canvas>
+                    <ul style="color: var(--muted); font-size: 0.95rem; line-height: 1.7; padding-left: 1.2rem; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><strong>N² bytes:</strong> Mảng boolean 2 chiều kích thước N x N (mỗi boolean tốn 1 byte).</li>
+                        <li style="margin-bottom: 0.5rem;"><strong>8N bytes:</strong> Chi phí cho N con trỏ tham chiếu đến mỗi hàng trên JVM 64-bit (mỗi tham chiếu tốn 8 bytes).</li>
+                        <li><strong>32 bytes:</strong> Hao phí cố định (Object Overhead) khởi tạo đối tượng mảng trong JVM.</li>
+                    </ul>
                 </div>
-            </div>
-            
-            <div>
-                <table id="table-rq3">
-                    <thead>
-                        <tr>
-                            <th>N</th>
-                            <th>K</th>
-                            <th>MaxHeap (ns)</th>
-                            <th>MinHeap-K (ns)</th>
-                            <th>Hiệu năng</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <div id="conclusion-rq3" class="conclusion-box">Đang tải dữ liệu...</div>
+                <div>
+                    <h4 style="color: var(--gold); font-family: 'DM Mono', monospace; font-size: 14px; margin-bottom: 1.2rem; text-transform: uppercase;">Danh sách kề (Adjacency List)</h4>
+                    <div style="font-family: 'DM Mono', monospace; font-size: 17px; margin-bottom: 1.2rem; color: #C9A96E; font-weight: 600;">
+                        Dung lượng (Bytes) = N x 80 + E x 48
+                    </div>
+                    <ul style="color: var(--muted); font-size: 0.95rem; line-height: 1.7; padding-left: 1.2rem; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><strong>N x 80 bytes:</strong> Chi phí lưu trữ thông tin của N đỉnh và đối tượng danh sách liên kết tương ứng (80 bytes mỗi đỉnh).</li>
+                        <li style="margin-bottom: 0.5rem;"><strong>E x 48 bytes:</strong> Chi phí bộ nhớ cho các nút liên kết kề đại diện cho các cạnh thực tế (48 bytes mỗi cạnh).</li>
+                        <li><strong>E (Edges):</strong> Số cạnh thực tế trong đồ thị.</li>
+                    </ul>
+                </div>
             </div>
         </div>
 
-        <div class="section-divider"></div>
-
-        <!-- Summary -->
-        <div class="section-number">04 — TỔNG KẾT</div>
-        <h2 style="margin-bottom: 2rem; color: var(--gold);">Báo cáo tổng quan</h2>
-        <div class="summary-grid">
-            <div class="summary-card">
-                <h4>RQ1: Duyệt Level-2</h4>
-                <p id="sum-rq1">Đang tải...</p>
-            </div>
-            <div class="summary-card">
-                <h4>RQ2: Bộ nhớ lưu trữ</h4>
-                <p id="sum-rq2">Đang tải...</p>
-            </div>
-            <div class="summary-card">
-                <h4>RQ3: Thuật toán Top-K</h4>
-                <p id="sum-rq3">Đang tải...</p>
-            </div>
+        <!-- Báo cáo tổng kết -->
+        <div class="section-number">02 — TỔNG KẾT HIỆU NĂNG</div>
+        <h2 style="margin-bottom: 2rem; color: var(--gold);">Báo cáo tổng kết hiệu năng bộ nhớ</h2>
+        <div style="background: var(--surface); border: 1px solid rgba(201, 169, 110, 0.3); border-radius: 12px; padding: 2rem; text-align: center; max-width: 700px; margin: 0 auto;">
+            <h4 style="color: var(--gold); margin-bottom: 1rem; font-family: 'DM Mono', monospace; font-size: 1.1rem;">Kết luận về tối ưu bộ nhớ</h4>
+            <p id="sum-rq2" style="font-size: 1.2rem; line-height: 1.6; margin: 0; font-family: 'Outfit', sans-serif;">Đang tải dữ liệu đo lường...</p>
         </div>
     </div>
 
@@ -380,24 +288,32 @@
         import { getUser } from './js/api.js';
         import { getCurrentUserId, createAvatar } from './js/app.js';
 
-        // Custom Chart Engine
-        // Helper to format Y axis labels cleanly
-        function formatYLabel(val, unit) {
-            if (unit === 'ms') {
-                if (val === 0) return '0';
-                if (val < 0.001) return val.toFixed(5);
-                if (val < 0.01) return val.toFixed(4);
-                if (val < 0.1) return val.toFixed(3);
-                if (val < 1) return val.toFixed(2);
-                if (val < 10) return val.toFixed(1);
-                return val.toFixed(0);
-            }
-            if (val >= 1000000) {
-                return (val / 1000000).toFixed(val % 1000000 === 0 ? 0 : 1) + 'M';
-            } else if (val >= 1000) {
-                return (val / 1000).toFixed(val % 1000 === 0 ? 0 : 1) + 'K';
-            }
+        // Format Y-axis tick labels nicely
+        function formatYLabel(val) {
+            if (val >= 1000000000) return (val / 1000000000).toFixed(val % 1000000000 === 0 ? 0 : 1) + 'B';
+            if (val >= 1000000)    return (val / 1000000).toFixed(val % 1000000 === 0 ? 0 : 1) + 'M';
+            if (val >= 1000)       return (val / 1000).toFixed(val % 1000 === 0 ? 0 : 1) + 'K';
             return val.toFixed(0);
+        }
+
+        // Format compact data-point labels
+        function formatDataLabel(val) {
+            if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M';
+            if (val >= 1000)    return (val / 1000).toFixed(1) + 'K';
+            return val.toFixed(1);
+        }
+
+        // Return the smallest "nice" step that splits [0, maxVal] into ~5-6 ticks
+        function niceStep(maxVal) {
+            const rough = maxVal / 5;                       // target ~5 ticks
+            const mag   = Math.pow(10, Math.floor(Math.log10(rough)));
+            const norm  = rough / mag;                     // 1..10
+            let step;
+            if      (norm < 1.5) step = 1;
+            else if (norm < 3)   step = 2;
+            else if (norm < 7)   step = 5;
+            else                 step = 10;
+            return step * mag;
         }
 
         // Custom Chart Engine
@@ -417,7 +333,7 @@
                 
                 this.width = rect.width;
                 this.height = rect.height;
-                this.padX = 55; // Slightly larger for Y-axis labels
+                this.padX = 65; // Room for large Y-axis labels (100M, 1B, etc.)
                 this.padY = 40;
 
                 this.canvas.addEventListener('mousemove', (e) => this.handleHover(e));
@@ -452,9 +368,6 @@
             }
 
             drawAxes(labelsCount, minY, maxY, options) {
-                const opt = options || {};
-                const useLog = opt.logarithmic;
-                const unit = opt.unit || '';
 
                 this.ctx.strokeStyle = 'rgba(255,255,255,0.2)';
                 this.ctx.lineWidth = 1;
@@ -473,28 +386,22 @@
 
                 const usableH = this.height - this.padY * 1.5;
 
-                for (let i = 0; i <= 4; i++) {
-                    const y = this.height - this.padY - (i * usableH / 4);
-                    
-                    // Draw grid line (except bottom axis)
-                    if (i > 0) {
+                // Linear scale with nice steps
+                const step = niceStep(maxY);
+                const tickMax = Math.ceil(maxY / step) * step;
+
+                for (let v = 0; v <= tickMax; v += step) {
+                    const ratio = v / tickMax;
+                    const y = this.height - this.padY - (ratio * usableH);
+
+                    if (v > 0) {
                         this.ctx.beginPath();
                         this.ctx.moveTo(this.padX, y);
                         this.ctx.lineTo(this.width - this.padX / 2, y);
                         this.ctx.stroke();
                     }
 
-                    // Compute and draw Y label
-                    let val = 0;
-                    if (useLog) {
-                        const logMin = Math.log10(Math.max(0.00001, minY));
-                        const logMax = Math.log10(Math.max(0.0001, maxY));
-                        const logVal = logMin + (i * (logMax - logMin) / 4);
-                        val = Math.pow(10, logVal);
-                    } else {
-                        val = minY + (i * (maxY - minY) / 4);
-                    }
-                    this.ctx.fillText(formatYLabel(val, unit), this.padX - 8, y);
+                    this.ctx.fillText(formatYLabel(v), this.padX - 8, y);
                 }
             }
         }
@@ -512,23 +419,16 @@
                 const labels = this.data.labels;
                 const datasets = this.data.datasets;
                 
+                // Linear scale: scan data and snap maxY to nice ceiling
                 let maxY = 0;
-                let minY = Infinity;
                 datasets.forEach(ds => ds.data.forEach(val => {
                     if (val > maxY) maxY = val;
-                    if (val < minY) minY = val;
                 }));
-                if (minY === Infinity) minY = 0;
-                
-                const useLog = this.options.logarithmic;
-                if (useLog) {
-                    minY = Math.max(0.00001, minY);
-                }
-                
-                maxY = maxY * 1.1; // 10% padding top
                 if (maxY === 0) maxY = 1;
+                const step = niceStep(maxY);
+                maxY = Math.ceil(maxY / step) * step; // snap to next nice tick
 
-                this.drawAxes(labels.length, minY, maxY, this.options);
+                this.drawAxes(labels.length, 0, maxY, this.options);
                 this.points = [];
 
                 const usableW = this.width - this.padX * 1.5;
@@ -544,18 +444,7 @@
                     this.ctx.fillText(l, x, this.height - this.padY / 2);
                 });
 
-                const getValY = (val) => {
-                    if (useLog) {
-                        const logVal = Math.log10(Math.max(0.00001, val));
-                        const logMin = Math.log10(Math.max(0.00001, minY));
-                        const logMax = Math.log10(Math.max(0.0001, maxY));
-                        if (logMax === logMin) return 0;
-                        const ratio = (logVal - logMin) / (logMax - logMin);
-                        return ratio * usableH;
-                    } else {
-                        return (val / maxY * usableH);
-                    }
-                };
+                const getValY = (val) => (Math.min(val, maxY) / maxY) * usableH;
 
                 // Draw Lines
                 datasets.forEach(ds => {
@@ -572,7 +461,6 @@
                         if (i === 0) {
                             this.ctx.moveTo(x, y);
                         } else {
-                            // Simple bezier for smoothness
                             const cpX = (prevX + x) / 2;
                             this.ctx.bezierCurveTo(cpX, prevY, cpX, y, x, y);
                         }
@@ -598,138 +486,41 @@
                         this.ctx.lineWidth = 1;
                         this.ctx.stroke();
                     });
-                });
-            }
-        }
 
-        class BarChart extends ChartEngine {
-            constructor(canvasId, data, options) {
-                super(canvasId);
-                this.data = data;
-                this.options = options || {};
-                this.draw();
-            }
+                    // Draw Data Labels (KB values above or below points)
+                    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+                    this.ctx.font = '10px "DM Mono"';
+                    this.ctx.textAlign = 'center';
 
-            draw() {
-                this.ctx.clearRect(0, 0, this.width, this.height);
-                const labels = this.data.labels;
-                const datasets = this.data.datasets;
-                
-                let maxY = 0;
-                let minY = Infinity;
-                datasets.forEach(ds => ds.data.forEach(val => { 
-                    if (val > maxY) maxY = val; 
-                    if (val < minY) minY = val;
-                }));
-                if (minY === Infinity) minY = 0;
-                
-                const useLog = this.options.logarithmic;
-                if (useLog) {
-                    minY = Math.max(0.00001, minY);
-                }
-                
-                maxY = maxY * 1.1;
-                if (maxY === 0) maxY = 1;
+                    ds.data.forEach((val, i) => {
+                        const x = this.padX + i * stepX;
+                        const y = this.height - this.padY - getValY(val);
 
-                this.drawAxes(labels.length, minY, maxY, this.options);
-                this.points = [];
+                        const labelText = formatDataLabel(val);
 
-                const usableW = this.width - this.padX * 1.5;
-                const usableH = this.height - this.padY * 1.5;
-                const groupWidth = usableW / labels.length;
-                const barWidth = groupWidth * 0.3;
-                const gap = 4;
-
-                this.ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                this.ctx.font = '10px "DM Mono"';
-                this.ctx.textAlign = 'center';
-
-                const getValY = (val) => {
-                    if (useLog) {
-                        const logVal = Math.log10(Math.max(0.00001, val));
-                        const logMin = Math.log10(Math.max(0.00001, minY));
-                        const logMax = Math.log10(Math.max(0.0001, maxY));
-                        if (logMax === logMin) return 0;
-                        const ratio = (logVal - logMin) / (logMax - logMin);
-                        return ratio * usableH;
-                    } else {
-                        return (val / maxY * usableH);
-                    }
-                };
-
-                labels.forEach((label, i) => {
-                    const groupX = this.padX + i * groupWidth;
-                    this.ctx.fillText(label, groupX + groupWidth / 2, this.height - this.padY / 2);
-
-                    datasets.forEach((ds, j) => {
-                        const val = ds.data[i];
-                        const barH = getValY(val);
-                        const x = groupX + (groupWidth/2) - barWidth - (gap/2) + (j * (barWidth + gap));
-                        const y = this.height - this.padY - barH;
-
-                        // Draw rounded bar
-                        this.ctx.fillStyle = ds.color;
-                        this.ctx.beginPath();
-                        this.ctx.roundRect(x, y, barWidth, barH, [4, 4, 0, 0]);
-                        this.ctx.fill();
-
-                        this.points.push({
-                            x: x + barWidth/2, y: y + barH/2,
-                            label: `${ds.label}: ${val.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 4})} ${this.options.unit}<br>N: ${label}`
-                        });
+                        if (ds.label.toLowerCase().includes('matrix')) {
+                            this.ctx.textBaseline = 'bottom';
+                            this.ctx.fillText(labelText + ' KB', x, y - 8);
+                        } else {
+                            this.ctx.textBaseline = 'top';
+                            this.ctx.fillText(labelText + ' KB', x, y + 8);
+                        }
                     });
                 });
             }
         }
 
         const mockData = {
-            rq1: [
-                { n: 100, bfsTimeNs: 12000, dfsTimeNs: 15000, bfsNodesVisited: 40, dfsNodesVisited: 40, winner: 'BFS' },
-                { n: 1000, bfsTimeNs: 45000, dfsTimeNs: 72000, bfsNodesVisited: 350, dfsNodesVisited: 350, winner: 'BFS' },
-                { n: 10000, bfsTimeNs: 280000, dfsTimeNs: 950000, bfsNodesVisited: 4200, dfsNodesVisited: 4200, winner: 'BFS' }
-            ],
             rq2: [
-                { n: 100, edgeCount: 10, listMemoryKB: 0.1, matrixMemoryKB: 10, winner: 'List', memorySavedPercent: 99 },
-                { n: 1000, edgeCount: 1000, listMemoryKB: 16, matrixMemoryKB: 1000, winner: 'List', memorySavedPercent: 98.4 },
-                { n: 5000, edgeCount: 25000, listMemoryKB: 400, matrixMemoryKB: 25000, winner: 'List', memorySavedPercent: 98.4 }
-            ],
-            rq3: [
-                { n: 100, k: 5, maxHeapTimeNs: 8000, minHeapTimeNs: 5000, winner: 'MinHeap-K' },
-                { n: 1000, k: 5, maxHeapTimeNs: 45000, minHeapTimeNs: 12000, winner: 'MinHeap-K' },
-                { n: 10000, k: 5, maxHeapTimeNs: 650000, minHeapTimeNs: 95000, winner: 'MinHeap-K' }
+                { n: 100, edgeCount: 10, listMemoryKB: 8.28, matrixMemoryKB: 10.58, winner: 'List', memorySavedPercent: 21.7 },
+                { n: 500, edgeCount: 250, listMemoryKB: 50.78, matrixMemoryKB: 248.08, winner: 'List', memorySavedPercent: 79.5 },
+                { n: 1000, edgeCount: 1000, listMemoryKB: 125.0, matrixMemoryKB: 984.4, winner: 'List', memorySavedPercent: 87.3 },
+                { n: 2000, edgeCount: 4000, listMemoryKB: 343.75, matrixMemoryKB: 3921.9, winner: 'List', memorySavedPercent: 91.2 },
+                { n: 5000, edgeCount: 25000, listMemoryKB: 1562.5, matrixMemoryKB: 24453.15, winner: 'List', memorySavedPercent: 93.6 }
             ]
         };
 
         function formatNum(n) { return new Intl.NumberFormat().format(n); }
-
-        function renderRQ1(list) {
-            const rq1Body = document.querySelector('#table-rq1 tbody');
-            rq1Body.innerHTML = list.map(d => `
-                <tr>
-                    <td>${formatNum(d.size)}</td>
-                    <td>${formatNum(d.bfsTimeNs)}</td>
-                    <td>${formatNum(d.dfsTimeNs)}</td>
-                    <td>${formatNum(d.bfsCandidates)}</td>
-                    <td>${formatNum(d.dfsCandidates)}</td>
-                    <td><span class="winner-badge">${d.bfsTimeNs < d.dfsTimeNs ? 'BFS' : 'DFS'}</span></td>
-                </tr>
-            `).join('');
-
-            const lastRQ1 = list[list.length - 1];
-            const winner = lastRQ1.bfsTimeNs < lastRQ1.dfsTimeNs ? 'BFS' : 'DFS';
-            const fasterTime = winner === 'BFS' ? lastRQ1.dfsTimeNs / lastRQ1.bfsTimeNs : lastRQ1.bfsTimeNs / lastRQ1.dfsTimeNs;
-            const rq1Ratio = fasterTime.toFixed(1);
-            document.getElementById('conclusion-rq1').innerHTML = `Với N = ${formatNum(lastRQ1.size)} node: <strong>${winner}</strong> nhanh hơn ${rq1Ratio} lần (${formatNum(lastRQ1.bfsTimeNs)}ns vs ${formatNum(lastRQ1.dfsTimeNs)}ns).`;
-            document.getElementById('sum-rq1').innerHTML = `<strong>${winner}</strong> tối ưu tốc độ hơn ${rq1Ratio}x khi N cực lớn.`;
-
-            new LineChart('chart-rq1', {
-                labels: list.map(d => d.size),
-                datasets: [
-                    { label: 'BFS', data: list.map(d => d.bfsTimeNs), color: '#C9A96E' },
-                    { label: 'DFS', data: list.map(d => d.dfsTimeNs), color: '#6EB2C9' }
-                ]
-            }, { unit: 'ns', logarithmic: true });
-        }
 
         function renderRQ2(list) {
             const rq2Body = document.querySelector('#table-rq2 tbody');
@@ -740,8 +531,8 @@
                     <tr>
                         <td>${formatNum(d.size)}</td>
                         <td>${formatNum(d.edges)}</td>
-                        <td>${formatNum(Math.round(d.listMemKb))}</td>
-                        <td>${formatNum(Math.round(d.matrixMemKb))}</td>
+                        <td>${formatNum(Math.round(d.listMemKb * 10) / 10)} KB</td>
+                        <td>${formatNum(Math.round(d.matrixMemKb * 10) / 10)} KB</td>
                         <td style="color:var(--goldglow)">${savings}%</td>
                         <td><span class="winner-badge">${winner}</span></td>
                     </tr>
@@ -750,8 +541,8 @@
 
             const lastRQ2 = list[list.length - 1];
             const savings = ((lastRQ2.matrixMemKb - lastRQ2.listMemKb) / lastRQ2.matrixMemKb * 100).toFixed(1);
-            document.getElementById('conclusion-rq2').innerHTML = `Với N = ${formatNum(lastRQ2.size)} node, danh sách kề tiết kiệm <strong>${savings}%</strong> bộ nhớ so với ma trận kề (${Math.round(lastRQ2.listMemKb)} KB vs ${Math.round(lastRQ2.matrixMemKb)} KB).`;
-            document.getElementById('sum-rq2').innerHTML = `<strong>Adjacency List</strong> tiết kiệm RAM ${savings}% cho đồ thị mạng xã hội thưa.`;
+            document.getElementById('conclusion-rq2').innerHTML = `Với N = ${formatNum(lastRQ2.size)} node, danh sách kề tiết kiệm <strong>${savings}%</strong> bộ nhớ so với ma trận kề (${(Math.round(lastRQ2.listMemKb * 10) / 10).toLocaleString()} KB vs ${(Math.round(lastRQ2.matrixMemKb * 10) / 10).toLocaleString()} KB).`;
+            document.getElementById('sum-rq2').innerHTML = `Cấu trúc <strong>Adjacency List (Danh sách kề)</strong> tối ưu hơn tuyệt đối khi đồ thị mạng xã hội thưa, tiết kiệm đến <strong>${savings}%</strong> bộ nhớ RAM so với Adjacency Matrix (Ma trận kề) ở quy mô N = ${formatNum(lastRQ2.size)} node.`;
 
             new LineChart('chart-rq2', {
                 labels: list.map(d => d.size),
@@ -759,63 +550,7 @@
                     { label: 'Adj List', data: list.map(d => d.listMemKb), color: '#C9A96E' },
                     { label: 'Adj Matrix', data: list.map(d => d.matrixMemKb), color: '#E08F8F' }
                 ]
-            }, { unit: 'KB', logarithmic: true });
-        }
-
-        function renderRQ3(list) {
-            const rq3Body = document.querySelector('#table-rq3 tbody');
-            rq3Body.innerHTML = list.map(d => `
-                <tr>
-                    <td>${formatNum(d.size)}</td>
-                    <td>${document.getElementById('input-rq3-k').value}</td>
-                    <td>${d.maxHeapTimeMs.toFixed(4)}</td>
-                    <td>${d.minHeapTimeMs.toFixed(4)}</td>
-                    <td><span class="winner-badge">${d.minHeapTimeMs < d.maxHeapTimeMs ? 'MinHeap-K' : 'MaxHeap'}</span></td>
-                </tr>
-            `).join('');
-
-            const lastRQ3 = list[list.length - 1];
-            const winner = lastRQ3.minHeapTimeMs < lastRQ3.maxHeapTimeMs ? 'MinHeap-K' : 'MaxHeap';
-            const speedup = (lastRQ3.maxHeapTimeMs / lastRQ3.minHeapTimeMs).toFixed(1);
-            document.getElementById('conclusion-rq3').innerHTML = `Với N = ${formatNum(lastRQ3.size)} ứng viên: Duy trì <strong>${winner}</strong> nhanh hơn MaxHeap toàn cục <strong>${speedup} lần</strong>.`;
-            document.getElementById('sum-rq3').innerHTML = `Thuật toán <strong>MinHeap-K</strong> đạt tốc độ O(N log K) tối ưu hơn ${speedup}x so với O(N log N).`;
-
-            new BarChart('chart-rq3', {
-                labels: list.map(d => d.size),
-                datasets: [
-                    { label: 'MaxHeap', data: list.map(d => d.maxHeapTimeMs), color: '#6a7382' },
-                    { label: 'MinHeap-K', data: list.map(d => d.minHeapTimeMs), color: '#C9A96E' }
-                ]
-            }, { unit: 'ms', logarithmic: true });
-        }
-
-        function renderAllCharts(data) {
-            // Map RQ1
-            const rq1List = data.rq1.map(d => ({
-                size: d.n,
-                bfsTimeNs: d.bfsTimeNs,
-                dfsTimeNs: d.dfsTimeNs,
-                bfsCandidates: d.bfsNodesVisited,
-                dfsCandidates: d.dfsNodesVisited
-            }));
-            renderRQ1(rq1List);
-
-            // Map RQ2
-            const rq2List = data.rq2.map(d => ({
-                size: d.n,
-                edges: d.edgeCount,
-                listMemKb: d.listMemoryKB,
-                matrixMemKb: d.matrixMemoryKB
-            }));
-            renderRQ2(rq2List);
-
-            // Map RQ3
-            const rq3List = data.rq3.map(d => ({
-                size: d.n,
-                maxHeapTimeMs: d.maxHeapTimeNs / 1_000_000.0,
-                minHeapTimeMs: d.minHeapTimeNs / 1_000_000.0
-            }));
-            renderRQ3(rq3List);
+            }, { unit: 'KB' });
         }
 
         async function init() {
@@ -828,13 +563,15 @@
             }
 
             try {
-                const response = await fetch('http://localhost:3003/api/suggestions/benchmark');
+                const response = await fetch('http://localhost:3003/api/suggestions/benchmark?type=rq2');
                 if (!response.ok) throw new Error('API failed');
                 const result = await response.json();
-                renderAllCharts(result.data);
+                
+                const list = result.data.benchmarkResults || result.data.rq2 || mockData.rq2;
+                renderRQ2(list);
             } catch (err) {
                 console.warn('Using mock data for benchmarks (API not ready/failed)', err);
-                renderAllCharts(mockData);
+                renderRQ2(mockData.rq2);
                 // Add a small banner
                 const banner = document.createElement('div');
                 banner.className = 'banner';
@@ -851,38 +588,20 @@
                 };
             }
 
-            async function runRQ1() {
-                const btn = document.getElementById('btn-run-rq1');
-                const originalText = btn.textContent;
-                btn.disabled = true;
-                btn.textContent = 'Đang đo lường...';
-                try {
-                    const sizes = document.getElementById('input-rq1-sizes').value;
-                    const degree = document.getElementById('input-rq1-degree').value;
-                    const res = await fetch(`http://localhost:3003/api/suggestions/benchmark?type=rq1&sizes=${sizes}&avgDegree=${degree}`);
-                    if (!res.ok) throw new Error('Benchmark failed');
-                    const result = await res.json();
-                    renderRQ1(result.data.benchmarkResults);
-                } catch (err) {
-                    console.error(err);
-                } finally {
-                    btn.disabled = false;
-                    btn.textContent = originalText;
-                }
-            }
-
             async function runRQ2() {
                 const btn = document.getElementById('btn-run-rq2');
                 const originalText = btn.textContent;
                 btn.disabled = true;
-                btn.textContent = 'Đang đo lường...';
+                btn.textContent = 'Đang đo lường bộ nhớ...';
                 try {
                     const sizes = document.getElementById('input-rq2-sizes').value;
                     const density = document.getElementById('input-rq2-density').value;
                     const res = await fetch(`http://localhost:3003/api/suggestions/benchmark?type=rq2&sizes=${sizes}&edgeDensity=${density}`);
                     if (!res.ok) throw new Error('Benchmark failed');
                     const result = await res.json();
-                    renderRQ2(result.data.benchmarkResults);
+                    
+                    const list = result.data.benchmarkResults || result.data.rq2 || mockData.rq2;
+                    renderRQ2(list);
                 } catch (err) {
                     console.error(err);
                 } finally {
@@ -891,43 +610,15 @@
                 }
             }
 
-            async function runRQ3() {
-                const btn = document.getElementById('btn-run-rq3');
-                const originalText = btn.textContent;
-                btn.disabled = true;
-                btn.textContent = 'Đang đo lường...';
-                try {
-                    const sizes = document.getElementById('input-rq3-sizes').value;
-                    const k = document.getElementById('input-rq3-k').value;
-                    const res = await fetch(`http://localhost:3003/api/suggestions/benchmark?type=rq3&sizes=${sizes}&k=${k}`);
-                    if (!res.ok) throw new Error('Benchmark failed');
-                    const result = await res.json();
-                    renderRQ3(result.data.benchmarkResults);
-                } catch (err) {
-                    console.error(err);
-                } finally {
-                    btn.disabled = false;
-                    btn.textContent = originalText;
-                }
-            }
-
-            // Debounced wrappers for auto re-rendering on input changes
-            const debouncedRQ1 = debounce(runRQ1, 800);
+            // Debounced wrapper for auto re-rendering on input changes
             const debouncedRQ2 = debounce(runRQ2, 800);
-            const debouncedRQ3 = debounce(runRQ3, 800);
 
-            // Bind click handlers (immediate)
-            document.getElementById('btn-run-rq1').addEventListener('click', runRQ1);
+            // Bind click handler (immediate)
             document.getElementById('btn-run-rq2').addEventListener('click', runRQ2);
-            document.getElementById('btn-run-rq3').addEventListener('click', runRQ3);
 
             // Bind change handlers (debounced auto re-render)
-            document.getElementById('input-rq1-sizes').addEventListener('input', debouncedRQ1);
-            document.getElementById('input-rq1-degree').addEventListener('input', debouncedRQ1);
             document.getElementById('input-rq2-sizes').addEventListener('input', debouncedRQ2);
             document.getElementById('input-rq2-density').addEventListener('input', debouncedRQ2);
-            document.getElementById('input-rq3-sizes').addEventListener('input', debouncedRQ3);
-            document.getElementById('input-rq3-k').addEventListener('input', debouncedRQ3);
         }
 
         init();

@@ -161,26 +161,14 @@ public class BenchmarkRunner {
         JSONArray arr = new JSONArray();
 
         for (int n : ns) {
-            Graph g = new Graph();
-            for (int i = 0; i < n; i++) {
-                g.addVertex("u" + i);
-            }
-            
-            int targetEdgeCount = (int) (n * n * edgeDensity);
-            for (int i = 0; i < targetEdgeCount; i++) {
-                int u1 = (int) (Math.random() * n);
-                int u2 = (int) (Math.random() * n);
-                g.addEdge("u" + u1, "u" + u2);
-            }
-            
-            int numVertices = g.getNumVertices();
-            int numEdges = g.getNumEdges();
+            long numVertices = n;
+            long numEdges = (long) (n * (long)n * edgeDensity);
 
             // Adjacency List: numVertices * 80 + numEdges * 48
-            long listMemoryBytes = (long) numVertices * 80 + (long) numEdges * 48;
+            long listMemoryBytes = numVertices * 80 + numEdges * 48;
             
             // Adjacency Matrix: n * n + n * 8 + 32
-            long matrixMemoryBytes = (long) numVertices * numVertices + (long) numVertices * 8 + 32;
+            long matrixMemoryBytes = numVertices * numVertices + numVertices * 8 + 32;
             
             JSONObject obj = new JSONObject();
             obj.put("n", numVertices);

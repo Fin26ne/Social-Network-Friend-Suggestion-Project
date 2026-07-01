@@ -18,7 +18,6 @@ public class Main {
 
         System.out.println("=================================================");
         System.out.println("   SOCIAL NETWORK FRIEND SUGGESTION - NATIVE JAVA");
-        System.out.println("   Author: Team Nguyen Tri Thien & Dinh Thien Nhan");
         System.out.println("=================================================");
         System.out.println("Initializing Social Network Graph...");
         GraphService graphService = new GraphService(dataDirectoryPath);
