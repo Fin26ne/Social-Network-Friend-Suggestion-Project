@@ -1,5 +1,6 @@
 @startuml
 skinparam defaultFontName "Segoe UI"
+skinparam classAttributeIconSize 0
 title Sơ đồ lớp (Class Diagram) - Hệ thống Gợi ý Kết bạn (Tối ưu hóa)
 
 package datastructures {
