@@ -200,12 +200,19 @@
             
             <div>
                 <div style="margin-bottom: 1.5rem;">
-                    <label style="display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px;">Kích thước nút (N) (nhập các số cách nhau bởi dấu phẩy, tối đa 15.000):</label>
+                    <label style="display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px;">Kích thước nút (N) (nhập các số cách nhau bởi dấu phẩy, tối đa 10.000.000):</label>
                     <input id="input-rq2-sizes" type="text" class="input-control" value="1000,2000,3000,4000,5000" style="width: 100%; font-family: 'DM Mono'; font-size: 14px; padding: 10px; border-radius: 8px; box-sizing: border-box;">
                 </div>
                 <div style="margin-bottom: 1.5rem;">
                     <label style="display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px;">Mật độ cạnh (Density, từ 0.0001 đến 0.2):</label>
                     <input id="input-rq2-density" type="number" class="input-control" value="0.001" step="0.0001" min="0.0001" max="0.2" style="width: 100%; font-family: 'DM Mono'; font-size: 14px; padding: 10px; border-radius: 8px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px;">Chế độ đo lường:</label>
+                    <select id="input-rq2-mode" class="input-control" style="width: 100%; font-family: 'DM Mono'; font-size: 14px; padding: 10px; border-radius: 8px; box-sizing: border-box; background: var(--surface); color: var(--text); border: 1px solid rgba(201,169,110,0.3);">
+                        <option value="theory">Lý thuyết (Toán học O(1) - Rất nhanh, hỗ trợ chục triệu node)</option>
+                        <option value="actual">Thực tế (Cấp phát RAM - Tối đa 500.000 node để test sập máy)</option>
+                    </select>
                 </div>
                 <button id="btn-run-rq2" class="btn btn-primary" style="width: 100%; padding: 10px; font-size: 15px; font-weight: 500;">Chạy thử nghiệm hiệu năng bộ nhớ</button>
             </div>
@@ -217,19 +224,36 @@
         
         <div class="layout-grid reverse" style="margin-bottom: 3rem;">
             <div>
-                <table id="table-rq2">
-                    <thead>
-                        <tr>
-                            <th>Số Node (N)</th>
-                            <th>Số cạnh (E)</th>
-                            <th>List (KB)</th>
-                            <th>Matrix (KB)</th>
-                            <th>Tiết kiệm</th>
-                            <th>Tối ưu</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+                <div id="table-theory-container">
+                    <h4 style="color: var(--gold); margin-bottom: 1rem; font-family: 'DM Mono', monospace; font-size: 1.1rem; text-transform: uppercase;">1. Đo lường Lý thuyết (Toán học O(1))</h4>
+                    <table id="table-rq2" style="margin-bottom: 2rem;">
+                        <thead>
+                            <tr>
+                                <th>Số Node (N)</th>
+                                <th>Số cạnh (E)</th>
+                                <th>List (Lý thuyết)</th>
+                                <th>Matrix (Lý thuyết)</th>
+                                <th>Tiết kiệm</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div id="table-actual-container" style="display: none;">
+                    <h4 style="color: var(--gold); margin-bottom: 1rem; font-family: 'DM Mono', monospace; font-size: 1.1rem; text-transform: uppercase;">2. Đo lường Thực tế (Cấp phát RAM - Max 500.000)</h4>
+                    <table id="table-rq2-actual" style="margin-bottom: 1rem;">
+                        <thead>
+                            <tr>
+                                <th>Số Node (N)</th>
+                                <th>Số cạnh (E)</th>
+                                <th>List (Thực tế)</th>
+                                <th>Matrix (Thực tế)</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
                 <div id="conclusion-rq2" class="conclusion-box">Đang tải dữ liệu...</div>
             </div>
 
@@ -253,12 +277,12 @@
                 <div style="border-right: 1px solid var(--border); padding-right: 1.5rem;">
                     <h4 style="color: var(--gold); font-family: 'DM Mono', monospace; font-size: 14px; margin-bottom: 1.2rem; text-transform: uppercase;">Ma trận kề (Adjacency Matrix)</h4>
                     <div style="font-family: 'DM Mono', monospace; font-size: 17px; margin-bottom: 1.2rem; color: #E08F8F; font-weight: 600;">
-                        Dung lượng (Bytes) = N² + 8N + 32
+                        Dung lượng (Bytes) = N² + 32N + 24
                     </div>
                     <ul style="color: var(--muted); font-size: 0.95rem; line-height: 1.7; padding-left: 1.2rem; margin: 0;">
                         <li style="margin-bottom: 0.5rem;"><strong>N² bytes:</strong> Mảng boolean 2 chiều kích thước N x N (mỗi boolean tốn 1 byte).</li>
-                        <li style="margin-bottom: 0.5rem;"><strong>8N bytes:</strong> Chi phí cho N con trỏ tham chiếu đến mỗi hàng trên JVM 64-bit (mỗi tham chiếu tốn 8 bytes).</li>
-                        <li><strong>32 bytes:</strong> Hao phí cố định (Object Overhead) khởi tạo đối tượng mảng trong JVM.</li>
+                        <li style="margin-bottom: 0.5rem;"><strong>32N bytes:</strong> Chi phí cho N con trỏ tham chiếu đến mỗi hàng (8N) và object header của N mảng con (24N).</li>
+                        <li><strong>24 bytes:</strong> Hao phí cố định (Object Overhead) khởi tạo mảng 2 chiều ở lớp ngoài cùng.</li>
                     </ul>
                 </div>
                 <div>
@@ -522,19 +546,36 @@
 
         function formatNum(n) { return new Intl.NumberFormat().format(n); }
 
-        function renderRQ2(list) {
+        function renderRQ2(list, mode = 'theory') {
+            const isTheory = mode === 'theory';
+            document.getElementById('table-theory-container').style.display = isTheory ? 'block' : 'none';
+            document.getElementById('table-actual-container').style.display = isTheory ? 'none' : 'block';
+
             const rq2Body = document.querySelector('#table-rq2 tbody');
+            const rq2ActualBody = document.querySelector('#table-rq2-actual tbody');
+            
             rq2Body.innerHTML = list.map(d => {
-                const winner = d.listMemKb < d.matrixMemKb ? 'List' : 'Matrix';
                 const savings = ((d.matrixMemKb - d.listMemKb) / d.matrixMemKb * 100).toFixed(1);
                 return `
                     <tr>
                         <td>${formatNum(d.size)}</td>
                         <td>${formatNum(d.edges)}</td>
-                        <td>${formatNum(Math.round(d.listMemKb * 10) / 10)} KB</td>
-                        <td>${formatNum(Math.round(d.matrixMemKb * 10) / 10)} KB</td>
+                        <td style="color:#C9A96E">${formatNum(Math.round(d.listMemKb * 10) / 10)} KB</td>
+                        <td style="color:#E08F8F">${formatNum(Math.round(d.matrixMemKb * 10) / 10)} KB</td>
                         <td style="color:var(--goldglow)">${savings}%</td>
-                        <td><span class="winner-badge">${winner}</span></td>
+                    </tr>
+                `;
+            }).join('');
+
+            rq2ActualBody.innerHTML = list.map(d => {
+                const actualList = d.actualListMemKb !== undefined && d.actualListMemKb >= 0 ? formatNum(Math.round(d.actualListMemKb * 10) / 10) + ' KB' : '<span style="color:#E08F8F;font-size:11px">[Quá tải RAM (Sập)]</span>';
+                const actualMatrix = d.actualMatrixMemKb !== undefined && d.actualMatrixMemKb >= 0 ? formatNum(Math.round(d.actualMatrixMemKb * 10) / 10) + ' KB' : '<span style="color:#E08F8F;font-size:11px">[Quá tải RAM (Sập)]</span>';
+                return `
+                    <tr>
+                        <td>${formatNum(d.size)}</td>
+                        <td>${formatNum(d.edges)}</td>
+                        <td style="color:#C9A96E">${actualList}</td>
+                        <td style="color:#E08F8F">${actualMatrix}</td>
                     </tr>
                 `;
             }).join('');
@@ -544,13 +585,23 @@
             document.getElementById('conclusion-rq2').innerHTML = `Với N = ${formatNum(lastRQ2.size)} node, danh sách kề tiết kiệm <strong>${savings}%</strong> bộ nhớ so với ma trận kề (${(Math.round(lastRQ2.listMemKb * 10) / 10).toLocaleString()} KB vs ${(Math.round(lastRQ2.matrixMemKb * 10) / 10).toLocaleString()} KB).`;
             document.getElementById('sum-rq2').innerHTML = `Cấu trúc <strong>Adjacency List (Danh sách kề)</strong> tối ưu hơn tuyệt đối khi đồ thị mạng xã hội thưa, tiết kiệm đến <strong>${savings}%</strong> bộ nhớ RAM so với Adjacency Matrix (Ma trận kề) ở quy mô N = ${formatNum(lastRQ2.size)} node.`;
 
-            new LineChart('chart-rq2', {
-                labels: list.map(d => d.size),
-                datasets: [
-                    { label: 'Adj List', data: list.map(d => d.listMemKb), color: '#C9A96E' },
-                    { label: 'Adj Matrix', data: list.map(d => d.matrixMemKb), color: '#E08F8F' }
-                ]
-            }, { unit: 'KB' });
+            if (isTheory) {
+                new LineChart('chart-rq2', {
+                    labels: list.map(d => d.size),
+                    datasets: [
+                        { label: 'Adj List (Lý thuyết)', data: list.map(d => d.listMemKb), color: '#C9A96E' },
+                        { label: 'Adj Matrix (Lý thuyết)', data: list.map(d => d.matrixMemKb), color: '#E08F8F' }
+                    ]
+                }, { unit: 'KB' });
+            } else {
+                new LineChart('chart-rq2', {
+                    labels: list.map(d => d.size),
+                    datasets: [
+                        { label: 'Adj List (Thực tế)', data: list.map(d => d.actualListMemKb >= 0 ? d.actualListMemKb : 0), color: '#C9A96E' },
+                        { label: 'Adj Matrix (Thực tế)', data: list.map(d => d.actualMatrixMemKb >= 0 ? d.actualMatrixMemKb : 0), color: '#E08F8F' }
+                    ]
+                }, { unit: 'KB' });
+            }
         }
 
         async function init() {
@@ -590,18 +641,20 @@
 
             async function runRQ2() {
                 const btn = document.getElementById('btn-run-rq2');
+                const mode = document.getElementById('input-rq2-mode').value;
                 const originalText = btn.textContent;
                 btn.disabled = true;
-                btn.textContent = 'Đang đo lường bộ nhớ...';
+                btn.textContent = mode === 'actual' ? 'Đang ép máy tính xử lý (Vui lòng chờ, máy có thể bị lag)...' : 'Đang tính toán toán học...';
                 try {
                     const sizes = document.getElementById('input-rq2-sizes').value;
                     const density = document.getElementById('input-rq2-density').value;
-                    const res = await fetch(`http://localhost:3003/api/suggestions/benchmark?type=rq2&sizes=${sizes}&edgeDensity=${density}`);
+                    const mode = document.getElementById('input-rq2-mode').value;
+                    const res = await fetch(`http://localhost:3003/api/suggestions/benchmark?type=rq2&sizes=${sizes}&edgeDensity=${density}&mode=${mode}`);
                     if (!res.ok) throw new Error('Benchmark failed');
                     const result = await res.json();
                     
                     const list = result.data.benchmarkResults || result.data.rq2 || mockData.rq2;
-                    renderRQ2(list);
+                    renderRQ2(list, mode);
                 } catch (err) {
                     console.error(err);
                 } finally {
@@ -619,6 +672,7 @@
             // Bind change handlers (debounced auto re-render)
             document.getElementById('input-rq2-sizes').addEventListener('input', debouncedRQ2);
             document.getElementById('input-rq2-density').addEventListener('input', debouncedRQ2);
+            document.getElementById('input-rq2-mode').addEventListener('change', runRQ2);
         }
 
         init();

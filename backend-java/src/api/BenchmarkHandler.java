@@ -24,141 +24,36 @@ public class BenchmarkHandler implements HttpHandler {
 
         try {
             Map<String, String> queryParams = AppServer.parseQueryParams(exchange.getRequestURI().getQuery());
-            String type = queryParams.getOrDefault("type", "all").toLowerCase();
+            String type = queryParams.getOrDefault("type", "rq2").toLowerCase();
             
-            if (!"rq1".equals(type) && !"rq2".equals(type) && !"rq3".equals(type) && !"all".equals(type)) {
-                type = "all";
-            }
-
-            boolean isCustom = queryParams.containsKey("sizes") || 
-                               queryParams.containsKey("avgDegree") || 
-                               queryParams.containsKey("edgeDensity") || 
-                               queryParams.containsKey("k");
-
             JSONArray mappedResults = new JSONArray();
 
-            if (!isCustom) {
-                // Run benchmarks dynamically on every request to measure real-time performance
-                JSONObject results = services.BenchmarkRunner.runAll();
+            if ("rq2".equals(type)) {
+                int[] ns = {100, 500, 1000, 2000, 5000};
+                double edgeDensity = 0.001;
+                String sizesStr = queryParams.get("sizes");
+                if (sizesStr != null && !sizesStr.trim().isEmpty()) {
+                    ns = parseSizes(sizesStr, Integer.MAX_VALUE);
+                }
+                String densityStr = queryParams.get("edgeDensity");
+                if (densityStr != null) {
+                    try {
+                        edgeDensity = Math.max(0.0001, Math.min(0.2, Double.parseDouble(densityStr.trim())));
+                    } catch (NumberFormatException ignored) {}
+                }
+                String mode = queryParams.getOrDefault("mode", "theory");
                 
-                if ("all".equals(type)) {
-                    JSONObject response = new JSONObject();
-                    response.put("success", true);
-                    response.put("data", results);
-                    AppServer.sendJsonResponse(exchange, 200, response);
-                    return;
-                }
-
-                JSONArray rawResults = results.getJSONArray(type);
-
-                if ("rq1".equals(type)) {
-                    for (int i = 0; i < rawResults.length(); i++) {
-                        JSONObject r = rawResults.getJSONObject(i);
-                        JSONObject m = new JSONObject();
-                        m.put("size", r.getInt("n"));
-                        m.put("bfsTimeNs", r.getLong("bfsTimeNs"));
-                        m.put("dfsTimeNs", r.getLong("dfsTimeNs"));
-                        m.put("bfsCandidates", r.getInt("bfsNodesVisited"));
-                        m.put("dfsCandidates", r.getInt("dfsNodesVisited"));
-                        mappedResults.put(m);
-                    }
-                } else if ("rq2".equals(type)) {
-                    for (int i = 0; i < rawResults.length(); i++) {
-                        JSONObject r = rawResults.getJSONObject(i);
-                        JSONObject m = new JSONObject();
-                        m.put("size", r.getInt("n"));
-                        m.put("edges", r.getInt("edgeCount"));
-                        m.put("listMemKb", r.getDouble("listMemoryKB"));
-                        m.put("matrixMemKb", r.getDouble("matrixMemoryKB"));
-                        mappedResults.put(m);
-                    }
-                } else { // rq3
-                    for (int i = 0; i < rawResults.length(); i++) {
-                        JSONObject r = rawResults.getJSONObject(i);
-                        JSONObject m = new JSONObject();
-                        m.put("size", r.getInt("n"));
-                        m.put("maxHeapTimeMs", r.getLong("maxHeapTimeNs") / 1_000_000.0);
-                        m.put("minHeapTimeMs", r.getLong("minHeapTimeNs") / 1_000_000.0);
-                        mappedResults.put(m);
-                    }
-                }
-            } else {
-                // Run custom benchmark dynamically
-                if ("rq1".equals(type)) {
-                    int[] ns = {100, 500, 1000, 5000, 10000};
-                    int avgDegree = 20;
-                    String sizesStr = queryParams.get("sizes");
-                    if (sizesStr != null && !sizesStr.trim().isEmpty()) {
-                        // Bỏ giới hạn tối đa của RQ1 (đặt là Integer.MAX_VALUE) theo yêu cầu
-                        ns = parseSizes(sizesStr, Integer.MAX_VALUE);
-                    }
-                    String avgDegreeStr = queryParams.get("avgDegree");
-                    if (avgDegreeStr != null) {
-                        try {
-                            avgDegree = Math.max(2, Math.min(100, Integer.parseInt(avgDegreeStr.trim())));
-                        } catch (NumberFormatException ignored) {}
-                    }
-                    
-                    JSONArray rawResults = services.BenchmarkRunner.runRQ1(ns, avgDegree);
-                    for (int i = 0; i < rawResults.length(); i++) {
-                        JSONObject r = rawResults.getJSONObject(i);
-                        JSONObject m = new JSONObject();
-                        m.put("size", r.getInt("n"));
-                        m.put("bfsTimeNs", r.getLong("bfsTimeNs"));
-                        m.put("dfsTimeNs", r.getLong("dfsTimeNs"));
-                        m.put("bfsCandidates", r.getInt("bfsNodesVisited"));
-                        m.put("dfsCandidates", r.getInt("dfsNodesVisited"));
-                        mappedResults.put(m);
-                    }
-                } else if ("rq2".equals(type)) {
-                    int[] ns = {100, 500, 1000, 2000, 5000};
-                    double edgeDensity = 0.001;
-                    String sizesStr = queryParams.get("sizes");
-                    if (sizesStr != null && !sizesStr.trim().isEmpty()) {
-                        // Computation is now O(1) math, safe to use massive sizes
-                        ns = parseSizes(sizesStr, Integer.MAX_VALUE);
-                    }
-                    String densityStr = queryParams.get("edgeDensity");
-                    if (densityStr != null) {
-                        try {
-                            edgeDensity = Math.max(0.0001, Math.min(0.2, Double.parseDouble(densityStr.trim())));
-                        } catch (NumberFormatException ignored) {}
-                    }
-                    
-                    JSONArray rawResults = services.BenchmarkRunner.runRQ2(ns, edgeDensity);
-                    for (int i = 0; i < rawResults.length(); i++) {
-                        JSONObject r = rawResults.getJSONObject(i);
-                        JSONObject m = new JSONObject();
-                        m.put("size", r.getInt("n"));
-                        m.put("edges", r.getInt("edgeCount"));
-                        m.put("listMemKb", r.getDouble("listMemoryKB"));
-                        m.put("matrixMemKb", r.getDouble("matrixMemoryKB"));
-                        mappedResults.put(m);
-                    }
-                } else { // rq3
-                    int[] ns = {100, 1000, 5000, 10000};
-                    int k = 5;
-                    String sizesStr = queryParams.get("sizes");
-                    if (sizesStr != null && !sizesStr.trim().isEmpty()) {
-                        // Bỏ giới hạn tối đa của RQ3 (đặt là Integer.MAX_VALUE) theo yêu cầu
-                        ns = parseSizes(sizesStr, Integer.MAX_VALUE);
-                    }
-                    String kStr = queryParams.get("k");
-                    if (kStr != null) {
-                        try {
-                            k = Math.max(1, Math.min(100, Integer.parseInt(kStr.trim())));
-                        } catch (NumberFormatException ignored) {}
-                    }
-                    
-                    JSONArray rawResults = services.BenchmarkRunner.runRQ3(ns, k);
-                    for (int i = 0; i < rawResults.length(); i++) {
-                        JSONObject r = rawResults.getJSONObject(i);
-                        JSONObject m = new JSONObject();
-                        m.put("size", r.getInt("n"));
-                        m.put("maxHeapTimeMs", r.getLong("maxHeapTimeNs") / 1_000_000.0);
-                        m.put("minHeapTimeMs", r.getLong("minHeapTimeNs") / 1_000_000.0);
-                        mappedResults.put(m);
-                    }
+                JSONArray rawResults = services.BenchmarkRunner.runRQ2(ns, edgeDensity, mode);
+                for (int i = 0; i < rawResults.length(); i++) {
+                    JSONObject r = rawResults.getJSONObject(i);
+                    JSONObject m = new JSONObject();
+                    m.put("size", r.getInt("n"));
+                    m.put("edges", r.getInt("edgeCount"));
+                    m.put("listMemKb", r.getDouble("listMemoryKB"));
+                    m.put("matrixMemKb", r.getDouble("matrixMemoryKB"));
+                    m.put("actualListMemKb", r.optDouble("actualListMemKb", -1));
+                    m.put("actualMatrixMemKb", r.optDouble("actualMatrixMemKb", -1));
+                    mappedResults.put(m);
                 }
             }
 
@@ -198,7 +93,7 @@ public class BenchmarkHandler implements HttpHandler {
             java.util.Arrays.sort(ns);
             return ns;
         } catch (Exception e) {
-            if (maxVal <= 15000) {
+            if (maxVal <= 10000000) {
                 return new int[]{100, 500, 1000, 2000, 5000};
             }
             return new int[]{100, 500, 1000, 5000, 10000};

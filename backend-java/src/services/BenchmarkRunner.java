@@ -65,100 +65,10 @@ public class BenchmarkRunner {
             System.err.println("Warmup failed: " + e.getMessage());
         }
     }
-    
-    public static JSONObject runAll() {
-        JSONObject results = new JSONObject();
-        
-        // Add metadata to prove ownership and reproducibility
-        JSONObject metadata = new JSONObject();
-        metadata.put("generatedAt", java.time.LocalDateTime.now().toString());
-        metadata.put("runByHostUser", System.getProperty("user.name"));
-        metadata.put("osName", System.getProperty("os.name"));
-        metadata.put("osArch", System.getProperty("os.arch"));
-        metadata.put("javaVersion", System.getProperty("java.version"));
-        metadata.put("availableProcessors", Runtime.getRuntime().availableProcessors());
-        results.put("metadata", metadata);
-        
-        System.out.println("Running RQ1 (BFS vs DFS)...");
-        results.put("rq1", runRQ1(new int[]{100, 500, 1000, 5000, 10000}, 20));
-        
-        System.out.println("Running RQ2 (List vs Matrix Memory)...");
-        results.put("rq2", runRQ2(new int[]{100, 500, 1000, 2000, 5000}, 0.001));
-        
-        System.out.println("Running RQ3 (MaxHeap vs MinHeap-K)...");
-        results.put("rq3", runRQ3(new int[]{100, 1000, 5000, 10000}, 5));
-        
-        try {
-            File dir = new File("backend-java/data");
-            if (!dir.exists()) dir.mkdirs();
-            FileWriter writer = new FileWriter("backend-java/data/benchmark_results.json");
-            writer.write(results.toString(2));
-            writer.close();
-            System.out.println("Benchmark results saved to backend-java/data/benchmark_results.json");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        return results;
-    }
 
-    public static JSONArray runRQ1(int[] ns, int avgDegree) {
+    public static JSONArray runRQ2(int[] ns, double edgeDensity, String mode) {
         JSONArray arr = new JSONArray();
-
-        for (int n : ns) {
-            Graph g = new Graph();
-            for (int i = 0; i < n; i++) {
-                g.addVertex("u" + i);
-            }
-            
-            // Add random edges to get roughly avgDegree * N edges total
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < avgDegree / 2; j++) {
-                    int target = (int) (Math.random() * n);
-                    g.addEdge("u" + i, "u" + target);
-                }
-            }
-            
-            String source = "u" + (int)(Math.random() * n);
-            
-            long totalBfsTime = 0, totalDfsTime = 0;
-            int bfsCount = 0, dfsCount = 0;
-            int runs = 5;
-            
-            for (int i = 0; i < runs; i++) {
-                long startBfs = System.nanoTime();
-                SinglyLinkedList<String> bfsRes = g.bfsLevel2(source);
-                totalBfsTime += (System.nanoTime() - startBfs);
-                bfsCount = bfsRes.size();
-                
-                long startDfs = System.nanoTime();
-                SinglyLinkedList<String> dfsRes = g.dfsLevel2(source);
-                totalDfsTime += (System.nanoTime() - startDfs);
-                dfsCount = dfsRes.size();
-            }
-            
-            long avgBfsTime = totalBfsTime / runs;
-            long avgDfsTime = totalDfsTime / runs;
-            
-            JSONObject obj = new JSONObject();
-            obj.put("n", n);
-            obj.put("avgDegree", avgDegree);
-            obj.put("bfsTimeNs", avgBfsTime);
-            obj.put("dfsTimeNs", avgDfsTime);
-            obj.put("bfsNodesVisited", bfsCount);
-            obj.put("dfsNodesVisited", dfsCount);
-            
-            double bfsFasterBy = avgBfsTime == 0 ? 1.0 : (double) avgDfsTime / avgBfsTime;
-            obj.put("bfsFasterBy", bfsFasterBy);
-            obj.put("winner", avgBfsTime < avgDfsTime ? "BFS" : "DFS");
-            
-            arr.put(obj);
-        }
-        return arr;
-    }
-
-    public static JSONArray runRQ2(int[] ns, double edgeDensity) {
-        JSONArray arr = new JSONArray();
+        boolean doActual = "actual".equalsIgnoreCase(mode);
 
         for (int n : ns) {
             long numVertices = n;
@@ -167,8 +77,54 @@ public class BenchmarkRunner {
             // Adjacency List: numVertices * 80 + numEdges * 48
             long listMemoryBytes = numVertices * 80 + numEdges * 48;
             
-            // Adjacency Matrix: n * n + n * 8 + 32
-            long matrixMemoryBytes = numVertices * numVertices + numVertices * 8 + 32;
+            // Adjacency Matrix: N^2 + 32N + 24
+            long matrixMemoryBytes = numVertices * numVertices + numVertices * 32 + 24;
+            
+            double actualListKB = -1;
+            double actualMatrixKB = -1;
+            
+            if (doActual && n <= 500000) {
+                try {
+                    // Measure Matrix
+                    System.out.println("[DO THUC TE] Dang don rac (GC) truoc khi do Matrix " + n + "x" + n + "...");
+                    System.gc();
+                    Thread.sleep(10);
+                    long mem1 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                    System.out.println("[DO THUC TE] Dang ep Java cap phat mang 2 chieu " + n + "x" + n + " (Co the gay lag may)...");
+                    boolean[][] matrix = new boolean[n][n];
+                    long mem2 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                    
+                    actualMatrixKB = Math.max(0, (mem2 - mem1) / 1024.0);
+                    System.out.println("[DO THUC TE] Matrix " + n + "x" + n + " ton: " + actualMatrixKB + " KB. Dang giai phong RAM...");
+                    if (n > 0) matrix[0][0] = true;
+                    matrix = null;
+                    
+                    // Measure List
+                    System.out.println("[DO THUC TE] Dang don rac (GC) truoc khi do List...");
+                    System.gc();
+                    Thread.sleep(10);
+                    long mem3 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                    System.out.println("[DO THUC TE] Dang ep Java cap phat Do thi: " + n + " Nodes va " + numEdges + " Edges (Se rat lag neu so luong lon)...");
+                    Graph g = new Graph();
+                    for (int i = 0; i < n; i++) g.addVertex("u" + i);
+                    int edgeCount = (int) numEdges;
+                    for (int i = 0; i < edgeCount; i++) {
+                        g.addEdge("u" + (int)(Math.random() * n), "u" + (int)(Math.random() * n));
+                    }
+                    long mem4 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                    
+                    actualListKB = Math.max(0, (mem4 - mem3) / 1024.0);
+                    System.out.println("[DO THUC TE] List ton: " + actualListKB + " KB. Dang giai phong RAM...");
+                    g.hasVertex("u0");
+                    g = null;
+                    System.gc();
+                } catch (OutOfMemoryError e) {
+                    System.out.println("[CANH BAO TRAN RAM] Java da vang OutOfMemoryError o N = " + n + ". RAM cua ban da can kiet!");
+                    System.gc();
+                    actualListKB = -1;
+                    actualMatrixKB = -1;
+                } catch (Exception e) {}
+            }
             
             JSONObject obj = new JSONObject();
             obj.put("n", numVertices);
@@ -180,6 +136,9 @@ public class BenchmarkRunner {
             obj.put("listMemoryKB", listMemoryBytes / 1024.0);
             obj.put("matrixMemoryKB", matrixMemoryBytes / 1024.0);
             
+            obj.put("actualListMemKb", actualListKB);
+            obj.put("actualMatrixMemKb", actualMatrixKB);
+            
             double savings = (double) (matrixMemoryBytes - listMemoryBytes) / matrixMemoryBytes * 100.0;
             obj.put("memorySavedPercent", savings);
             obj.put("winner", listMemoryBytes < matrixMemoryBytes ? "List" : "Matrix");
@@ -189,74 +148,56 @@ public class BenchmarkRunner {
         return arr;
     }
 
-    public static JSONArray runRQ3(int[] ns, int k) {
-        JSONArray arr = new JSONArray();
 
-        for (int n : ns) {
-            String[] ids = new String[n];
-            double[] scores = new double[n];
-            Recommendation[] recs = new Recommendation[n];
-            for (int i = 0; i < n; i++) {
-                ids[i] = "u" + i;
-                scores[i] = Math.random();
-                User u = new User(ids[i], "User " + i, "user_" + i, "", "");
-                recs[i] = new Recommendation(u, (int)(Math.random() * 10), scores[i]);
-            }
-            
-            long totalMaxHeapTime = 0;
-            long totalMinHeapTime = 0;
-            int runs = 5;
-            
-            for (int r = 0; r < runs; r++) {
-                // MaxHeap approach
-                long startMax = System.nanoTime();
-                MaxHeap<Recommendation> maxHeap = new MaxHeap<>();
-                for (int i = 0; i < n; i++) {
-                    maxHeap.insert(recs[i]);
-                }
-                Recommendation[] maxRes = new Recommendation[k];
-                for (int i = 0; i < k; i++) {
-                    maxRes[i] = maxHeap.extractMax();
-                }
-                totalMaxHeapTime += (System.nanoTime() - startMax);
-                
-                // MinHeap-K approach
-                long startMin = System.nanoTime();
-                MinHeap<Recommendation> minHeap = new MinHeap<>();
-                for (int i = 0; i < n; i++) {
-                    if (minHeap.size() < k) {
-                        minHeap.insert(recs[i]);
-                    } else {
-                        if (recs[i].compareTo(minHeap.peekMin()) > 0) {
-                            minHeap.extractMin();
-                            minHeap.insert(recs[i]);
-                        }
-                    }
-                }
-                Recommendation[] minRes = new Recommendation[minHeap.size()];
-                for (int i = minRes.length - 1; i >= 0; i--) {
-                    minRes[i] = minHeap.extractMin();
-                }
-                totalMinHeapTime += (System.nanoTime() - startMin);
-            }
-            
-            long avgMaxTime = totalMaxHeapTime / runs;
-            long avgMinTime = totalMinHeapTime / runs;
-            
-            JSONObject obj = new JSONObject();
-            obj.put("n", n);
-            obj.put("k", k);
-            obj.put("maxHeapTimeNs", avgMaxTime);
-            obj.put("minHeapTimeNs", avgMinTime);
-            obj.put("maxHeapOps", n + k); // Rough ops proxy
-            obj.put("minHeapOps", n);     
-            
-            double speedup = avgMinTime == 0 ? 1.0 : (double) avgMaxTime / avgMinTime;
-            obj.put("speedupFactor", speedup);
-            obj.put("winner", avgMinTime < avgMaxTime ? "MinHeap-K" : "MaxHeap");
-            
-            arr.put(obj);
+    public static void main(String[] args) {
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
+        System.out.println("==================================================");
+        System.out.println("   BAT DAU CHAY BENCHMARK DOC LAP TREN CONSOLE ");
+        System.out.println("==================================================");
+        
+        System.out.print("Nhap cac kich thuoc N (VD: 1000,5000,10000): ");
+        String sizesInput = scanner.nextLine().trim();
+        if (sizesInput.isEmpty()) sizesInput = "1000,5000,10000";
+        String[] parts = sizesInput.split(",");
+        int[] ns = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            ns[i] = Integer.parseInt(parts[i].trim());
         }
-        return arr;
+        
+        System.out.print("Nhap mat do canh (Density - VD: 0.001): ");
+        double edgeDensity = 0.001;
+        try {
+            String den = scanner.nextLine().trim();
+            if (!den.isEmpty()) edgeDensity = Double.parseDouble(den);
+        } catch (Exception e) {}
+        
+        System.out.print("Chon che do do luong bo nho RQ2 (1 = Ly thuyet, 2 = Thuc te): ");
+        String modeInput = scanner.nextLine().trim();
+        String mode = "2".equals(modeInput) ? "actual" : "theory";
+
+        System.out.println("\n--- DANG CHAY RQ2: SO SANH MEMORY (CHE DO: " + mode.toUpperCase() + ") ---");
+        JSONArray rq2Results = runRQ2(ns, edgeDensity, mode);
+        
+        System.out.println("\n--- KET QUA RQ2 ---");
+        System.out.printf("%-10s | %-20s | %-20s | %-20s | %-20s\n", "Node (N)", "List (Ly thuyet)", "Matrix (Ly thuyet)", "List (Thuc te)", "Matrix (Thuc te)");
+        System.out.println("--------------------------------------------------------------------------------------------------------");
+        for (int i = 0; i < rq2Results.length(); i++) {
+            JSONObject res = rq2Results.getJSONObject(i);
+            
+            String actualList = res.optDouble("actualListMemKb", -1) >= 0 ? 
+                                String.format("%.1f KB", res.getDouble("actualListMemKb")) : "[Qua tai RAM]";
+            String actualMatrix = res.optDouble("actualMatrixMemKb", -1) >= 0 ? 
+                                String.format("%.1f KB", res.getDouble("actualMatrixMemKb")) : "[Qua tai RAM]";
+                                
+            System.out.printf("%-10d | %-20.1f | %-20.1f | %-20s | %-20s\n", 
+                res.getInt("n"), 
+                res.getDouble("listMemoryKB"), 
+                res.getDouble("matrixMemoryKB"),
+                actualList,
+                actualMatrix);
+        }
+        
+        System.out.println("\n[HOAN TAT BENCHMARK]");
+        scanner.close();
     }
 }
