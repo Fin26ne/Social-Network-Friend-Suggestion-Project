@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Network - Mạng lưới</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .network-layout {
+            display: flex;
+            height: calc(100vh - 80px); /* 80px approx topbar height */
+        }
+        
+        .network-sidebar {
+            width: 350px;
+            background: var(--bg2);
+            border-left: 1px solid var(--border);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        #network-container {
+            flex: 1;
+            height: 100%;
+            border: none;
+            border-radius: 0;
+            background: var(--bg);
+        }
+    </style>
+</head>
+<body style="overflow: hidden;">
+    <div class="grain"></div>
+
+    <div class="topbar">
+        <div class="brand">SocialNet</div>
+        <div class="nav-links">
+            <a href="home.html">Trang chủ</a>
+            <a href="explore.html">Khám phá</a>
+            <a href="network.html" class="active">Mạng lưới</a>
+            <a href="research.html">Nghiên cứu</a>
+        </div>
+        <div class="nav-user">
+            <span id="current-user-name">Đang tải...</span>
+            <div id="current-user-avatar" class="user-avatar">?</div>
+            <a href="index.html" class="btn btn-sm" style="margin-left: 1rem;">Đổi tài khoản</a>
+        </div>
+    </div>
+
+    <div class="network-layout">
+        <div id="network-container">
+            <div class="empty-state" style="margin-top: 20%;">Đang tải mạng lưới...</div>
+        </div>
+        
+        <div class="network-sidebar" id="node-info">
+            <div class="empty-state">Chọn một người dùng để xem thông tin chi tiết</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getUser, getNetworkData, getSuggestions, addFriend } from './js/api.js';
+        import { getCurrentUserId, createAvatar } from './js/app.js';
+        import { renderNetworkGraph } from './js/network.js';
+
+        const userId = getCurrentUserId();
+        if (!userId) {
+            window.location.href = 'index.html';
+        }
+
+        let currentUser = null;
+
+        async function init() {
+            try {
+                currentUser = await getUser(userId);
+
+                // Update Header
+                document.getElementById('current-user-name').textContent = currentUser.displayName;
+                document.getElementById('current-user-avatar').textContent = createAvatar(currentUser.displayName);
+
+                loadNetwork();
+            } catch (error) {
+                console.error("Lỗi khởi tạo", error);
+            }
+        }
+
+        async function loadNetwork() {
+            try {
+                const data = await getNetworkData();
+                renderNetworkGraph('network-container', data, showNodeInfo);
+            } catch (error) {
+                document.getElementById('network-container').innerHTML = '<div class="empty-state" style="margin-top: 20%;">Lỗi tải mạng lưới</div>';
+            }
+        }
+
+        async function showNodeInfo(nodeData) {
+            const sidebar = document.getElementById('node-info');
+            sidebar.innerHTML = '<div class="empty-state">Đang tải...</div>';
+            
+            try {
+                const [targetUser, suggestions] = await Promise.all([
+                    getUser(nodeData.id),
+                    getSuggestions(nodeData.id)
+                ]);
+
+                // Check if friend
+                let isFriend = false;
+                if (currentUser.friends && currentUser.friends.includes(targetUser.id)) {
+                    isFriend = true;
+                }
+                const isSelf = targetUser.id === userId;
+
+                let actionBtn = '';
+                if (!isSelf && !isFriend) {
+                    actionBtn = `<button class="btn btn-primary btn-add" style="width: 100%; margin-top: 1rem;" data-id="${targetUser.id}">Thêm bạn bè</button>`;
+                } else if (!isSelf && isFriend) {
+                    actionBtn = `<button class="btn" style="width: 100%; margin-top: 1rem;" disabled>Đã là bạn bè</button>`;
+                } else if (isSelf) {
+                    actionBtn = `<button class="btn" style="width: 100%; margin-top: 1rem;" disabled>Đây là bạn</button>`;
+                }
+
+                let suggestionsHTML = '';
+                if (suggestions && suggestions.length > 0) {
+                    const top3 = suggestions.slice(0, 3);
+                    suggestionsHTML = `
+                        <div style="margin-top: 2rem;">
+                            <div class="section-title">Gợi ý cho ${targetUser.displayName}</div>
+                            <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                                ${top3.map(s => `
+                                    <div class="user-item">
+                                        <div class="user-avatar" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                            ${createAvatar(s.user.displayName)}
+                                        </div>
+                                        <div class="user-info">
+                                            <div class="user-name" style="font-size: 0.9rem;">${s.user.displayName}</div>
+                                            <div class="user-meta">${s.mutualFriends} bạn chung</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    suggestionsHTML = `
+                        <div style="margin-top: 2rem;">
+                            <div class="section-title">Gợi ý cho ${targetUser.displayName}</div>
+                            <div class="empty-state">Không có gợi ý</div>
+                        </div>
+                    `;
+                }
+
+                sidebar.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="user-avatar" style="width: 64px; height: 64px; font-size: 1.5rem;">
+                            ${createAvatar(targetUser.displayName)}
+                        </div>
+                        <div>
+                            <h2 style="color: var(--gold);">${targetUser.displayName}</h2>
+                            <div class="user-meta" style="font-size: 0.9rem;">${targetUser.age} tuổi</div>
+                        </div>
+                    </div>
+                    ${targetUser.bio ? `<div style="font-size: 0.95rem; color: var(--text); padding: 1rem; background: var(--surface); border-radius: 4px; border: 1px solid var(--border);">${targetUser.bio}</div>` : ''}
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                        <div class="card" style="padding: 1rem; text-align: center;">
+                            <div style="font-size: 1.5rem; color: var(--gold); font-family: 'DM Mono';">${targetUser.friends ? targetUser.friends.length : 0}</div>
+                            <div style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase;">Bạn bè</div>
+                        </div>
+                    </div>
+                    ${actionBtn}
+                    ${suggestionsHTML}
+                `;
+
+                if (!isSelf && !isFriend) {
+                    sidebar.querySelector('.btn-add').addEventListener('click', async (e) => {
+                        const targetId = e.target.dataset.id;
+                        e.target.disabled = true;
+                        e.target.textContent = 'Đang thêm...';
+                        try {
+                            await addFriend(userId, targetId);
+                            // Refresh
+                            await init();
+                            // Also click the same node again to refresh sidebar
+                            showNodeInfo(nodeData);
+                        } catch (err) {
+                            e.target.disabled = false;
+                            e.target.textContent = 'Thêm bạn bè';
+                            alert('Lỗi thêm bạn');
+                        }
+                    });
+                }
+
+            } catch (error) {
+                sidebar.innerHTML = '<div class="empty-state">Lỗi tải thông tin</div>';
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

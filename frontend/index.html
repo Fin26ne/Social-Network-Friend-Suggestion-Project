@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Network - Select User</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="grain"></div>
+
+    <div class="topbar">
+        <div class="brand">SocialNet</div>
+    </div>
+
+    <div class="container" style="max-width: 1000px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2>Chọn người dùng</h2>
+            <button class="btn btn-primary" id="btn-add-user">+ Thêm người dùng</button>
+        </div>
+
+        <div id="users-grid" class="grid">
+            <!-- User cards will be rendered here -->
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="add-user-modal" class="modal-overlay">
+        <div class="modal">
+            <h3 style="margin-bottom: 1.5rem; color: var(--gold);">Thêm người dùng mới</h3>
+            <form id="add-user-form">
+                <div class="input-group">
+                    <label>Tên hiển thị</label>
+                    <input type="text" id="input-name" class="input-control" required>
+                </div>
+                <div class="input-group">
+                    <label>Tuổi</label>
+                    <input type="number" id="input-age" class="input-control" required min="13" max="120">
+                </div>
+                <div class="input-group">
+                    <label>Tiểu sử</label>
+                    <input type="text" id="input-bio" class="input-control">
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn" id="btn-cancel" style="flex: 1;">Hủy</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Thêm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getUsers, addUser } from './js/api.js';
+        import { createAvatar, setCurrentUserId, clearCurrentUserId } from './js/app.js';
+
+        // Always clear current user when visiting index
+        clearCurrentUserId();
+
+        const grid = document.getElementById('users-grid');
+        const modal = document.getElementById('add-user-modal');
+        const form = document.getElementById('add-user-form');
+        
+        async function loadUsers() {
+            try {
+                grid.innerHTML = '<div class="empty-state">Đang tải...</div>';
+                const users = await getUsers();
+                
+                if (!users || users.length === 0) {
+                    grid.innerHTML = '<div class="empty-state">Chưa có người dùng nào</div>';
+                    return;
+                }
+                
+                grid.innerHTML = users.map(user => `
+                    <div class="card user-card" data-id="${user.id}" style="cursor: pointer; display: flex; align-items: center; gap: 1rem;">
+                        <div class="user-avatar" style="width: 48px; height: 48px; font-size: 1.2rem;">
+                            ${createAvatar(user.displayName)}
+                        </div>
+                        <div>
+                            <h3 class="user-name" style="font-size: 1.1rem; margin-bottom: 0.2rem;">${user.displayName}</h3>
+                            <div class="user-meta">${user.age} tuổi • ${user.friends ? user.friends.length : 0} bạn bè</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.querySelectorAll('.user-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        setCurrentUserId(card.dataset.id);
+                        window.location.href = 'home.html';
+                    });
+                });
+            } catch (error) {
+                grid.innerHTML = '<div class="empty-state">Lỗi kết nối máy chủ</div>';
+            }
+        }
+
+        document.getElementById('btn-add-user').addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+
+        document.getElementById('btn-cancel').addEventListener('click', () => {
+            modal.classList.remove('active');
+            form.reset();
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('input-name').value;
+            const age = parseInt(document.getElementById('input-age').value);
+            const bio = document.getElementById('input-bio').value;
+            
+            try {
+                await addUser({ displayName: name, age, bio });
+                modal.classList.remove('active');
+                form.reset();
+                loadUsers();
+            } catch (error) {
+                alert('Có lỗi xảy ra khi thêm người dùng.');
+            }
+        });
+
+        loadUsers();
+    </script>
+</body>
+</html>

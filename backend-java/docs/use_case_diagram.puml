@@ -1,0 +1,79 @@
+@startuml use_case_diagram
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam nodesep 40
+skinparam ranksep 60
+
+skinparam usecase {
+  BackgroundColor #E8F4FD
+  BorderColor #2E86C1
+  FontColor #1B4F72
+  ArrowColor #2E86C1
+  StereotypeFontColor #7B7D7D
+}
+
+skinparam actor {
+  BackgroundColor #F9E79F
+  BorderColor #B7950B
+  FontColor #1B4F72
+}
+
+skinparam rectangle {
+  BackgroundColor #FDFEFE
+  BorderColor #2E86C1
+  RoundCorner 15
+}
+
+left to right direction
+
+actor "Người dùng" as User
+actor "Quản trị viên /\nKiểm thử viên" as Admin
+
+rectangle "Hệ thống Mạng xã hội & Gợi ý kết bạn" {
+
+  ' --- Các chức năng của Người dùng bình thường ---
+  usecase "Đăng ký tài khoản mới" as UC_Register
+  usecase "Xem thông tin cá nhân" as UC_ViewProfile
+  usecase "Xem danh sách người dùng" as UC_ViewUsers
+  usecase "Xem danh sách bạn bè" as UC_ViewFriends
+  usecase "Xem danh sách bạn chung" as UC_MutualFriends
+  usecase "Kết bạn (Thêm liên kết)" as UC_AddFriend
+  usecase "Hủy kết bạn (Hủy liên kết)" as UC_RemoveFriend
+  usecase "Trực quan hóa đồ thị mạng lưới" as UC_VisualizeGraph
+  
+  ' Tính năng dùng chung cho cả 2 Actor
+  usecase "Xem gợi ý kết bạn (Top-K)" as UC_SuggestFriends
+
+  ' --- Các chức năng của Quản trị / Kiểm thử ---
+  usecase "Chạy thử nghiệm hiệu năng (Benchmark)" as UC_Benchmark
+  usecase "Xem báo cáo hiệu năng" as UC_ViewReport
+  usecase "Xóa tài khoản người dùng" as UC_DeleteUser
+  usecase "Duyệt đồ thị (BFS / DFS)" as UC_TraverseGraph
+  usecase "Tìm khoảng cách / đường đi ngắn nhất" as UC_ShortestPath
+  usecase "Xem ma trận kề (Adjacency Matrix)" as UC_AdjacencyMatrix
+}
+
+' Kết nối của Người dùng (User)
+User --> UC_Register
+User --> UC_ViewProfile
+User --> UC_ViewUsers
+User --> UC_ViewFriends
+User --> UC_MutualFriends
+User --> UC_AddFriend
+User --> UC_RemoveFriend
+User --> UC_VisualizeGraph
+User --> UC_SuggestFriends
+
+' Kết nối của Quản trị viên / Kiểm thử viên (Admin)
+Admin --> UC_SuggestFriends
+Admin --> UC_Benchmark
+Admin --> UC_ViewReport
+Admin --> UC_DeleteUser
+Admin --> UC_TraverseGraph
+Admin --> UC_ShortestPath
+Admin --> UC_AdjacencyMatrix
+
+@enduml

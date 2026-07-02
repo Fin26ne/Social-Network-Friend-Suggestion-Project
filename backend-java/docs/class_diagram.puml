@@ -1,0 +1,315 @@
+@startuml
+skinparam defaultFontName "Segoe UI"
+title Sơ đồ lớp (Class Diagram) - Hệ thống Gợi ý Kết bạn (Tối ưu hóa)
+
+package datastructures {
+    class SinglyLinkedList<T> {
+        - Node<T> head
+        - int size
+        + SinglyLinkedList()
+        + add(T data): void
+        + remove(T data): boolean
+        + contains(T data): boolean
+        + size(): int
+        + isEmpty(): boolean
+        + clear(): void
+        + iterator(): Iterator<T>
+    }
+    
+    class "SinglyLinkedList.Node<T>" as SLLNode {
+        ~ T data
+        ~ Node<T> next
+    }
+    SinglyLinkedList +-- SLLNode
+
+    class BinarySearchTree<K extends Comparable<K>, V> {
+        - Node<K, V> root
+        + BinarySearchTree()
+        + put(K key, V value): void
+        + get(K key): V
+        + remove(K key): void
+        + contains(K key): boolean
+        + inOrderKeys(): SinglyLinkedList<K>
+        + inOrderValues(): SinglyLinkedList<V>
+    }
+    
+    class "BinarySearchTree.Node<K, V>" as BSTNode {
+        ~ K key
+        ~ V value
+        ~ Node<K, V> left
+        ~ Node<K, V> right
+    }
+    BinarySearchTree +-- BSTNode
+
+    class Queue<T> {
+        - Node<T> front
+        - Node<T> rear
+        - int size
+        + Queue()
+        + enqueue(T data): void
+        + dequeue(): T
+        + peek(): T
+        + isEmpty(): boolean
+        + size(): int
+        + clear(): void
+    }
+    
+    class "Queue.Node<T>" as QueueNode {
+        ~ T data
+        ~ Node<T> next
+    }
+    Queue +-- QueueNode
+
+    class MinHeap<T extends Comparable<T>> {
+        - T[] heap
+        - int size
+        - int capacity
+        + MinHeap()
+        + insert(T element): void
+        + peekMin(): T
+        + extractMin(): T
+        + size(): int
+        + isEmpty(): boolean
+        - heapifyUp(int index): void
+        - heapifyDown(int index): void
+    }
+
+    class MaxHeap<T extends Comparable<T>> {
+        - T[] heap
+        - int size
+        - int capacity
+        + MaxHeap()
+        + insert(T element): void
+        + peekMax(): T
+        + extractMax(): T
+        + size(): int
+        + isEmpty(): boolean
+        - heapifyUp(int index): void
+        - heapifyDown(int index): void
+    }
+}
+
+package graph {
+    class Graph {
+        - BinarySearchTree<String, SinglyLinkedList<String>> adjList
+        - int numVertices
+        - int numEdges
+        + Graph()
+        + addVertex(String userId): void
+        + removeVertex(String userId): void
+        + addEdge(String userId1, String userId2): void
+        + removeEdge(String userId1, String userId2): void
+        + hasVertex(String userId): boolean
+        + hasEdge(String userId1, String userId2): boolean
+        + getNeighbors(String userId): SinglyLinkedList<String>
+        + getVertices(): SinglyLinkedList<String>
+        + getNumVertices(): int
+        + getNumEdges(): int
+        + bfs(String startUserId): SinglyLinkedList<String>
+        + dfs(String startUserId): SinglyLinkedList<String>
+        + getShortestPathDistance(String start, String target): int
+        + getAdjacencyMatrix(): AdjacencyMatrixInfo
+        + bfsLevel2(String startUserId): SinglyLinkedList<String>
+        + dfsLevel2(String startUserId): SinglyLinkedList<String>
+    }
+
+    class "Graph.AdjacencyMatrixInfo" as AdjInfo {
+        + String[] vertices
+        + boolean[][] matrix
+        + AdjacencyMatrixInfo(String[] vertices, boolean[][] matrix)
+    }
+    Graph +-- AdjInfo
+}
+
+package model {
+    class User {
+        - String id
+        - String name
+        - String username
+        - String bio
+        - String joinedDate
+        + User(String id, String name, String username, String bio, String joinedDate)
+        + getId(): String
+        + getName(): String
+        + getUsername(): String
+        + getBio(): String
+        + getJoinedDate(): String
+        + toJSONObject(): JSONObject
+        + {static} fromJSONObject(JSONObject json): User
+        + toString(): String
+    }
+
+    class Recommendation {
+        - User user
+        - int mutualFriends
+        - double jaccardSimilarity
+        + Recommendation(User user, int mutualFriends, double jaccardSimilarity)
+        + getUser(): User
+        + getMutualFriends(): int
+        + getJaccardSimilarity(): double
+        + compareTo(Recommendation other): int
+        + toJSONObject(): JSONObject
+        + toString(): String
+    }
+    Recommendation ..|> Comparable
+    Recommendation o-- User
+}
+
+package service {
+    interface IGraphService {
+        + addUser(String name, String username, String bio): User
+        + deleteUser(String userId): boolean
+        + addFriendship(String userId1, String userId2): boolean
+        + removeFriendship(String userId1, String userId2): boolean
+        + getAllUsers(): SinglyLinkedList<User>
+        + getUserById(String userId): User
+        + getUserByUsername(String username): User
+        + getGraph(): Graph
+        + getFriends(String userId): SinglyLinkedList<String>
+        + getRecommendations(String userId, int k): SinglyLinkedList<Recommendation>
+        + getRecommendationsMinHeap(String userId, int k): SinglyLinkedList<Recommendation>
+        + getRecommendationsMaxHeap(String userId, int k): SinglyLinkedList<Recommendation>
+        + bfs(String startUserId): SinglyLinkedList<String>
+        + dfs(String startUserId): SinglyLinkedList<String>
+        + getShortestPathDistance(String start, String target): int
+        + getAdjacencyMatrix(): Graph.AdjacencyMatrixInfo
+    }
+
+    class GraphService implements IGraphService {
+        - Graph graph
+        - BinarySearchTree<String, User> userBst
+        - BinarySearchTree<String, String> usernameToIdBst
+        - DataStore dataStore
+        - RecommendationEngine recommendationEngine
+        - int nextUserIdNum
+        + GraphService(String dataFilePath)
+        - rebuildIndexes(): void
+        - autoSave(): void
+    }
+
+    class RecommendationEngine {
+        + getMutualFriendsCount(Graph graph, String userId1, String userId2): int
+        + getJaccardSimilarity(Graph graph, String userId1, String userId2): double
+        + getRecommendationsMaxHeap(Graph graph, BinarySearchTree<String, User> userBst, String userId, int k): SinglyLinkedList<Recommendation>
+        + getRecommendationsMinHeap(Graph graph, BinarySearchTree<String, User> userBst, String userId, int k): SinglyLinkedList<Recommendation>
+    }
+
+    class DataStore {
+        - String directoryPath
+        - String usersFilePath
+        - String friendshipsFilePath
+        + DataStore(String directoryPath)
+        - ensureDirectoryExists(): void
+        + exists(): boolean
+        + seedIfEmpty(Graph graph, BinarySearchTree<String, User> userBst): void
+        + save(Graph graph, BinarySearchTree<String, User> userBst): void
+        + load(Graph graph, BinarySearchTree<String, User> userBst): void
+        + initializeSeedData(Graph graph, BinarySearchTree<String, User> userBst): void
+    }
+
+    class BenchmarkRunner {
+        + {static} runAll(): void
+        + {static} runRQ2(int[] ns, double edgeDensity, String mode): JSONArray
+    }
+}
+
+package api {
+    class AppServer {
+        - HttpServer server
+        - IGraphService graphService
+        - int port
+        + AppServer(int port, IGraphService graphService)
+        + start(): void
+        + stop(): void
+    }
+
+    class HttpUtils {
+        + {static} sendJsonResponse(HttpExchange exchange, int statusCode, JSONObject responseJson): void
+        + {static} sendJsonResponse(HttpExchange exchange, int statusCode, String responseStr): void
+        + {static} handleOptions(HttpExchange exchange): boolean
+        + {static} parseQueryParams(String query): Map<String, String>
+        + {static} readRequestBody(HttpExchange exchange): String
+    }
+
+    class UserHandler implements HttpHandler {
+        - IGraphService graphService
+        + UserHandler(IGraphService graphService)
+        + handle(HttpExchange exchange): void
+    }
+
+    class FriendHandler implements HttpHandler {
+        - IGraphService graphService
+        + FriendHandler(IGraphService graphService)
+        + handle(HttpExchange exchange): void
+    }
+
+    class SuggestionHandler implements HttpHandler {
+        - IGraphService graphService
+        + SuggestionHandler(IGraphService graphService)
+        + handle(HttpExchange exchange): void
+    }
+
+    class NetworkHandler implements HttpHandler {
+        - IGraphService graphService
+        + NetworkHandler(IGraphService graphService)
+        + handle(HttpExchange exchange): void
+    }
+
+    class BenchmarkHandler implements HttpHandler {
+        + handle(HttpExchange exchange): void
+    }
+}
+
+package console {
+    class ConsoleMenu {
+        - IGraphService graphService
+        - Scanner scanner
+        + ConsoleMenu(IGraphService graphService)
+        + start(): void
+    }
+}
+
+package benchmark {
+    class PerformanceTester {
+        + {static} runBenchmarks(String outputFilePath): void
+    }
+}
+
+class Main {
+    + {static} main(String[] args): void
+}
+
+' Relationships & Associations
+Graph *-- BinarySearchTree : uses for adjacency list
+GraphService *-- Graph
+GraphService *-- BinarySearchTree : userBst & usernameToIdBst
+GraphService *-- DataStore
+GraphService *-- RecommendationEngine
+RecommendationEngine ..> MinHeap : instantiates
+RecommendationEngine ..> MaxHeap : instantiates
+RecommendationEngine ..> SinglyLinkedList : returns
+RecommendationEngine ..> Recommendation : computes
+DataStore ..> Graph : seeds/loads/saves
+DataStore ..> BinarySearchTree : seeds/loads/saves
+
+AppServer *-- IGraphService
+AppServer ..> HttpUtils : uses
+UserHandler o-- IGraphService
+UserHandler ..> HttpUtils : uses
+FriendHandler o-- IGraphService
+FriendHandler ..> HttpUtils : uses
+SuggestionHandler o-- IGraphService
+SuggestionHandler ..> HttpUtils : uses
+NetworkHandler o-- IGraphService
+NetworkHandler ..> HttpUtils : uses
+
+ConsoleMenu o-- IGraphService
+
+Main ..> GraphService : creates concrete
+Main ..> AppServer : creates
+Main ..> ConsoleMenu : creates
+Main ..> BenchmarkRunner : triggers
+
+PerformanceTester ..> RecommendationEngine : benchmarks
+
+@enduml

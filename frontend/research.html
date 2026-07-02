@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Network - Research</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Typography */
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap');
+        
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 48px;
+            font-style: italic;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero-subtitle {
+            color: var(--muted);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .badges-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        
+        .badge {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            padding: 4px 12px;
+            background: rgba(201, 169, 110, 0.1);
+            color: var(--gold);
+            border: 1px solid rgba(201, 169, 110, 0.3);
+            border-radius: 4px;
+        }
+
+        .section-number {
+            font-family: 'DM Mono', monospace;
+            color: rgba(201, 169, 110, 0.4);
+            font-size: 14px;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: rgba(201, 169, 110, 0.3);
+            margin: 4rem 0 3rem 0;
+            width: 100%;
+        }
+
+        .chart-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+        }
+
+        canvas {
+            width: 100%;
+            height: 350px;
+            display: block;
+        }
+
+        .conclusion-box {
+            border-left: 3px solid var(--gold);
+            background: var(--goldglow);
+            padding: 16px;
+            border-radius: 0 12px 12px 0;
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Canvas Tooltip */
+        #chart-tooltip {
+            position: absolute;
+            background: rgba(8, 10, 15, 0.95);
+            border: 1px solid rgba(201, 169, 110, 0.3);
+            border-radius: 6px;
+            padding: 8px 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s, top 0.1s, left 0.1s;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text);
+            z-index: 100;
+            white-space: nowrap;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .winner-badge {
+            background: var(--gold);
+            color: var(--bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .summary-card {
+            background: var(--surface);
+            border: 1px solid rgba(201, 169, 110, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .summary-card h4 {
+            color: var(--gold);
+            margin-bottom: 1rem;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .summary-card p {
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            align-items: center;
+        }
+        .layout-grid.reverse {
+            grid-template-columns: 2fr 1fr;
+        }
+    </style>
+</head>
+<body>
+    <div class="grain"></div>
+
+    <div class="topbar">
+        <div class="brand">SocialNet</div>
+        <div class="nav-links">
+            <a href="home.html">Trang chủ</a>
+            <a href="explore.html">Khám phá</a>
+            <a href="network.html">Mạng lưới</a>
+            <a href="research.html" class="active">Nghiên cứu</a>
+        </div>
+        <div class="nav-user">
+            <span id="current-user-name">Đang tải...</span>
+            <div id="current-user-avatar" class="user-avatar">?</div>
+            <a href="index.html" class="btn btn-sm" style="margin-left: 1rem;">Đổi tài khoản</a>
+        </div>
+    </div>
+
+    <div id="chart-tooltip"></div>
+
+    <div class="container" style="padding-bottom: 5rem;">
+        <div style="margin-bottom: 3rem;">
+            <h1 class="hero-title">Research & Analysis</h1>
+            <div class="hero-subtitle">Topic 05 — Social Network Friend Suggestion | CSD201 FPT</div>
+            <div class="badges-row">
+                <div class="badge">Phân tích hiệu năng bộ nhớ</div>
+                <div class="badge">Adjacency List vs Adjacency Matrix</div>
+            </div>
+        </div>
+
+        <!-- Bảng điều khiển thử nghiệm bộ nhớ -->
+        <div class="card" style="padding: 2rem; margin-bottom: 3rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; max-width: 600px; margin: 0 auto 3rem auto;">
+            <h3 style="color: var(--gold); margin-bottom: 1.5rem; font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-style: italic; text-align: center;">Cấu hình đo lường hiệu năng bộ nhớ</h3>
+            
+            <div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px;">Kích thước nút (N) (nhập các số cách nhau bởi dấu phẩy, tối đa 10.000.000):</label>
+                    <input id="input-rq2-sizes" type="text" class="input-control" value="1000,2000,3000,4000,5000" style="width: 100%; font-family: 'DM Mono'; font-size: 14px; padding: 10px; border-radius: 8px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px;">Mật độ cạnh (Density, từ 0.0001 đến 0.2):</label>
+                    <input id="input-rq2-density" type="number" class="input-control" value="0.001" step="0.0001" min="0.0001" max="0.2" style="width: 100%; font-family: 'DM Mono'; font-size: 14px; padding: 10px; border-radius: 8px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px;">Chế độ đo lường:</label>
+                    <select id="input-rq2-mode" class="input-control" style="width: 100%; font-family: 'DM Mono'; font-size: 14px; padding: 10px; border-radius: 8px; box-sizing: border-box; background: var(--surface); color: var(--text); border: 1px solid rgba(201,169,110,0.3);">
+                        <option value="theory">Lý thuyết (Toán học O(1) - Rất nhanh, hỗ trợ chục triệu node)</option>
+                        <option value="actual">Thực tế (Cấp phát RAM - Tối đa 500.000 node để test sập máy)</option>
+                    </select>
+                </div>
+                <button id="btn-run-rq2" class="btn btn-primary" style="width: 100%; padding: 10px; font-size: 15px; font-weight: 500;">Chạy thử nghiệm hiệu năng bộ nhớ</button>
+            </div>
+        </div>
+
+        <!-- RQ2: Adjacency List vs Matrix -->
+        <div class="section-number">01 — PHÂN TÍCH BỘ NHỚ LƯU TRỮ</div>
+        <h2 style="margin-bottom: 2rem; color: var(--gold);">Hiệu năng bộ nhớ: Adjacency List vs Adjacency Matrix</h2>
+        
+        <div class="layout-grid reverse" style="margin-bottom: 3rem;">
+            <div>
+                <div id="table-theory-container">
+                    <h4 style="color: var(--gold); margin-bottom: 1rem; font-family: 'DM Mono', monospace; font-size: 1.1rem; text-transform: uppercase;">1. Đo lường Lý thuyết (Toán học O(1))</h4>
+                    <table id="table-rq2" style="margin-bottom: 2rem;">
+                        <thead>
+                            <tr>
+                                <th>Số Node (N)</th>
+                                <th>Số cạnh (E)</th>
+                                <th>List (Lý thuyết)</th>
+                                <th>Matrix (Lý thuyết)</th>
+                                <th>Tiết kiệm</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div id="table-actual-container" style="display: none;">
+                    <h4 style="color: var(--gold); margin-bottom: 1rem; font-family: 'DM Mono', monospace; font-size: 1.1rem; text-transform: uppercase;">2. Đo lường Thực tế (Cấp phát RAM - Max 500.000)</h4>
+                    <table id="table-rq2-actual" style="margin-bottom: 1rem;">
+                        <thead>
+                            <tr>
+                                <th>Số Node (N)</th>
+                                <th>Số cạnh (E)</th>
+                                <th>List (Thực tế)</th>
+                                <th>Matrix (Thực tế)</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div id="conclusion-rq2" class="conclusion-box">Đang tải dữ liệu...</div>
+            </div>
+
+            <div>
+                <p style="color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem;">
+                    <strong>Giả thuyết:</strong> Mạng xã hội trong thực tế là đồ thị thưa (mật độ cạnh thấp, &lt; 1%). Danh sách kề (Adjacency List) chỉ lưu trữ các cạnh thực sự tồn tại nên sẽ tiết kiệm bộ nhớ đáng kể so với Ma trận kề (Adjacency Matrix) luôn tiêu tốn bộ nhớ cố định O(N²).
+                </p>
+                <div class="chart-container" style="padding: 16px;">
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; justify-content: center; font-size: 0.8rem; font-family: 'DM Mono', monospace;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:2px;background:#C9A96E"></div> Danh sách kề (KB)</div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;"><div style="width:12px;height:2px;background:#E08F8F"></div> Ma trận kề (KB)</div>
+                    </div>
+                    <canvas id="chart-rq2"></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Chi tiết công thức tính bộ nhớ -->
+        <div class="card" style="padding: 2.5rem; margin-bottom: 4rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 16px;">
+            <h3 style="color: var(--gold); margin-bottom: 2rem; font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-style: italic; text-align: center;">Công thức tính dung lượng bộ nhớ thực tế (JVM 64-bit)</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem;">
+                <div style="border-right: 1px solid var(--border); padding-right: 1.5rem;">
+                    <h4 style="color: var(--gold); font-family: 'DM Mono', monospace; font-size: 14px; margin-bottom: 1.2rem; text-transform: uppercase;">Ma trận kề (Adjacency Matrix)</h4>
+                    <div style="font-family: 'DM Mono', monospace; font-size: 17px; margin-bottom: 1.2rem; color: #E08F8F; font-weight: 600;">
+                        Dung lượng (Bytes) = N² + 32N + 24
+                    </div>
+                    <ul style="color: var(--muted); font-size: 0.95rem; line-height: 1.7; padding-left: 1.2rem; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><strong>N² bytes:</strong> Mảng boolean 2 chiều kích thước N x N (mỗi boolean tốn 1 byte).</li>
+                        <li style="margin-bottom: 0.5rem;"><strong>32N bytes:</strong> Chi phí cho N con trỏ tham chiếu đến mỗi hàng (8N) và object header của N mảng con (24N).</li>
+                        <li><strong>24 bytes:</strong> Hao phí cố định (Object Overhead) khởi tạo mảng 2 chiều ở lớp ngoài cùng.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--gold); font-family: 'DM Mono', monospace; font-size: 14px; margin-bottom: 1.2rem; text-transform: uppercase;">Danh sách kề (Adjacency List)</h4>
+                    <div style="font-family: 'DM Mono', monospace; font-size: 17px; margin-bottom: 1.2rem; color: #C9A96E; font-weight: 600;">
+                        Dung lượng (Bytes) = N x 80 + E x 48
+                    </div>
+                    <ul style="color: var(--muted); font-size: 0.95rem; line-height: 1.7; padding-left: 1.2rem; margin: 0;">
+                        <li style="margin-bottom: 0.5rem;"><strong>N x 80 bytes:</strong> Chi phí lưu trữ thông tin của N đỉnh và đối tượng danh sách liên kết tương ứng (80 bytes mỗi đỉnh).</li>
+                        <li style="margin-bottom: 0.5rem;"><strong>E x 48 bytes:</strong> Chi phí bộ nhớ cho các nút liên kết kề đại diện cho các cạnh thực tế (48 bytes mỗi cạnh).</li>
+                        <li><strong>E (Edges):</strong> Số cạnh thực tế trong đồ thị.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Báo cáo tổng kết -->
+        <div class="section-number">02 — TỔNG KẾT HIỆU NĂNG</div>
+        <h2 style="margin-bottom: 2rem; color: var(--gold);">Báo cáo tổng kết hiệu năng bộ nhớ</h2>
+        <div style="background: var(--surface); border: 1px solid rgba(201, 169, 110, 0.3); border-radius: 12px; padding: 2rem; text-align: center; max-width: 700px; margin: 0 auto;">
+            <h4 style="color: var(--gold); margin-bottom: 1rem; font-family: 'DM Mono', monospace; font-size: 1.1rem;">Kết luận về tối ưu bộ nhớ</h4>
+            <p id="sum-rq2" style="font-size: 1.2rem; line-height: 1.6; margin: 0; font-family: 'Outfit', sans-serif;">Đang tải dữ liệu đo lường...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getUser } from './js/api.js';
+        import { getCurrentUserId, createAvatar } from './js/app.js';
+
+        // Format Y-axis tick labels nicely
+        function formatYLabel(val) {
+            if (val >= 1000000000) return (val / 1000000000).toFixed(val % 1000000000 === 0 ? 0 : 1) + 'B';
+            if (val >= 1000000)    return (val / 1000000).toFixed(val % 1000000 === 0 ? 0 : 1) + 'M';
+            if (val >= 1000)       return (val / 1000).toFixed(val % 1000 === 0 ? 0 : 1) + 'K';
+            return val.toFixed(0);
+        }
+
+        // Format compact data-point labels
+        function formatDataLabel(val) {
+            if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M';
+            if (val >= 1000)    return (val / 1000).toFixed(1) + 'K';
+            return val.toFixed(1);
+        }
+
+        // Return the smallest "nice" step that splits [0, maxVal] into ~5-6 ticks
+        function niceStep(maxVal) {
+            const rough = maxVal / 5;                       // target ~5 ticks
+            const mag   = Math.pow(10, Math.floor(Math.log10(rough)));
+            const norm  = rough / mag;                     // 1..10
+            let step;
+            if      (norm < 1.5) step = 1;
+            else if (norm < 3)   step = 2;
+            else if (norm < 7)   step = 5;
+            else                 step = 10;
+            return step * mag;
+        }
+
+        // Custom Chart Engine
+        class ChartEngine {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.tooltip = document.getElementById('chart-tooltip');
+                this.dpr = window.devicePixelRatio || 1;
+                this.points = [];
+                
+                // Resize for retina displays
+                const rect = this.canvas.getBoundingClientRect();
+                this.canvas.width = rect.width * this.dpr;
+                this.canvas.height = rect.height * this.dpr;
+                this.ctx.scale(this.dpr, this.dpr);
+                
+                this.width = rect.width;
+                this.height = rect.height;
+                this.padX = 65; // Room for large Y-axis labels (100M, 1B, etc.)
+                this.padY = 40;
+
+                this.canvas.addEventListener('mousemove', (e) => this.handleHover(e));
+                this.canvas.addEventListener('mouseleave', () => { this.tooltip.style.opacity = 0; });
+            }
+
+            handleHover(e) {
+                if (!this.points.length) return;
+                const rect = this.canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                let closest = null;
+                let minDist = 30; // Max hover distance
+
+                this.points.forEach(p => {
+                    const dist = Math.sqrt(Math.pow(mouseX - p.x, 2) + Math.pow(mouseY - p.y, 2));
+                    if (dist < minDist) {
+                        minDist = dist;
+                        closest = p;
+                    }
+                });
+
+                if (closest) {
+                    this.tooltip.innerHTML = closest.label;
+                    this.tooltip.style.left = (e.clientX + 15) + 'px';
+                    this.tooltip.style.top = (e.clientY - 15) + 'px';
+                    this.tooltip.style.opacity = 1;
+                } else {
+                    this.tooltip.style.opacity = 0;
+                }
+            }
+
+            drawAxes(labelsCount, minY, maxY, options) {
+
+                this.ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+                this.ctx.lineWidth = 1;
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.padX, this.padY / 2);
+                this.ctx.lineTo(this.padX, this.height - this.padY);
+                this.ctx.lineTo(this.width - this.padX / 2, this.height - this.padY);
+                this.ctx.stroke();
+
+                // Horizontal grid lines and Y-axis labels
+                this.ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+                this.ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                this.ctx.font = '9px "DM Mono"';
+                this.ctx.textAlign = 'right';
+                this.ctx.textBaseline = 'middle';
+
+                const usableH = this.height - this.padY * 1.5;
+
+                // Linear scale with nice steps
+                const step = niceStep(maxY);
+                const tickMax = Math.ceil(maxY / step) * step;
+
+                for (let v = 0; v <= tickMax; v += step) {
+                    const ratio = v / tickMax;
+                    const y = this.height - this.padY - (ratio * usableH);
+
+                    if (v > 0) {
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(this.padX, y);
+                        this.ctx.lineTo(this.width - this.padX / 2, y);
+                        this.ctx.stroke();
+                    }
+
+                    this.ctx.fillText(formatYLabel(v), this.padX - 8, y);
+                }
+            }
+        }
+
+        class LineChart extends ChartEngine {
+            constructor(canvasId, data, options) {
+                super(canvasId);
+                this.data = data;
+                this.options = options || {};
+                this.draw();
+            }
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                const labels = this.data.labels;
+                const datasets = this.data.datasets;
+                
+                // Linear scale: scan data and snap maxY to nice ceiling
+                let maxY = 0;
+                datasets.forEach(ds => ds.data.forEach(val => {
+                    if (val > maxY) maxY = val;
+                }));
+                if (maxY === 0) maxY = 1;
+                const step = niceStep(maxY);
+                maxY = Math.ceil(maxY / step) * step; // snap to next nice tick
+
+                this.drawAxes(labels.length, 0, maxY, this.options);
+                this.points = [];
+
+                const usableW = this.width - this.padX * 1.5;
+                const usableH = this.height - this.padY * 1.5;
+                const stepX = usableW / Math.max(1, labels.length - 1);
+
+                // Draw X labels
+                this.ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                this.ctx.font = '10px "DM Mono"';
+                this.ctx.textAlign = 'center';
+                labels.forEach((l, i) => {
+                    const x = this.padX + i * stepX;
+                    this.ctx.fillText(l, x, this.height - this.padY / 2);
+                });
+
+                const getValY = (val) => (Math.min(val, maxY) / maxY) * usableH;
+
+                // Draw Lines
+                datasets.forEach(ds => {
+                    this.ctx.strokeStyle = ds.color;
+                    this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    
+                    let prevX = 0, prevY = 0;
+
+                    ds.data.forEach((val, i) => {
+                        const x = this.padX + i * stepX;
+                        const y = this.height - this.padY - getValY(val);
+                        
+                        if (i === 0) {
+                            this.ctx.moveTo(x, y);
+                        } else {
+                            const cpX = (prevX + x) / 2;
+                            this.ctx.bezierCurveTo(cpX, prevY, cpX, y, x, y);
+                        }
+                        prevX = x;
+                        prevY = y;
+
+                        this.points.push({
+                            x, y,
+                            label: `${ds.label}: ${val.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 4})} ${this.options.unit}<br>N: ${labels[i]}`
+                        });
+                    });
+                    this.ctx.stroke();
+
+                    // Draw Points
+                    this.ctx.fillStyle = ds.color;
+                    ds.data.forEach((val, i) => {
+                        const x = this.padX + i * stepX;
+                        const y = this.height - this.padY - getValY(val);
+                        this.ctx.beginPath();
+                        this.ctx.arc(x, y, 4, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        this.ctx.strokeStyle = 'var(--surface)';
+                        this.ctx.lineWidth = 1;
+                        this.ctx.stroke();
+                    });
+
+                    // Draw Data Labels (KB values above or below points)
+                    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+                    this.ctx.font = '10px "DM Mono"';
+                    this.ctx.textAlign = 'center';
+
+                    ds.data.forEach((val, i) => {
+                        const x = this.padX + i * stepX;
+                        const y = this.height - this.padY - getValY(val);
+
+                        const labelText = formatDataLabel(val);
+
+                        if (ds.label.toLowerCase().includes('matrix')) {
+                            this.ctx.textBaseline = 'bottom';
+                            this.ctx.fillText(labelText + ' KB', x, y - 8);
+                        } else {
+                            this.ctx.textBaseline = 'top';
+                            this.ctx.fillText(labelText + ' KB', x, y + 8);
+                        }
+                    });
+                });
+            }
+        }
+
+        const mockData = {
+            rq2: [
+                { n: 100, edgeCount: 10, listMemoryKB: 8.28, matrixMemoryKB: 10.58, winner: 'List', memorySavedPercent: 21.7 },
+                { n: 500, edgeCount: 250, listMemoryKB: 50.78, matrixMemoryKB: 248.08, winner: 'List', memorySavedPercent: 79.5 },
+                { n: 1000, edgeCount: 1000, listMemoryKB: 125.0, matrixMemoryKB: 984.4, winner: 'List', memorySavedPercent: 87.3 },
+                { n: 2000, edgeCount: 4000, listMemoryKB: 343.75, matrixMemoryKB: 3921.9, winner: 'List', memorySavedPercent: 91.2 },
+                { n: 5000, edgeCount: 25000, listMemoryKB: 1562.5, matrixMemoryKB: 24453.15, winner: 'List', memorySavedPercent: 93.6 }
+            ]
+        };
+
+        function formatNum(n) { return new Intl.NumberFormat().format(n); }
+
+        function renderRQ2(list, mode = 'theory') {
+            const isTheory = mode === 'theory';
+            document.getElementById('table-theory-container').style.display = isTheory ? 'block' : 'none';
+            document.getElementById('table-actual-container').style.display = isTheory ? 'none' : 'block';
+
+            const rq2Body = document.querySelector('#table-rq2 tbody');
+            const rq2ActualBody = document.querySelector('#table-rq2-actual tbody');
+            
+            rq2Body.innerHTML = list.map(d => {
+                const savings = ((d.matrixMemKb - d.listMemKb) / d.matrixMemKb * 100).toFixed(1);
+                return `
+                    <tr>
+                        <td>${formatNum(d.size)}</td>
+                        <td>${formatNum(d.edges)}</td>
+                        <td style="color:#C9A96E">${formatNum(Math.round(d.listMemKb * 10) / 10)} KB</td>
+                        <td style="color:#E08F8F">${formatNum(Math.round(d.matrixMemKb * 10) / 10)} KB</td>
+                        <td style="color:var(--goldglow)">${savings}%</td>
+                    </tr>
+                `;
+            }).join('');
+
+            rq2ActualBody.innerHTML = list.map(d => {
+                const actualList = d.actualListMemKb !== undefined && d.actualListMemKb >= 0 ? formatNum(Math.round(d.actualListMemKb * 10) / 10) + ' KB' : '<span style="color:#E08F8F;font-size:11px">[Quá tải RAM (Sập)]</span>';
+                const actualMatrix = d.actualMatrixMemKb !== undefined && d.actualMatrixMemKb >= 0 ? formatNum(Math.round(d.actualMatrixMemKb * 10) / 10) + ' KB' : '<span style="color:#E08F8F;font-size:11px">[Quá tải RAM (Sập)]</span>';
+                return `
+                    <tr>
+                        <td>${formatNum(d.size)}</td>
+                        <td>${formatNum(d.edges)}</td>
+                        <td style="color:#C9A96E">${actualList}</td>
+                        <td style="color:#E08F8F">${actualMatrix}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            const lastRQ2 = list[list.length - 1];
+            const savings = ((lastRQ2.matrixMemKb - lastRQ2.listMemKb) / lastRQ2.matrixMemKb * 100).toFixed(1);
+            document.getElementById('conclusion-rq2').innerHTML = `Với N = ${formatNum(lastRQ2.size)} node, danh sách kề tiết kiệm <strong>${savings}%</strong> bộ nhớ so với ma trận kề (${(Math.round(lastRQ2.listMemKb * 10) / 10).toLocaleString()} KB vs ${(Math.round(lastRQ2.matrixMemKb * 10) / 10).toLocaleString()} KB).`;
+            document.getElementById('sum-rq2').innerHTML = `Cấu trúc <strong>Adjacency List (Danh sách kề)</strong> tối ưu hơn tuyệt đối khi đồ thị mạng xã hội thưa, tiết kiệm đến <strong>${savings}%</strong> bộ nhớ RAM so với Adjacency Matrix (Ma trận kề) ở quy mô N = ${formatNum(lastRQ2.size)} node.`;
+
+            if (isTheory) {
+                new LineChart('chart-rq2', {
+                    labels: list.map(d => d.size),
+                    datasets: [
+                        { label: 'Adj List (Lý thuyết)', data: list.map(d => d.listMemKb), color: '#C9A96E' },
+                        { label: 'Adj Matrix (Lý thuyết)', data: list.map(d => d.matrixMemKb), color: '#E08F8F' }
+                    ]
+                }, { unit: 'KB' });
+            } else {
+                new LineChart('chart-rq2', {
+                    labels: list.map(d => d.size),
+                    datasets: [
+                        { label: 'Adj List (Thực tế)', data: list.map(d => d.actualListMemKb >= 0 ? d.actualListMemKb : 0), color: '#C9A96E' },
+                        { label: 'Adj Matrix (Thực tế)', data: list.map(d => d.actualMatrixMemKb >= 0 ? d.actualMatrixMemKb : 0), color: '#E08F8F' }
+                    ]
+                }, { unit: 'KB' });
+            }
+        }
+
+        async function init() {
+            const userId = getCurrentUserId();
+            if (userId) {
+                getUser(userId).then(u => {
+                    document.getElementById('current-user-name').textContent = u.displayName;
+                    document.getElementById('current-user-avatar').textContent = createAvatar(u.displayName);
+                }).catch(e => console.error("Could not load user"));
+            }
+
+            try {
+                const response = await fetch('http://localhost:3003/api/suggestions/benchmark?type=rq2');
+                if (!response.ok) throw new Error('API failed');
+                const result = await response.json();
+                
+                const list = result.data.benchmarkResults || result.data.rq2 || mockData.rq2;
+                renderRQ2(list);
+            } catch (err) {
+                console.warn('Using mock data for benchmarks (API not ready/failed)', err);
+                renderRQ2(mockData.rq2);
+                // Add a small banner
+                const banner = document.createElement('div');
+                banner.className = 'banner';
+                banner.innerHTML = '⚠ Đang hiển thị dữ liệu giả định. Vui lòng chạy Server Java để xem đo lường thực tế.';
+                document.body.prepend(banner);
+            }
+
+            // Debounce helper to prevent spamming the backend while typing
+            function debounce(func, wait) {
+                let timeout;
+                return function(...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
+                };
+            }
+
+            async function runRQ2() {
+                const btn = document.getElementById('btn-run-rq2');
+                const mode = document.getElementById('input-rq2-mode').value;
+                const originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = mode === 'actual' ? 'Đang ép máy tính xử lý (Vui lòng chờ, máy có thể bị lag)...' : 'Đang tính toán toán học...';
+                try {
+                    const sizes = document.getElementById('input-rq2-sizes').value;
+                    const density = document.getElementById('input-rq2-density').value;
+                    const mode = document.getElementById('input-rq2-mode').value;
+                    const res = await fetch(`http://localhost:3003/api/suggestions/benchmark?type=rq2&sizes=${sizes}&edgeDensity=${density}&mode=${mode}`);
+                    if (!res.ok) throw new Error('Benchmark failed');
+                    const result = await res.json();
+                    
+                    const list = result.data.benchmarkResults || result.data.rq2 || mockData.rq2;
+                    renderRQ2(list, mode);
+                } catch (err) {
+                    console.error(err);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            }
+
+            // Debounced wrapper for auto re-rendering on input changes
+            const debouncedRQ2 = debounce(runRQ2, 800);
+
+            // Bind click handler (immediate)
+            document.getElementById('btn-run-rq2').addEventListener('click', runRQ2);
+
+            // Bind change handlers (debounced auto re-render)
+            document.getElementById('input-rq2-sizes').addEventListener('input', debouncedRQ2);
+            document.getElementById('input-rq2-density').addEventListener('input', debouncedRQ2);
+            document.getElementById('input-rq2-mode').addEventListener('change', runRQ2);
+        }
+
+        init();
+    </script>
+</body>
+</html>

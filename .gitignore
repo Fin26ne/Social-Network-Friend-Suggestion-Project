@@ -1,0 +1,26 @@
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Project output directories
+/bin/
+/out/
+/backend-java/bin/
+/backend-java/out/
+/backend-java/sources.txt
+/sources.txt
+/backend-java/data/benchmark_results.json
+
+# IDE specific files and directories
+.idea/
+*.iml
+.vscode/
+.settings/
+.project/
+.classpath
+/nbproject/
+/build/
+/dist/
+
