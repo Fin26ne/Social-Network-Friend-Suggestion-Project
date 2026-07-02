@@ -22,12 +22,7 @@ public class Main {
         System.out.println("Initializing Social Network Graph...");
         GraphService graphService = new GraphService(dataDirectoryPath);
 
-        // Run BenchmarkRunner to generate benchmark_results.json if it doesn't exist
-        java.io.File benchmarkFile = new java.io.File("backend-java/data/benchmark_results.json");
-        if (!benchmarkFile.exists()) {
-            System.out.println("Generating benchmark results on startup...");
-            services.BenchmarkRunner.runAll();
-        }
+        // No-op startup benchmark generation (results are queried dynamically via API or runner)
 
         boolean consoleOnly = false;
         for (String arg : args) {

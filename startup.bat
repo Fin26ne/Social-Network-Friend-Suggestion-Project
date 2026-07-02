@@ -2,6 +2,19 @@
 chcp 65001 > nul
 cls
 
+set "JAVAC_CMD=javac"
+set "JAVA_CMD=java"
+
+where javac >nul 2>nul
+if %errorlevel% neq 0 (
+    for /d %%d in ("C:\Program Files\Java\jdk*") do (
+        if exist "%%d\bin\javac.exe" (
+            set "JAVAC_CMD=%%d\bin\javac.exe"
+            set "JAVA_CMD=%%d\bin\java.exe"
+        )
+    )
+)
+
 echo ===================================================
 echo   Social Network Friend Suggestion System
 echo   CSD201 - FPT University
@@ -23,7 +36,7 @@ echo.
 
 if not exist backend-java\bin mkdir backend-java\bin
 
-javac -encoding UTF-8 -cp backend-java\lib\json-20240303.jar -d backend-java\bin backend-java\src\Main.java backend-java\src\api\*.java backend-java\src\benchmark\*.java backend-java\src\console\*.java backend-java\src\datastructures\*.java backend-java\src\graph\*.java backend-java\src\model\*.java backend-java\src\service\*.java backend-java\src\services\*.java
+"%JAVAC_CMD%" -encoding UTF-8 -cp backend-java\lib\json-20240303.jar -d backend-java\bin backend-java\src\Main.java backend-java\src\api\*.java backend-java\src\benchmark\*.java backend-java\src\console\*.java backend-java\src\datastructures\*.java backend-java\src\graph\*.java backend-java\src\model\*.java backend-java\src\service\*.java backend-java\src\services\*.java
 
 if %errorlevel% neq 0 (
     echo.
@@ -51,7 +64,7 @@ echo.
 echo   Nhan Ctrl+C de dung server.
 echo.
 
-java -Dfile.encoding=UTF-8 -cp backend-java\bin;backend-java\lib\json-20240303.jar Main
+"%JAVA_CMD%" -Dfile.encoding=UTF-8 -cp backend-java\bin;backend-java\lib\json-20240303.jar Main
 
 echo.
 echo Server da dung.
