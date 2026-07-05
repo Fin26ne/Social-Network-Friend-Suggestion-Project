@@ -317,13 +317,54 @@ public class Graph {
     }
 
     public static void main(String[] args) {
-        System.out.println("=== GRAPH BFS TEST ===");
-        Graph socialNetwork = new Graph();
-        socialNetwork.addEdge("A", "B");
-        socialNetwork.addEdge("B", "C");
-        socialNetwork.addEdge("C", "D");
-        socialNetwork.addEdge("A", "C");
-        System.out.println("Neighbors of A: " + socialNetwork.getNeighbors("A"));
-        System.out.println("BFS Traversal from A: " + socialNetwork.bfs("A"));
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
+        Graph graph = new Graph();
+        System.out.println("=== GRAPH INTERACTIVE TEST ===");
+        
+        while (true) {
+            System.out.println("\n1. Add Vertex");
+            System.out.println("2. Add Edge");
+            System.out.println("3. Run BFS");
+            System.out.println("4. Run DFS");
+            System.out.println("5. Shortest Path");
+            System.out.println("6. Exit");
+            System.out.print("Choice: ");
+            String choice = scanner.nextLine().trim();
+            
+            if (choice.equals("1")) {
+                System.out.print("Enter vertex name: ");
+                String v = scanner.nextLine().trim();
+                graph.addVertex(v);
+                System.out.println("Vertex added: " + v);
+            } else if (choice.equals("2")) {
+                System.out.print("Enter first vertex: ");
+                String v1 = scanner.nextLine().trim();
+                System.out.print("Enter second vertex: ");
+                String v2 = scanner.nextLine().trim();
+                graph.addEdge(v1, v2);
+                System.out.println("Edge added between " + v1 + " and " + v2);
+            } else if (choice.equals("3")) {
+                System.out.print("Enter start vertex for BFS: ");
+                String v = scanner.nextLine().trim();
+                System.out.println("BFS Traversal: " + graph.bfs(v));
+            } else if (choice.equals("4")) {
+                System.out.print("Enter start vertex for DFS: ");
+                String v = scanner.nextLine().trim();
+                System.out.println("DFS Traversal: " + graph.dfs(v));
+            } else if (choice.equals("5")) {
+                System.out.print("Enter start vertex: ");
+                String v1 = scanner.nextLine().trim();
+                System.out.print("Enter end vertex: ");
+                String v2 = scanner.nextLine().trim();
+                int dist = graph.getShortestPathDistance(v1, v2);
+                System.out.println("Shortest path distance: " + dist);
+            } else if (choice.equals("6")) {
+                System.out.println("Exiting Graph test.");
+                break;
+            } else {
+                System.out.println("Invalid choice!");
+            }
+        }
+        scanner.close();
     }
 }

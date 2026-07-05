@@ -91,15 +91,42 @@ public class MinHeap<T extends Comparable<T>> {
     }
 
     public static void main(String[] args) {
-        System.out.println("=== MIN HEAP TEST ===");
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
         MinHeap<Double> minHeap = new MinHeap<>();
-        minHeap.insert(0.45);
-        minHeap.insert(0.95);
-        minHeap.insert(0.12);
-        minHeap.insert(0.72);
-        System.out.println("Min element: " + minHeap.peekMin());
-        System.out.println("Extract Min: " + minHeap.extractMin());
-        System.out.println("Extract Min: " + minHeap.extractMin());
-        System.out.println("Extract Min: " + minHeap.extractMin());
+        System.out.println("=== MIN HEAP INTERACTIVE (DOUBLE) ===");
+        
+        while (true) {
+            System.out.println("\n1. Insert number");
+            System.out.println("2. Peek Min");
+            System.out.println("3. Extract Min");
+            System.out.println("4. Exit");
+            System.out.print("Choice: ");
+            String choice = scanner.nextLine().trim();
+            
+            if (choice.equals("1")) {
+                System.out.print("Enter a number to insert: ");
+                try {
+                    double val = Double.parseDouble(scanner.nextLine().trim());
+                    minHeap.insert(val);
+                    System.out.println("Inserted " + val + " into MinHeap. (Size: " + minHeap.size() + ")");
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid number!");
+                }
+            } else if (choice.equals("2")) {
+                Double min = minHeap.peekMin();
+                if (min == null) System.out.println("Heap is empty!");
+                else System.out.println("Current Min element: " + min);
+            } else if (choice.equals("3")) {
+                Double min = minHeap.extractMin();
+                if (min == null) System.out.println("Heap is empty!");
+                else System.out.println("Extracted Min: " + min + " (Remaining size: " + minHeap.size() + ")");
+            } else if (choice.equals("4")) {
+                System.out.println("Exiting MinHeap test.");
+                break;
+            } else {
+                System.out.println("Invalid choice!");
+            }
+        }
+        scanner.close();
     }
 }
