@@ -21,17 +21,22 @@ echo   CSD201 - FPT University
 echo ===================================================
 echo.
 
-echo [1/3] Bien dich Java...
+echo [1/4] Bien dich Java...
 echo.
 
-echo Kiem tra port 3003...
+echo Kiem tra port 3003 (Backend) va 3004 (Frontend)...
 for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3003 2^>nul') do (
     if not "%%a"=="0" (
         taskkill /PID %%a /F > nul 2>&1
     )
 )
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3004 2^>nul') do (
+    if not "%%a"=="0" (
+        taskkill /PID %%a /F > nul 2>&1
+    )
+)
 ping -n 2 127.0.0.1 > nul
-echo Port 3003 san sang.
+echo Port 3003 va 3004 san sang.
 echo.
 
 if not exist backend-java\bin mkdir backend-java\bin
@@ -46,22 +51,27 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-echo [1/3] Bien dich thanh cong!
+echo [1/4] Bien dich thanh cong!
 echo.
-echo [2/3] Mo browser sau khi server san sang...
+echo [2/4] Khoi dong Next.js Frontend...
 echo.
 
-start "" cmd /c "ping -n 4 127.0.0.1 > nul & start http://localhost:3003/home.html & ping -n 1 127.0.0.1 > nul & start http://localhost:3003/research.html & exit"
+start "Frontend (Next.js)" cmd /c "cd frontend & npm run dev"
 
-echo [3/3] Khoi dong Java Server...
+echo [3/4] Mo browser sau khi server san sang...
+echo.
+
+start "" cmd /c "ping -n 8 127.0.0.1 > nul & start http://localhost:3004/ & exit"
+
+echo [4/4] Khoi dong Java Backend...
 echo.
 echo ===================================================
-echo   Dashboard  : http://localhost:3003/home.html
-echo   Research   : http://localhost:3003/research.html
-echo   API Test   : http://localhost:3003/api/users
+echo   Frontend (Next.js): http://localhost:3004
+echo   Backend (Java API): http://localhost:3003/api/users
 echo ===================================================
 echo.
-echo   Nhan Ctrl+C de dung server.
+echo   Nhan Ctrl+C tai cua so nay de dung Java Backend.
+echo   Dong cua so Frontend rieng de dung Next.js.
 echo.
 
 "%JAVA_CMD%" -Dfile.encoding=UTF-8 -cp backend-java\bin;backend-java\lib\json-20240303.jar Main

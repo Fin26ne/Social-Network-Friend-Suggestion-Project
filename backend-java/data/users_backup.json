@@ -1,0 +1,86 @@
+[
+    {
+        "name": "Nguyễn Văn An",
+        "bio": "Yêu lập trình Java và cấu trúc dữ liệu",
+        "id": "u1",
+        "username": "an.nguyen",
+        "joinedDate": "2026-01-01"
+    },
+    {
+        "name": "Đặng Lan Khánh",
+        "bio": "Người viết nội dung UX & đọc sách",
+        "id": "u10",
+        "username": "khanh.dang",
+        "joinedDate": "2026-02-01"
+    },
+    {
+        "name": "Trịnh Văn Lâm",
+        "bio": "Lập trình viên đam mê khám phá thiên nhiên",
+        "id": "u11",
+        "username": "lam.trinh",
+        "joinedDate": "2026-02-05"
+    },
+    {
+        "name": "Mai Thu Minh",
+        "bio": "Nhà phân tích dữ liệu & ẩm thực",
+        "id": "u12",
+        "username": "minh.mai",
+        "joinedDate": "2026-02-10"
+    },
+    {
+        "name": "Trần Thị Bình",
+        "bio": "Đam mê cà phê và thuật toán đồ thị",
+        "id": "u2",
+        "username": "binh.tran",
+        "joinedDate": "2026-01-05"
+    },
+    {
+        "name": "Lê Hoàng Cường",
+        "bio": "Sinh viên CNTT tại Đại học FPT",
+        "id": "u3",
+        "username": "cuong.le",
+        "joinedDate": "2026-01-10"
+    },
+    {
+        "name": "Phạm Hồng Dung",
+        "bio": "Nhà thiết kế giao diện & CSS master",
+        "id": "u4",
+        "username": "dung.pham",
+        "joinedDate": "2026-01-12"
+    },
+    {
+        "name": "Hoàng Văn Em",
+        "bio": "Chuyên gia an ninh mạng & game thủ",
+        "id": "u5",
+        "username": "em.hoang",
+        "joinedDate": "2026-01-15"
+    },
+    {
+        "name": "Ngô Quốc Phong",
+        "bio": "Kỹ sư phần mềm yêu thích công nghệ mới",
+        "id": "u6",
+        "username": "phong.ngo",
+        "joinedDate": "2026-01-20"
+    },
+    {
+        "name": "Vũ Thị Giang",
+        "bio": "Nghiên cứu sĩ AI và yêu thích thú cưng",
+        "id": "u7",
+        "username": "giang.vu",
+        "joinedDate": "2026-01-22"
+    },
+    {
+        "name": "Đỗ Minh Hương",
+        "bio": "Nhiếp ảnh gia nghiệp dư & đam mê du lịch",
+        "id": "u8",
+        "username": "huong.do",
+        "joinedDate": "2026-01-25"
+    },
+    {
+        "name": "Bùi Tiến Hải",
+        "bio": "Thầy giáo toán & kỳ thủ cờ vua",
+        "id": "u9",
+        "username": "hai.bui",
+        "joinedDate": "2026-01-28"
+    }
+]

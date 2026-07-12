@@ -272,6 +272,39 @@ public class Graph {
         return candidates;
     }
 
+    // Get all vertices within distance <= 2 (for Local Subgraph rendering)
+    public SinglyLinkedList<String> getLocalSubgraphVertices(String startUserId) {
+        SinglyLinkedList<String> result = new SinglyLinkedList<>();
+        if (!adjList.contains(startUserId)) return result;
+
+        BinarySearchTree<String, Boolean> visited = new BinarySearchTree<>();
+        Queue<String> queue = new Queue<>();
+        Queue<Integer> depthQueue = new Queue<>();
+
+        queue.enqueue(startUserId);
+        depthQueue.enqueue(0);
+        visited.put(startUserId, true);
+        result.add(startUserId);
+
+        while (!queue.isEmpty()) {
+            String curr = queue.dequeue();
+            int depth = depthQueue.dequeue();
+
+            if (depth < 2) {
+                SinglyLinkedList<String> neighbors = getNeighbors(curr);
+                for (String neighbor : neighbors) {
+                    if (visited.get(neighbor) == null) {
+                        visited.put(neighbor, true);
+                        result.add(neighbor);
+                        queue.enqueue(neighbor);
+                        depthQueue.enqueue(depth + 1);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     // DFS traversal limited to depth 2 (Level-2 candidates / friend-of-friend)
     public SinglyLinkedList<String> dfsLevel2(String startUserId) {
         SinglyLinkedList<String> candidates = new SinglyLinkedList<>();
