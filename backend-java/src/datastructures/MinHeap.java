@@ -78,9 +78,19 @@ public class MinHeap<T extends Comparable<T>> {
     }
 
     private void swap(int i, int j) {
+        System.out.println("   --> [Swap] Doi cho: " + heap[i] + " (vi tri " + i + ") <=> " + heap[j] + " (vi tri " + j + ")");
         T temp = heap[i];
         heap[i] = heap[j];
         heap[j] = temp;
+    }
+
+    public void printHeap() {
+        System.out.print("Current Heap Array: [");
+        for(int k = 0; k < size; k++) {
+            System.out.print(heap[k]);
+            if (k < size - 1) System.out.print(", ");
+        }
+        System.out.println("]");
     }
 
     private void resize() {
@@ -96,10 +106,12 @@ public class MinHeap<T extends Comparable<T>> {
         System.out.println("=== MIN HEAP INTERACTIVE (DOUBLE) ===");
         
         while (true) {
-            System.out.println("\n1. Insert number");
+            System.out.println("\n--- MENU ---");
+            System.out.println("1. Insert number");
             System.out.println("2. Peek Min");
             System.out.println("3. Extract Min");
-            System.out.println("4. Exit");
+            System.out.println("4. Print Heap Array");
+            System.out.println("5. Exit");
             System.out.print("Choice: ");
             String choice = scanner.nextLine().trim();
             
@@ -107,6 +119,7 @@ public class MinHeap<T extends Comparable<T>> {
                 System.out.print("Enter a number to insert: ");
                 try {
                     double val = Double.parseDouble(scanner.nextLine().trim());
+                    System.out.println("--- BAT DAU CHEN " + val + " ---");
                     minHeap.insert(val);
                     System.out.println("Inserted " + val + " into MinHeap. (Size: " + minHeap.size() + ")");
                 } catch (NumberFormatException e) {
@@ -117,10 +130,13 @@ public class MinHeap<T extends Comparable<T>> {
                 if (min == null) System.out.println("Heap is empty!");
                 else System.out.println("Current Min element: " + min);
             } else if (choice.equals("3")) {
+                System.out.println("--- BAT DAU RUT MIN ---");
                 Double min = minHeap.extractMin();
                 if (min == null) System.out.println("Heap is empty!");
                 else System.out.println("Extracted Min: " + min + " (Remaining size: " + minHeap.size() + ")");
             } else if (choice.equals("4")) {
+                minHeap.printHeap();
+            } else if (choice.equals("5")) {
                 System.out.println("Exiting MinHeap test.");
                 break;
             } else {
