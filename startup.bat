@@ -74,7 +74,7 @@ echo   Nhan Ctrl+C tai cua so nay de dung Java Backend.
 echo   Dong cua so Frontend rieng de dung Next.js.
 echo.
 
-"%JAVA_CMD%" -Dfile.encoding=UTF-8 -cp backend-java\bin;backend-java\lib\json-20240303.jar Main
+"%JAVA_CMD%" -Xmx5g -Dfile.encoding=UTF-8 -cp backend-java\bin;backend-java\lib\json-20240303.jar Main
 
 echo.
 echo Server da dung.
