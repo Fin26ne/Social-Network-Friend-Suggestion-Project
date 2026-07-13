@@ -142,15 +142,57 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     }
 
     public static void main(String[] args) {
-        System.out.println("=== BINARY SEARCH TREE TEST ===");
+        System.out.println("=== BINARY SEARCH TREE INTERACTIVE TEST ===");
         BinarySearchTree<String, String> bst = new BinarySearchTree<>();
-        bst.put("U003", "Nguyen");
-        bst.put("U001", "Tri");
-        bst.put("U002", "Thien");
-        System.out.println("Get U002: " + bst.get("U002"));
-        System.out.println("Contains U004? " + bst.contains("U004"));
-        System.out.println("Keys in order: " + bst.inOrderKeys());
-        bst.remove("U002");
-        System.out.println("Keys after removing U002: " + bst.inOrderKeys());
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
+        
+        while (true) {
+            System.out.println("\n--- MENU ---");
+            System.out.println("1. Put (Add/Update Node)");
+            System.out.println("2. Get (Find by Key)");
+            System.out.println("3. Remove (Delete Node)");
+            System.out.println("4. Check Contains");
+            System.out.println("5. Print Keys In-Order");
+            System.out.println("6. Print Values In-Order");
+            System.out.println("7. Get Tree Size");
+            System.out.println("8. Exit");
+            System.out.print("Choice: ");
+            
+            String choice = scanner.nextLine().trim();
+            
+            if (choice.equals("1")) {
+                System.out.print("Enter Key (e.g., U001): ");
+                String key = scanner.nextLine();
+                System.out.print("Enter Value (e.g., Alice): ");
+                String val = scanner.nextLine();
+                bst.put(key, val);
+                System.out.println("Added/Updated Node [" + key + " = " + val + "]");
+            } else if (choice.equals("2")) {
+                System.out.print("Enter Key to Get: ");
+                String key = scanner.nextLine();
+                System.out.println("Result: " + bst.get(key));
+            } else if (choice.equals("3")) {
+                System.out.print("Enter Key to Remove: ");
+                String key = scanner.nextLine();
+                bst.remove(key);
+                System.out.println("Attempted to remove key: " + key);
+            } else if (choice.equals("4")) {
+                System.out.print("Enter Key to Check: ");
+                String key = scanner.nextLine();
+                System.out.println("Contains '" + key + "'? " + bst.contains(key));
+            } else if (choice.equals("5")) {
+                System.out.println("Keys In-Order (Sorted): " + bst.inOrderKeys());
+            } else if (choice.equals("6")) {
+                System.out.println("Values In-Order: " + bst.inOrderValues());
+            } else if (choice.equals("7")) {
+                System.out.println("Tree Size: " + bst.size());
+            } else if (choice.equals("8")) {
+                System.out.println("Exiting test.");
+                break;
+            } else {
+                System.out.println("Invalid choice!");
+            }
+        }
+        scanner.close();
     }
 }

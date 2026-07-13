@@ -37,7 +37,8 @@ public class SinglyLinkedList<T> implements Iterable<T> {
     }
 
     public boolean remove(T data) {
-        if (head == null) return false;
+        if (head == null)
+            return false;
 
         if (head.data.equals(data)) {
             head = head.next;
@@ -142,14 +143,53 @@ public class SinglyLinkedList<T> implements Iterable<T> {
     }
 
     public static void main(String[] args) {
-        System.out.println("=== SINGLY LINKED LIST TEST ===");
+        System.out.println("=== SINGLY LINKED LIST INTERACTIVE TEST ===");
         SinglyLinkedList<String> list = new SinglyLinkedList<>();
-        list.add("Anh Yeu");
-        list.add("Em Yeu");
-        list.add("CSD201");
-        System.out.println("Danh sach goc: " + list);
-        System.out.println("Chua 'Em Yeu'? " + list.contains("Em Yeu"));
-        list.remove("Em Yeu");
-        System.out.println("Sau khi xoa 'Em Yeu': " + list);
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n--- MENU ---");
+            System.out.println("1. Add Element");
+            System.out.println("2. Remove Element");
+            System.out.println("3. Check if Contains");
+            System.out.println("4. Print List");
+            System.out.println("5. Clear List");
+            System.out.println("6. Exit");
+            System.out.print("Choice: ");
+
+            String choice = scanner.nextLine().trim();
+
+            if (choice.equals("1")) {
+                System.out.print("Enter value to add: ");
+                String val = scanner.nextLine();
+                list.add(val);
+                System.out.println("Added: " + val);
+            } else if (choice.equals("2")) {
+                System.out.print("Enter value to remove: ");
+                String val = scanner.nextLine();
+                boolean removed = list.remove(val);
+                if (removed) {
+                    System.out.println("Successfully removed: " + val);
+                } else {
+                    System.out.println("Not found: " + val);
+                }
+            } else if (choice.equals("3")) {
+                System.out.print("Enter value to check: ");
+                String val = scanner.nextLine();
+                System.out.println("Contains '" + val + "'? " + list.contains(val));
+            } else if (choice.equals("4")) {
+                System.out.println("Current List: " + list);
+                System.out.println("Size: " + list.size());
+            } else if (choice.equals("5")) {
+                list.clear();
+                System.out.println("List cleared.");
+            } else if (choice.equals("6")) {
+                System.out.println("Exiting test.");
+                break;
+            } else {
+                System.out.println("Invalid choice!");
+            }
+        }
+        scanner.close();
     }
 }

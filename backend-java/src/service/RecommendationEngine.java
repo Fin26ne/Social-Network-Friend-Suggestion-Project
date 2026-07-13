@@ -160,4 +160,48 @@ public class RecommendationEngine {
 
         return result;
     }
+
+    // MAIN METHOD FOR INDEPENDENT TESTING
+    public static void main(String[] args) {
+        System.out.println("=== RECOMMENDATION ENGINE TEST ===");
+        Graph graph = new Graph();
+        BinarySearchTree<String, User> userBst = new BinarySearchTree<>();
+
+        // Add users
+        User u1 = new User("u1", "Alice", "alice", "", "2023-01-01");
+        User u2 = new User("u2", "Bob", "bob", "", "2023-01-01");
+        User u3 = new User("u3", "Charlie", "charlie", "", "2023-01-01");
+        User u4 = new User("u4", "Dave", "dave", "", "2023-01-01");
+        User u5 = new User("u5", "Eve", "eve", "", "2023-01-01");
+
+        userBst.put("u1", u1);
+        userBst.put("u2", u2);
+        userBst.put("u3", u3);
+        userBst.put("u4", u4);
+        userBst.put("u5", u5);
+
+        // Add friendships: Alice is friends with Bob and Charlie
+        graph.addEdge("u1", "u2");
+        graph.addEdge("u1", "u3");
+
+        // Dave is friends with Bob and Charlie (Mutuals = 2)
+        graph.addEdge("u4", "u2");
+        graph.addEdge("u4", "u3");
+
+        // Eve is friends with Charlie only (Mutual = 1)
+        graph.addEdge("u5", "u3");
+
+        RecommendationEngine engine = new RecommendationEngine();
+
+        System.out.println("Testing Jaccard Similarity between Alice (u1) and Dave (u4)...");
+        double jaccard = engine.getJaccardSimilarity(graph, "u1", "u4");
+        System.out.println("Jaccard = " + jaccard); // expected 1.0 because both have exactly {u2, u3}
+
+        System.out.println("\nTesting Recommendations for Alice (u1) using MinHeap:");
+        SinglyLinkedList<Recommendation> recs = engine.getRecommendationsMinHeap(graph, userBst, "u1", 2);
+        for (Recommendation r : recs) {
+            System.out.println("- " + r.getUser().getName() + " | Mutuals: " + r.getMutualFriends() + " | Jaccard: " + r.getJaccardSimilarity());
+        }
+        System.out.println("TEST COMPLETED.");
+    }
 }

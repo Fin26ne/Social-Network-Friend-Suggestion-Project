@@ -91,15 +91,42 @@ public class MaxHeap<T extends Comparable<T>> {
     }
 
     public static void main(String[] args) {
-        System.out.println("=== MAX HEAP TEST ===");
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
         MaxHeap<Double> maxHeap = new MaxHeap<>();
-        maxHeap.insert(0.45);
-        maxHeap.insert(0.95);
-        maxHeap.insert(0.12);
-        maxHeap.insert(0.72);
-        System.out.println("Max element: " + maxHeap.peekMax());
-        System.out.println("Extract Max: " + maxHeap.extractMax());
-        System.out.println("Extract Max: " + maxHeap.extractMax());
-        System.out.println("Extract Max: " + maxHeap.extractMax());
+        System.out.println("=== MAX HEAP INTERACTIVE (DOUBLE) ===");
+        
+        while (true) {
+            System.out.println("\n1. Insert number");
+            System.out.println("2. Peek Max");
+            System.out.println("3. Extract Max");
+            System.out.println("4. Exit");
+            System.out.print("Choice: ");
+            String choice = scanner.nextLine().trim();
+            
+            if (choice.equals("1")) {
+                System.out.print("Enter a number to insert: ");
+                try {
+                    double val = Double.parseDouble(scanner.nextLine().trim());
+                    maxHeap.insert(val);
+                    System.out.println("Inserted " + val + " into MaxHeap. (Size: " + maxHeap.size() + ")");
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid number!");
+                }
+            } else if (choice.equals("2")) {
+                Double max = maxHeap.peekMax();
+                if (max == null) System.out.println("Heap is empty!");
+                else System.out.println("Current Max element: " + max);
+            } else if (choice.equals("3")) {
+                Double max = maxHeap.extractMax();
+                if (max == null) System.out.println("Heap is empty!");
+                else System.out.println("Extracted Max: " + max + " (Remaining size: " + maxHeap.size() + ")");
+            } else if (choice.equals("4")) {
+                System.out.println("Exiting MaxHeap test.");
+                break;
+            } else {
+                System.out.println("Invalid choice!");
+            }
+        }
+        scanner.close();
     }
 }

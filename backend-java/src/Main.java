@@ -22,7 +22,20 @@ public class Main {
         System.out.println("Initializing Social Network Graph...");
         GraphService graphService = new GraphService(dataDirectoryPath);
 
-        // No-op startup benchmark generation (results are queried dynamically via API or runner)
+        // Run BenchmarkRunner to generate benchmark_results.json if it doesn't exist
+        java.io.File benchmarkFile = new java.io.File("backend-java/data/benchmark_results.json");
+        if (!benchmarkFile.exists()) {
+            System.out.println("Generating benchmark results on startup...");
+            try {
+                int[] ns = {1000, 5000, 10000};
+                org.json.JSONArray results = services.BenchmarkRunner.runRQ2(ns, 0.001, "theory");
+                java.io.FileWriter fileWriter = new java.io.FileWriter(benchmarkFile);
+                fileWriter.write(results.toString(4));
+                fileWriter.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         boolean consoleOnly = false;
         for (String arg : args) {
