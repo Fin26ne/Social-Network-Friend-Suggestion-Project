@@ -68,13 +68,29 @@ public class GraphService {
     }
 
     public synchronized User addUser(String name, String username, String bio) {
+        return addUser(name, username, bio, 20);
+    }
+
+    public synchronized User addUser(String name, String username, String bio, int age) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Display Name cannot be empty.");
+        }
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be empty.");
+        }
+        if (username.contains(" ")) {
+            throw new IllegalArgumentException("Username cannot contain spaces.");
+        }
+        if (age < 1 || age > 120) {
+            throw new IllegalArgumentException("Age must be between 1 and 120.");
+        }
         if (usernameToIdBst.contains(username.toLowerCase())) {
             throw new IllegalArgumentException("Username already exists: @" + username);
         }
 
         String newId = "u" + (nextUserIdNum++);
         String dateStr = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        User newUser = new User(newId, name, username, bio, dateStr);
+        User newUser = new User(newId, name, username, bio, dateStr, age);
 
         userBst.put(newId, newUser);
         usernameToIdBst.put(username.toLowerCase(), newId);

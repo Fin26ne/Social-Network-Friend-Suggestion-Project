@@ -81,9 +81,10 @@ public class UserHandler implements HttpHandler {
                 String name = json.has("displayName") ? json.getString("displayName") : json.optString("name", "Unknown");
                 String username = json.has("username") ? json.getString("username") : name.toLowerCase().replaceAll("\\s+", "");
                 String bio = json.optString("bio", "");
+                int age = json.optInt("age", 20);
 
                 try {
-                    User created = graphService.addUser(name, username, bio);
+                    User created = graphService.addUser(name, username, bio, age);
                     JSONObject response = new JSONObject();
                     response.put("success", true);
                     response.put("data", new JSONObject().put("message", "User created successfully").put("user", created.toJSONObject()));

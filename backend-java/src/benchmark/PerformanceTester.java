@@ -118,7 +118,119 @@ public class PerformanceTester {
         }
     }
 
+    public static void runCustomBenchmarks(int[] sizes, double edgeDensity, int k, int runs) {
+        RecommendationEngine engine = new RecommendationEngine();
+        System.out.println("\n--- RUNNING CUSTOM BENCHMARKS ---");
+        System.out.println("Graph Size (V) | Edges (E) | Max-Heap Time (ms) | Min-Heap Time (ms) | Speedup Ratio");
+        System.out.println("---------------------------------------------------------------------------------");
+        
+        for (int size : sizes) {
+            Graph tempGraph = new Graph();
+            BinarySearchTree<String, User> tempUsers = new BinarySearchTree<>();
+
+            for (int i = 0; i < size; i++) {
+                String id = "temp_" + i;
+                User u = new User(id, "User " + i, "user_" + i, "", "");
+                tempUsers.put(id, u);
+                tempGraph.addVertex(id);
+            }
+
+            int numEdges = (int) (size * size * edgeDensity);
+            for (int e = 0; e < numEdges; e++) {
+                int u1 = (int) (Math.random() * size);
+                int u2 = (int) (Math.random() * size);
+                if (u1 != u2) {
+                    tempGraph.addEdge("temp_" + u1, "temp_" + u2);
+                }
+            }
+
+            // Warm up JVM
+            String targetId = "temp_0";
+            if (tempGraph.hasVertex(targetId)) {
+                for (int w = 0; w < 5; w++) {
+                    engine.getRecommendationsMaxHeap(tempGraph, tempUsers, targetId, k);
+                    engine.getRecommendationsMinHeap(tempGraph, tempUsers, targetId, k);
+                }
+            }
+
+            // Measure Max-Heap
+            long maxHeapTotalNs = 0;
+            for (int r = 0; r < runs; r++) {
+                long start = System.nanoTime();
+                engine.getRecommendationsMaxHeap(tempGraph, tempUsers, targetId, k);
+                maxHeapTotalNs += (System.nanoTime() - start);
+            }
+            double maxHeapTimeMs = (maxHeapTotalNs / (double) runs) / 1_000_000.0;
+
+            // Measure Min-Heap
+            long minHeapTotalNs = 0;
+            for (int r = 0; r < runs; r++) {
+                long start = System.nanoTime();
+                engine.getRecommendationsMinHeap(tempGraph, tempUsers, targetId, k);
+                minHeapTotalNs += (System.nanoTime() - start);
+            }
+            double minHeapTimeMs = (minHeapTotalNs / (double) runs) / 1_000_000.0;
+
+            double ratio = minHeapTimeMs == 0 ? 999.0 : (maxHeapTimeMs / minHeapTimeMs);
+            String ratioStr = ratio > 1 ? String.format("%.1fx Nhanh hon", ratio) : String.format("%.1fx Cham hon", 1 / ratio);
+
+            System.out.printf("%14d | %9d | %17.4f | %17.4f | %13s\n",
+                    size, tempGraph.getNumEdges(), maxHeapTimeMs, minHeapTimeMs, ratioStr);
+        }
+    }
+
     public static void main(String[] args) {
-        runBenchmarks("docs/performance_report.md");
+        java.util.Scanner scanner = new java.util.Scanner(System.in, "UTF-8");
+        System.out.println("==================================================");
+        System.out.println("   PERFORMANCE BENCHMARK TEST (MAX-HEAP VS MIN-HEAP) ");
+        System.out.println("==================================================");
+        System.out.println("1. Run default benchmark report (N = 10 to 1000, 3% density)");
+        System.out.println("2. Run custom benchmark with real numbers");
+        System.out.print("Choice (1-2): ");
+        
+        String choice = "";
+        if (scanner.hasNextLine()) {
+            choice = scanner.nextLine().trim();
+        }
+
+        if ("2".equals(choice)) {
+            System.out.print("Enter sizes N separated by commas (e.g. 100,500,1000): ");
+            String sizesInput = scanner.hasNextLine() ? scanner.nextLine().trim() : "";
+            if (sizesInput.isEmpty()) sizesInput = "100,500,1000";
+            String[] parts = sizesInput.split(",");
+            int[] customSizes = new int[parts.length];
+            for (int i = 0; i < parts.length; i++) {
+                customSizes[i] = Integer.parseInt(parts[i].trim());
+            }
+
+            System.out.print("Enter edge density (e.g. 0.03 for 3%): ");
+            double density = 0.03;
+            try {
+                if (scanner.hasNextLine()) {
+                    density = Double.parseDouble(scanner.nextLine().trim());
+                }
+            } catch (Exception e) {}
+
+            System.out.print("Enter query parameter K (e.g. 10): ");
+            int k = 10;
+            try {
+                if (scanner.hasNextLine()) {
+                    k = Integer.parseInt(scanner.nextLine().trim());
+                }
+            } catch (Exception e) {}
+
+            System.out.print("Enter number of runs to average (e.g. 10): ");
+            int runs = 10;
+            try {
+                if (scanner.hasNextLine()) {
+                    runs = Integer.parseInt(scanner.nextLine().trim());
+                }
+            } catch (Exception e) {}
+
+            runCustomBenchmarks(customSizes, density, k, runs);
+        } else {
+            runBenchmarks("docs/performance_report.md");
+        }
+        scanner.close();
     }
 }

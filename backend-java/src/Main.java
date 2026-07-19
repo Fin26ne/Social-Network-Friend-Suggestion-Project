@@ -15,15 +15,19 @@ public class Main {
         }
 
         String dataDirectoryPath = "backend-java/data";
+        java.io.File localDataDir = new java.io.File("data");
+        if (localDataDir.exists() && new java.io.File(localDataDir, "users.json").exists()) {
+            dataDirectoryPath = "data";
+        }
 
         System.out.println("=================================================");
         System.out.println("   SOCIAL NETWORK FRIEND SUGGESTION - NATIVE JAVA");
         System.out.println("=================================================");
-        System.out.println("Initializing Social Network Graph...");
+        System.out.println("Initializing Social Network Graph from: " + dataDirectoryPath);
         GraphService graphService = new GraphService(dataDirectoryPath);
 
         // Run BenchmarkRunner to generate benchmark_results.json if it doesn't exist
-        java.io.File benchmarkFile = new java.io.File("backend-java/data/benchmark_results.json");
+        java.io.File benchmarkFile = new java.io.File(dataDirectoryPath + "/benchmark_results.json");
         if (!benchmarkFile.exists()) {
             System.out.println("Generating benchmark results on startup...");
             try {

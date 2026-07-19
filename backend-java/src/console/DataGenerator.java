@@ -97,11 +97,13 @@ public class DataGenerator {
                 String username = lname.toLowerCase() + "." + fname.toLowerCase() + u;
                 String bio = BIOS[rand.nextInt(BIOS.length)];
                 
+                int age = 18 + rand.nextInt(43); // 18 to 60
                 usersJson.append("    {\n");
                 usersJson.append("        \"id\": \"u").append(u).append("\",\n");
                 usersJson.append("        \"name\": \"").append(name).append("\",\n");
                 usersJson.append("        \"bio\": \"").append(bio).append("\",\n");
-                usersJson.append("        \"username\": \"").append(username).append("\"\n");
+                usersJson.append("        \"username\": \"").append(username).append("\",\n");
+                usersJson.append("        \"age\": ").append(age).append("\n");
                 usersJson.append("    }");
                 if (count < userSet.size() - 1) {
                     usersJson.append(",");

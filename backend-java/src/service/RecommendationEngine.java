@@ -163,16 +163,16 @@ public class RecommendationEngine {
 
     // MAIN METHOD FOR INDEPENDENT TESTING
     public static void main(String[] args) {
-        System.out.println("=== RECOMMENDATION ENGINE TEST ===");
+        System.out.println("=== RECOMMENDATION ENGINE INTERACTIVE TEST ===");
         Graph graph = new Graph();
         BinarySearchTree<String, User> userBst = new BinarySearchTree<>();
 
         // Add users
-        User u1 = new User("u1", "Alice", "alice", "", "2023-01-01");
-        User u2 = new User("u2", "Bob", "bob", "", "2023-01-01");
-        User u3 = new User("u3", "Charlie", "charlie", "", "2023-01-01");
-        User u4 = new User("u4", "Dave", "dave", "", "2023-01-01");
-        User u5 = new User("u5", "Eve", "eve", "", "2023-01-01");
+        User u1 = new User("u1", "Alice", "alice", "Developer", "2023-01-01");
+        User u2 = new User("u2", "Bob", "bob", "Designer", "2023-01-01");
+        User u3 = new User("u3", "Charlie", "charlie", "Manager", "2023-01-01");
+        User u4 = new User("u4", "Dave", "dave", "QA", "2023-01-01");
+        User u5 = new User("u5", "Eve", "eve", "Data Scientist", "2023-01-01");
 
         userBst.put("u1", u1);
         userBst.put("u2", u2);
@@ -180,28 +180,102 @@ public class RecommendationEngine {
         userBst.put("u4", u4);
         userBst.put("u5", u5);
 
-        // Add friendships: Alice is friends with Bob and Charlie
-        graph.addEdge("u1", "u2");
-        graph.addEdge("u1", "u3");
-
-        // Dave is friends with Bob and Charlie (Mutuals = 2)
-        graph.addEdge("u4", "u2");
-        graph.addEdge("u4", "u3");
-
-        // Eve is friends with Charlie only (Mutual = 1)
-        graph.addEdge("u5", "u3");
+        // Add friendships
+        graph.addEdge("u1", "u2"); // Alice - Bob
+        graph.addEdge("u1", "u3"); // Alice - Charlie
+        graph.addEdge("u4", "u2"); // Dave - Bob
+        graph.addEdge("u4", "u3"); // Dave - Charlie
+        graph.addEdge("u5", "u3"); // Eve - Charlie
 
         RecommendationEngine engine = new RecommendationEngine();
-
-        System.out.println("Testing Jaccard Similarity between Alice (u1) and Dave (u4)...");
-        double jaccard = engine.getJaccardSimilarity(graph, "u1", "u4");
-        System.out.println("Jaccard = " + jaccard); // expected 1.0 because both have exactly {u2, u3}
-
-        System.out.println("\nTesting Recommendations for Alice (u1) using MinHeap:");
-        SinglyLinkedList<Recommendation> recs = engine.getRecommendationsMinHeap(graph, userBst, "u1", 2);
-        for (Recommendation r : recs) {
-            System.out.println("- " + r.getUser().getName() + " | Mutuals: " + r.getMutualFriends() + " | Jaccard: " + r.getJaccardSimilarity());
+        
+        System.out.println("\nSample Graph loaded:");
+        for (String uId : userBst.inOrderKeys()) {
+            User u = userBst.get(uId);
+            System.out.println("- [" + uId + "] " + u.getName() + " | Friends: " + graph.getNeighbors(uId));
         }
-        System.out.println("TEST COMPLETED.");
+
+        java.util.Scanner scanner = new java.util.Scanner(System.in, "UTF-8");
+        while (true) {
+            System.out.println("\n--- MENU ---");
+            System.out.println("1. Get Friend Recommendations for a User");
+            System.out.println("2. Calculate Jaccard Similarity between two Users");
+            System.out.println("3. Exit");
+            System.out.print("Choice: ");
+
+            String choice;
+            if (scanner.hasNextLine()) {
+                choice = scanner.nextLine().trim();
+            } else {
+                break;
+            }
+
+            if (choice.equals("1")) {
+                System.out.print("Enter User ID (e.g. u1): ");
+                String userId = scanner.nextLine().trim();
+                if (!graph.hasVertex(userId)) {
+                    System.out.println("User not found!");
+                    continue;
+                }
+
+                System.out.print("Enter number of suggestions (K): ");
+                int k = 2;
+                try {
+                    k = Integer.parseInt(scanner.nextLine().trim());
+                } catch (Exception e) {}
+
+                System.out.println("Choose Heap Strategy:");
+                System.out.println("  1. Min-Heap (K-bounded - O(N log K))");
+                System.out.println("  2. Max-Heap (Standard - O(N log N))");
+                System.out.print("Choice (1-2): ");
+                String strategy = scanner.nextLine().trim();
+
+                SinglyLinkedList<Recommendation> recs;
+                long start = System.nanoTime();
+                if ("2".equals(strategy)) {
+                    recs = engine.getRecommendationsMaxHeap(graph, userBst, userId, k);
+                    System.out.println("Running Max-Heap Strategy...");
+                } else {
+                    recs = engine.getRecommendationsMinHeap(graph, userBst, userId, k);
+                    System.out.println("Running Min-Heap Strategy...");
+                }
+                long duration = System.nanoTime() - start;
+
+                System.out.println("Result recommendations for " + userBst.get(userId).getName() + ":");
+                if (recs.isEmpty()) {
+                    System.out.println("  (No recommendations found)");
+                } else {
+                    int rank = 1;
+                    for (Recommendation r : recs) {
+                        System.out.printf("  Rank %d: %s | Mutual Friends: %d | Jaccard Score: %.2f\n", 
+                                rank++, r.getUser().getName(), r.getMutualFriends(), r.getJaccardSimilarity());
+                    }
+                }
+                System.out.printf("Query executed in %.4f ms\n", duration / 1_000_000.0);
+
+            } else if (choice.equals("2")) {
+                System.out.print("Enter first User ID: ");
+                String id1 = scanner.nextLine().trim();
+                System.out.print("Enter second User ID: ");
+                String id2 = scanner.nextLine().trim();
+
+                if (!graph.hasVertex(id1) || !graph.hasVertex(id2)) {
+                    System.out.println("One or both users not found!");
+                    continue;
+                }
+
+                double jaccard = engine.getJaccardSimilarity(graph, id1, id2);
+                int mutuals = engine.getMutualFriendsCount(graph, id1, id2);
+                System.out.printf("Mutual friends count: %d\n", mutuals);
+                System.out.printf("Jaccard Similarity Score: %.4f\n", jaccard);
+
+            } else if (choice.equals("3")) {
+                System.out.println("Exiting test.");
+                break;
+            } else {
+                System.out.println("Invalid choice!");
+            }
+        }
+        scanner.close();
     }
 }

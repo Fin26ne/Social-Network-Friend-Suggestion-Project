@@ -70,14 +70,54 @@ public class Queue<T> {
     }
 
     public static void main(String[] args) {
-        System.out.println("=== QUEUE TEST ===");
+        System.out.println("=== QUEUE INTERACTIVE TEST ===");
         Queue<String> q = new Queue<>();
-        q.enqueue("A");
-        q.enqueue("B");
-        q.enqueue("C");
-        System.out.println("Queue size: " + q.size());
-        System.out.println("Front (peek): " + q.peek());
-        System.out.println("Dequeue: " + q.dequeue());
-        System.out.println("Front after dequeue: " + q.peek());
+        java.util.Scanner scanner = new java.util.Scanner(System.in, "UTF-8");
+
+        while (true) {
+            System.out.println("\n--- MENU ---");
+            System.out.println("1. Enqueue (Add element)");
+            System.out.println("2. Dequeue (Remove front)");
+            System.out.println("3. Peek (View front)");
+            System.out.println("4. View Queue Size");
+            System.out.println("5. Exit");
+            System.out.print("Choice: ");
+
+            String choice;
+            if (scanner.hasNextLine()) {
+                choice = scanner.nextLine().trim();
+            } else {
+                break;
+            }
+
+            if (choice.equals("1")) {
+                System.out.print("Enter value to enqueue: ");
+                String val = scanner.nextLine();
+                q.enqueue(val);
+                System.out.println("Enqueued: " + val);
+            } else if (choice.equals("2")) {
+                try {
+                    String val = q.dequeue();
+                    System.out.println("Dequeued: " + val);
+                } catch (Exception e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
+            } else if (choice.equals("3")) {
+                try {
+                    String val = q.peek();
+                    System.out.println("Front element (peek): " + val);
+                } catch (Exception e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
+            } else if (choice.equals("4")) {
+                System.out.println("Current Queue Size: " + q.size());
+            } else if (choice.equals("5")) {
+                System.out.println("Exiting test.");
+                break;
+            } else {
+                System.out.println("Invalid choice!");
+            }
+        }
+        scanner.close();
     }
 }

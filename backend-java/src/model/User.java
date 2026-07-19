@@ -8,6 +8,7 @@ public class User {
     private String username;
     private String bio;
     private String joinedDate;
+    private int age = 20; // Default age
 
     public User(String id, String name, String username, String bio, String joinedDate) {
         this.id = id;
@@ -15,6 +16,12 @@ public class User {
         this.username = username;
         this.bio = bio;
         this.joinedDate = joinedDate;
+        this.age = 18 + (int)(Math.random() * 43); // Random age between 18 and 60
+    }
+
+    public User(String id, String name, String username, String bio, String joinedDate, int age) {
+        this(id, name, username, bio, joinedDate);
+        this.age = age;
     }
 
     public String getId() {
@@ -57,25 +64,38 @@ public class User {
         this.joinedDate = joinedDate;
     }
 
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
     public JSONObject toJSONObject() {
         JSONObject json = new JSONObject();
         json.put("id", id);
         json.put("name", name);
         json.put("username", username);
         json.put("displayName", name);
-        json.put("age", 20); // Default age for UI compatibility
+        json.put("age", age); // Real or random age
         json.put("bio", bio);
         json.put("joinedDate", joinedDate);
         return json;
     }
 
     public static User fromJSONObject(JSONObject json) {
+        int loadedAge = json.optInt("age", 0);
+        if (loadedAge == 0) {
+            loadedAge = 18 + (int)(Math.random() * 43);
+        }
         return new User(
             json.getString("id"),
             json.getString("name"),
             json.getString("username"),
             json.optString("bio", ""),
-            json.optString("joinedDate", "")
+            json.optString("joinedDate", ""),
+            loadedAge
         );
     }
 

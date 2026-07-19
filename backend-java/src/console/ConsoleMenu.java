@@ -103,9 +103,34 @@ public class ConsoleMenu {
             System.out.println("No users in the system.");
             return;
         }
-        System.out.println("Users list (" + users.size() + " total):");
+        int totalUsers = users.size();
+        System.out.println("Users list (" + totalUsers + " total):");
+        
+        int limit = 100;
+        int count = 0;
         for (User user : users) {
-            System.out.printf("- [%s] %s (@%s) - %s\n", user.getId(), removeAccent(user.getName()), user.getUsername(), removeAccent(user.getBio()));
+            if (count < limit) {
+                System.out.printf("- [%s] %s (@%s) - %s (Age: %d)\n", user.getId(), removeAccent(user.getName()), user.getUsername(), removeAccent(user.getBio()), user.getAge());
+                count++;
+            } else {
+                break;
+            }
+        }
+        
+        if (totalUsers > limit) {
+            int remaining = totalUsers - limit;
+            System.out.printf("... and %d more users are loaded in memory but not displayed to prevent console scrollback limits.\n", remaining);
+            System.out.print("Do you want to print all remaining " + remaining + " users? (y/n): ");
+            String ans = scanner.nextLine().trim();
+            if ("y".equalsIgnoreCase(ans) || "yes".equalsIgnoreCase(ans)) {
+                count = 0;
+                for (User user : users) {
+                    if (count >= limit) {
+                        System.out.printf("- [%s] %s (@%s) - %s (Age: %d)\n", user.getId(), removeAccent(user.getName()), user.getUsername(), removeAccent(user.getBio()), user.getAge());
+                    }
+                    count++;
+                }
+            }
         }
     }
 
@@ -117,14 +142,25 @@ public class ConsoleMenu {
             String username = scanner.nextLine().trim();
             System.out.print("Enter Bio: ");
             String bio = scanner.nextLine().trim();
+            
+            System.out.print("Enter Age: ");
+            int age = 20;
+            try {
+                String ageStr = scanner.nextLine().trim();
+                if (!ageStr.isEmpty()) {
+                    age = Integer.parseInt(ageStr);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid age format. Defaulting to 20.");
+            }
 
             if (name.isEmpty() || username.isEmpty()) {
                 System.out.println("Error: Name and Username cannot be empty.");
                 return;
             }
 
-            User created = graphService.addUser(name, username, bio);
-            System.out.println("User added successfully: " + removeAccent(created.getName()) + " (@" + created.getUsername() + ")");
+            User created = graphService.addUser(name, username, bio, age);
+            System.out.println("User added successfully: " + removeAccent(created.getName()) + " (@" + created.getUsername() + ") - Age: " + created.getAge());
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         } catch (Exception e) {
